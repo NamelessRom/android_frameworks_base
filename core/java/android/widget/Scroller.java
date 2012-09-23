@@ -109,6 +109,8 @@ public class Scroller  {
     private float mDeceleration;
     private final float mPpi;
 
+    private final PowerManager mPm;
+
     // A context-specific coefficient adjusted to physical values.
     private float mPhysicalCoeff;
 
@@ -412,6 +414,8 @@ public class Scroller  {
         mDeltaX = dx;
         mDeltaY = dy;
         mDurationReciprocal = 1.0f / (float) mDuration;
+
+        mPm.cpuBoost(duration * 1000);
     }
 
     /**
