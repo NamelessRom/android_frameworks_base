@@ -3422,6 +3422,13 @@ public final class Settings {
         public static final String CLEAR_RECENTS_BUTTON_LOCATION = "clear_recents_button_location";
 
         /**
+         * whether to hide the Ram Usage Bar on recent switcher
+         *
+         *@hide
+         */
+        public static final String RAM_USAGE_BAR = "ram_usage_bar";
+
+        /**
          * Whether or not to show circle battery around the lockscreen ring
          * @hide
          */
