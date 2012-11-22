@@ -7356,6 +7356,13 @@ public final class Settings {
         public static boolean putFloat(ContentResolver cr, String name, float value) {
             return putString(cr, name, Float.toString(value));
         }
+
+       /**
+         * Whether to enable swiping your finger across the statusbar to change the brightness.
+         * Boolean value. Defaults to true.
+         */
+        public static final String STATUSBAR_ENABLE_BRIGHTNESS_SLIDER = "statusbar_enable_brightness_slider";
+
     }
 
     /**
