@@ -3081,6 +3081,15 @@ public final class Settings {
         public static final String KEY_APP_SWITCH_LONG_PRESS_ACTION = "key_app_switch_long_press_action";
 
         /**
+         * MediaScanner behavior on boot.
+         * 0 = enabled
+         * 1 = ask (notification)
+         * 2 = disabled
+         * @hide
+         */
+         public static final String MEDIA_SCANNER_ON_BOOT = "media_scanner_on_boot";
+
+        /**
          * Whether to wake the screen with the home key, the value is boolean.
          * @hide
          */
