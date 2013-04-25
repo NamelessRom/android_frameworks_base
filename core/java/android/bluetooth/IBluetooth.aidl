@@ -63,6 +63,8 @@ interface IBluetooth
     int getRemoteType(in BluetoothDevice device);
     String getRemoteAlias(in BluetoothDevice device);
     boolean setRemoteAlias(in BluetoothDevice device, in String name);
+    boolean setRemoteTrust(in BluetoothDevice device, in boolean value);
+    boolean getRemoteTrust(in BluetoothDevice device);
     int getRemoteClass(in BluetoothDevice device);
     ParcelUuid[] getRemoteUuids(in BluetoothDevice device);
     boolean fetchRemoteUuids(in BluetoothDevice device);
@@ -82,4 +84,7 @@ interface IBluetooth
     ParcelFileDescriptor createSocketChannel(int type, in String serviceName, in ParcelUuid uuid, int port, int flag);
 
     boolean configHciSnoopLog(boolean enable);
+
+    int setSocketOpt(int type, int port, int optionName, in byte [] optionVal, int optionLen);
+    int getSocketOpt(int type, int port, int optionName, out byte [] optionVal);
 }

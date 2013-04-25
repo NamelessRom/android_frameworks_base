@@ -269,10 +269,11 @@ public final class BluetoothDevice implements Parcelable {
     public static final String EXTRA_PAIRING_VARIANT =
             "android.bluetooth.device.extra.PAIRING_VARIANT";
 
-    /**
-     * Used as an int extra field in {@link #ACTION_PAIRING_REQUEST}
-     * intents as the value of passkey.
-     */
+    /** @hide */
+    public static final String EXTRA_SECURE_PAIRING =
+            "codeaurora.bluetooth.device.extra.SECURE";
+
+    /** @hide */
     public static final String EXTRA_PAIRING_KEY = "android.bluetooth.device.extra.PAIRING_KEY";
 
     /**
@@ -878,16 +879,20 @@ public final class BluetoothDevice implements Parcelable {
     /**
      * Get trust state of a remote device.
      * <p>Requires {@link android.Manifest.permission#BLUETOOTH}.
+     * @return true/false
      * @hide
      */
     public boolean getTrustState() {
-        //TODO(BT)
-        /*
+        if (sService == null) {
+            Log.e(TAG, "BT not enabled. Cannot get Remote Device Alias");
+            return false;
+        }
+
         try {
-            return sService.getTrustState(this);
+            return sService.getRemoteTrust(this);
         } catch (RemoteException e) {
             Log.e(TAG, "", e);
-        }*/
+        }
         return false;
     }
 
@@ -895,16 +900,19 @@ public final class BluetoothDevice implements Parcelable {
      * Set trust state for a remote device.
      * <p>Requires {@link android.Manifest.permission#BLUETOOTH_ADMIN}.
      * @param value the trust state value (true or false)
+     * @return true/false
      * @hide
      */
-    public boolean setTrust(boolean value) {
-        //TODO(BT)
-        /*
+    public boolean setTrust(boolean trustValue) {
+        if (sService == null) {
+            Log.e(TAG, "BT not enabled. Cannot set Remote Device name");
+            return false;
+        }
         try {
-            return sService.setTrust(this, value);
+            return sService.setRemoteTrust(this, trustValue);
         } catch (RemoteException e) {
             Log.e(TAG, "", e);
-        }*/
+        }
         return false;
     }
 
