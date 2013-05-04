@@ -1761,8 +1761,7 @@
   <java-symbol type="dimen" name="subtitle_shadow_offset" />
   <java-symbol type="dimen" name="subtitle_outline_width" />
 
-  <!-- ################################# AOKP Symbols ############################### 
--->
+  <!-- ################################# AOKP Symbols ############################### -->
 
   <java-symbol type="bool" name="config_smsSamsungCdmaAlternateMessageIDEncoding" />
   <java-symbol type="bool" name="config_samsung_stk" />
@@ -1774,5 +1773,8 @@
 
   <!-- Package Manager -->
   <java-symbol type="array" name="config_disabledComponents" />
+
+  <!-- Panel auto brightness -->
+  <java-symbol type="integer" name="config_panelAutoBrightnessValue" />
 
 </resources>
