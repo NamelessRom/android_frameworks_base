@@ -1774,5 +1774,9 @@
 
   <!-- Package Manager -->
   <java-symbol type="array" name="config_disabledComponents" />
+  <java-symbol type="bool" name="config_wifiApFirmwareReload" />
+
+  <!-- Panel auto brightness -->
+  <java-symbol type="integer" name="config_panelAutoBrightnessValue" />
 
 </resources>
