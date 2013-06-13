@@ -256,6 +256,7 @@
   <java-symbol type="bool" name="config_duplicate_port_omadm_wappush" />
   <java-symbol type="bool" name="config_enable_emergency_call_while_sim_locked" />
   <java-symbol type="bool" name="config_enable_puk_unlock_screen" />
+  <java-symbol type="bool" name="config_hotswapCapable" />
   <java-symbol type="bool" name="config_mms_content_disposition_support" />
   <java-symbol type="bool" name="config_showMenuShortcutsWhenKeyboardPresent" />
   <java-symbol type="bool" name="config_sip_wifi_only" />
@@ -691,6 +692,7 @@
   <java-symbol type="string" name="mobile_provisioning_apn" />
   <java-symbol type="string" name="mobile_provisioning_url" />
   <java-symbol type="string" name="mobile_redirected_provisioning_url" />
+  <java-symbol type="string" name="progress_nomediapresent" />
   <java-symbol type="string" name="reboot_safemode_confirm" />
   <java-symbol type="string" name="reboot_safemode_title" />
   <java-symbol type="string" name="relationTypeAssistant" />
@@ -1564,6 +1566,7 @@
   <java-symbol type="string" name="config_geocoderProviderPackageName" />
   <java-symbol type="string" name="config_geofenceProviderPackageName" />
   <java-symbol type="string" name="config_networkLocationProviderPackageName" />
+  <java-symbol type="string" name="config_geofenceProvider" />
   <java-symbol type="string" name="config_wimaxManagerClassname" />
   <java-symbol type="string" name="config_wimaxNativeLibLocation" />
   <java-symbol type="string" name="config_wimaxServiceClassname" />

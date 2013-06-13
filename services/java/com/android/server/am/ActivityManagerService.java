@@ -1222,7 +1222,11 @@ public final class ActivityManagerService extends ActivityManagerNative
                     mHandler.sendMessageDelayed(nmsg, ActiveServices.SERVICE_TIMEOUT);
                     return;
                 }
-                mServices.serviceTimeout((ProcessRecord)msg.obj);
+                //synchronising to avoid proc.executingServices set
+                //getting updated while being iterated in serviceTimeout()
+                synchronized(ActivityManagerService.this){
+                    mServices.serviceTimeout((ProcessRecord)msg.obj);
+                }
             } break;
             case UPDATE_TIME_ZONE: {
                 synchronized (ActivityManagerService.this) {
@@ -4101,6 +4105,23 @@ public final class ActivityManagerService extends ActivityManagerNative
                     activity != null ? activity.shortComponentName : null,
                     annotation != null ? "ANR " + annotation : "ANR",
                     info.toString());
+
+            String tracesPath = SystemProperties.get("dalvik.vm.stack-trace-file", null);
+            if (tracesPath != null && tracesPath.length() != 0) {
+                File traceRenameFile = new File(tracesPath);
+                String newTracesPath;
+                int lpos = tracesPath.lastIndexOf (".");
+                if (-1 != lpos)
+                    newTracesPath = tracesPath.substring (0, lpos) + "_" + app.processName + tracesPath.substring (lpos);
+                else
+                    newTracesPath = tracesPath + "_" + app.processName;
+                traceRenameFile.renameTo(new File(newTracesPath));
+
+                Process.sendSignal(app.pid, 6);
+                SystemClock.sleep(1000);
+                Process.sendSignal(app.pid, 6);
+                SystemClock.sleep(1000);
+            }
 
             // Bring up the infamous App Not Responding dialog
             Message msg = Message.obtain();
@@ -8508,6 +8529,10 @@ public final class ActivityManagerService extends ActivityManagerNative
     public void setActivityController(IActivityController controller) {
         enforceCallingPermission(android.Manifest.permission.SET_ACTIVITY_WATCHER,
                 "setActivityController()");
+
+        int pid = controller == null ? 0 : Binder.getCallingPid();
+        Watchdog.getInstance().processStarted("ActivityController", pid);
+
         synchronized (this) {
             mController = controller;
             Watchdog.getInstance().setActivityController(controller);
