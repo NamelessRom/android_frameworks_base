@@ -77,14 +77,13 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <com.android.systemui.statusbar.policy.NetworkTraffic
-                android:id="@+id/networkTraffic"
+            <include layout="@layout/network_stats"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:singleLine="false"
-                android:gravity="right|center_vertical"/>
+                android:gravity="center"
+                />
 
-           <LinearLayout android:id="@+id/statusIcons"
+            <LinearLayout android:id="@+id/statusIcons"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
