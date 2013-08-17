@@ -34,7 +34,8 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
     private final float mIconAlphaWhenOpaque;
 
     private View mLeftSide, mStatusIcons, mSignalCluster, mClock, mCenterClock;
-    private View mBattery, mDockBattery, mNetworkTraffic;
+    private View mBattery, mDockBattery;
+    private View mStatsUp, mStatsUpArrow, mStatsDown, mStatsDownArrow;
     private Animator mCurrentAnimation;
 
     public PhoneStatusBarTransitions(PhoneStatusBarView view) {
@@ -55,9 +56,12 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
         }
         mBattery = mView.findViewById(R.id.battery);
         mDockBattery = mView.findViewById(R.id.dock_battery);
-        mNetworkTraffic = mView.findViewById(R.id.networkTraffic);
         mClock = mView.findViewById(R.id.clock);
         mCenterClock = mView.findViewById(R.id.center_clock);
+        mStatsUp = mView.findViewById(R.id.bytes_tx);
+        mStatsUpArrow = mView.findViewById(R.id.bytes_tx_arrow);
+        mStatsDown = mView.findViewById(R.id.bytes_rx);
+        mStatsDownArrow = mView.findViewById(R.id.bytes_rx_arrow);
         applyModeBackground(-1, getMode(), false /*animate*/);
         applyMode(getMode(), false /*animate*/);
     }
@@ -100,8 +104,11 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
                     animateTransitionTo(mLeftSide, newAlpha),
                     animateTransitionTo(mStatusIcons, newAlpha),
                     animateTransitionTo(mSignalCluster, newAlpha),
+                    animateTransitionTo(mStatsUp, newAlpha),
+                    animateTransitionTo(mStatsUpArrow, newAlpha),
+                    animateTransitionTo(mStatsDown, newAlpha),
+                    animateTransitionTo(mStatsDownArrow, newAlpha),
                     animateTransitionTo(mDockBattery, newAlphaBC),
-                    animateTransitionTo(mNetworkTraffic, newAlpha),
                     animateTransitionTo(mBattery, newAlphaBC),
                     animateTransitionTo(mClock, newAlphaBC),
                     animateTransitionTo(mCenterClock, newAlphaBC)
@@ -115,8 +122,11 @@ public final class PhoneStatusBarTransitions extends BarTransitions {
             mLeftSide.setAlpha(newAlpha);
             mStatusIcons.setAlpha(newAlpha);
             mSignalCluster.setAlpha(newAlpha);
+            mStatsUp.setAlpha(newAlpha);
+            mStatsDown.setAlpha(newAlpha);
+            mStatsUpArrow.setAlpha(newAlpha);
+            mStatsDownArrow.setAlpha(newAlpha);
             mDockBattery.setAlpha(newAlphaBC);
-            mNetworkTraffic.setAlpha(newAlpha);
             mBattery.setAlpha(newAlphaBC);
             mClock.setAlpha(newAlphaBC);
             mCenterClock.setAlpha(newAlphaBC);
