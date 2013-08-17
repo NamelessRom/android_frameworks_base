@@ -4112,16 +4112,6 @@ public final class Settings {
         public static final String POWER_MENU_EXPANDED_DESKTOP_ENABLED = "power_menu_expanded_desktop_enabled";
 
         /**
-         * Network traffic indicator, goes from least to greatest significant bitwise
-         * 0 = Display up-stream traffic if set
-         * 1 = Display down-stream traffic if set
-         * 2 = Show as Byte/s if set
-         * 16-31 = Refresh interval(ms)  min: 250  max: 32750  default: 1000
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_STATE = "network_traffic_state";
-
-        /**
          * Give SMS notifications a breathing effect
          * @hide
          */
@@ -4532,6 +4522,24 @@ public final class Settings {
          * @hide
          */
         public static final String ENABLE_NAVBAR_SPEN = "enable_navbar_spen";
+
+        /**
+         * Whether to show the network status in the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS = "status_bar_network_stats";
+
+        /**
+         * Frequency at which stats are updated, in milliseconds
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS_UPDATE_INTERVAL = "status_bar_network_stats_update_frequency";
+
+        /**
+         * Whether to hide the network status in the status bar with no activity
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS_HIDE = "status_bar_network_stats_hide";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
