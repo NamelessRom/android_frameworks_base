@@ -39,6 +39,7 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -65,6 +66,8 @@ import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
+import android.view.IWindowManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -647,7 +650,7 @@ public class Activity extends ContextThemeWrapper
         Window.Callback, KeyEvent.Callback,
         OnCreateContextMenuListener, ComponentCallbacks2 {
     private static final String TAG = "Activity";
-    private static final boolean DEBUG_LIFECYCLE = false;
+    private static final boolean DEBUG_LIFECYCLE = true;
 
     /** Standard activity result: operation canceled. */
     public static final int RESULT_CANCELED    = 0;
@@ -755,7 +758,7 @@ public class Activity extends ContextThemeWrapper
 
     private int mDefaultKeyMode = DEFAULT_KEYS_DISABLE;
     private SpannableStringBuilder mDefaultKeySsb = null;
-    
+
     protected static final int[] FOCUSED_STATE_SET = {com.android.internal.R.attr.state_focused};
 
     @SuppressWarnings("unused")
@@ -764,21 +767,24 @@ public class Activity extends ContextThemeWrapper
     private Thread mUiThread;
     final Handler mHandler = new Handler();
 
+    private Rect mOriginalBounds;
+    private boolean mIsSplitView;
+
     /** Return the intent that started this activity. */
     public Intent getIntent() {
         return mIntent;
     }
 
-    /** 
-     * Change the intent returned by {@link #getIntent}.  This holds a 
-     * reference to the given intent; it does not copy it.  Often used in 
-     * conjunction with {@link #onNewIntent}. 
-     *  
-     * @param newIntent The new Intent object to return from getIntent 
-     * 
+    /**
+     * Change the intent returned by {@link #getIntent}.  This holds a
+     * reference to the given intent; it does not copy it.  Often used in
+     * conjunction with {@link #onNewIntent}.
+     *
+     * @param newIntent The new Intent object to return from getIntent
+     *
      * @see #getIntent
      * @see #onNewIntent
-     */ 
+     */
     public void setIntent(Intent newIntent) {
         mIntent = newIntent;
     }
@@ -2455,20 +2461,28 @@ public class Activity extends ContextThemeWrapper
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             onUserInteraction();
         }
+        if (mIsSplitView && ev.getAction() == MotionEvent.ACTION_DOWN) {
+            IWindowManager wm = (IWindowManager) WindowManagerGlobal.getWindowManagerService();
+            try {
+                wm.notifyActivityTouched(mToken, false);
+            } catch (RemoteException e) {
+                Log.e(TAG, "Cannot notify activity touched", e);
+            }
+        }
         if (getWindow().superDispatchTouchEvent(ev)) {
             return true;
         }
         return onTouchEvent(ev);
     }
-    
+
     /**
      * Called to process trackball events.  You can override this to
      * intercept all trackball events before they are dispatched to the
      * window.  Be sure to call this implementation for trackball events
      * that should be handled normally.
-     * 
+     *
      * @param ev The trackball event.
-     * 
+     *
      * @return boolean Return true if this event was consumed.
      */
     public boolean dispatchTrackballEvent(MotionEvent ev) {
@@ -5176,7 +5190,7 @@ public class Activity extends ContextThemeWrapper
         attach(context, aThread, instr, token, 0, application, intent, info, title, parent, id,
             lastNonConfigurationInstances, config);
     }
-    
+
     final void attach(Context context, ActivityThread aThread,
             Instrumentation instr, IBinder token, int ident,
             Application application, Intent intent, ActivityInfo info,
@@ -5186,7 +5200,7 @@ public class Activity extends ContextThemeWrapper
         attachBaseContext(context);
 
         mFragments.attachActivity(this, mContainer, null);
-        
+
         mWindow = PolicyManager.makeNewWindow(this);
         mWindow.setCallback(this);
         mWindow.getLayoutInflater().setPrivateFactory(this);
@@ -5220,11 +5234,103 @@ public class Activity extends ContextThemeWrapper
         }
         mWindowManager = mWindow.getWindowManager();
         mCurrentConfig = config;
+
+        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_SPLIT_VIEW) != 0) {
+            final IWindowManager wm = (IWindowManager) WindowManagerGlobal.getWindowManagerService();
+            updateSplitViewMetrics(true);
+        }
     }
 
     /** @hide */
     public final IBinder getActivityToken() {
         return mParent != null ? mParent.getActivityToken() : mToken;
+    }
+
+    /** @hide */
+    public final void setSplitViewRect(int l, int t, int r, int b) {
+        final IWindowManager wm = (IWindowManager) WindowManagerGlobal.getWindowManagerService();
+        /*try {
+            wm.setSplitViewRect(l,t,r,b);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Could not update split view rect", e);
+        }*/
+        updateSplitViewMetrics(false);
+    }
+
+    /** @hide */
+    public final boolean isSplitView() {
+        return mIsSplitView;
+    }
+
+    /** @hide */
+    final void updateSplitViewMetrics(boolean shouldReset) {
+        if (mParent != null) {
+            // Also update the parent activities, don't let the windows hanging
+            mParent.updateSplitViewMetrics(shouldReset);
+        }
+
+        final IWindowManager wm = (IWindowManager) WindowManagerGlobal.getWindowManagerService();
+
+        try {
+            mIsSplitView = false;
+
+            if (shouldReset) {
+                wm.getSplitViewRect(getTaskId());
+            }
+
+            // Check for split view settings
+            if (wm.isTaskSplitView(getTaskId())) {
+                // This activity/task is tagged as being in split view
+                mIsSplitView = true;
+
+                wm.setTaskChildSplit(getTaskId(), mToken, true);
+
+                // Then, we apply it the position and size
+                mWindow.setGravity(Gravity.LEFT | Gravity.TOP);
+
+                WindowManager.LayoutParams params = mWindow.getAttributes();
+
+                // We save the original window size, in case we want to restore it later
+                if (mOriginalBounds == null) {
+                    mOriginalBounds = new Rect();
+                    mOriginalBounds.left = params.x;
+                    mOriginalBounds.top = params.y;
+                    mOriginalBounds.right = params.x + params.width;
+                    mOriginalBounds.bottom = params.y + params.height;
+                }
+
+                /*try {
+                    wm.setSplitViewRect(mOriginalBounds.left, mOriginalBounds.top, mOriginalBounds.right, mOriginalBounds.bottom);
+                } catch (RemoteException e) {
+                    Log.e(TAG, "Could not update split view rect", e);
+                }*/
+
+                Rect windowBounds = wm.getSplitViewRect(getTaskId());
+                mWindow.setLayout(windowBounds.right - windowBounds.left,
+                    windowBounds.bottom - windowBounds.top);
+
+                params.x = windowBounds.left;
+                params.y = windowBounds.top;
+                mWindow.setAttributes(params);
+
+                // Finally, we make the window non-modal to allow the second app to get input
+                mWindow.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+                mWindow.addFlags(WindowManager.LayoutParams.FLAG_SPLIT_TOUCH);
+            } else if (mOriginalBounds != null) {
+                // Restore normal window bounds
+                Log.d(TAG, "Restore original bounds from split (TaskId=" + getTaskId() + ")");
+                WindowManager.LayoutParams params = mWindow.getAttributes();
+                params.x = mOriginalBounds.left;
+                params.y = mOriginalBounds.top;
+
+                mWindow.setLayout(mOriginalBounds.right - mOriginalBounds.left,
+                    mOriginalBounds.bottom - mOriginalBounds.top);
+
+                wm.setTaskChildSplit(getTaskId(), mToken, false);
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "Could not perform split view actions on restart", e);
+        }
     }
 
     final void performCreate(Bundle icicle) {
@@ -5233,7 +5339,7 @@ public class Activity extends ContextThemeWrapper
                 com.android.internal.R.styleable.Window_windowNoDisplay, false);
         mFragments.dispatchActivityCreated();
     }
-    
+
     final void performStart() {
         mFragments.noteStateNotSaved();
         mCalled = false;
@@ -5258,9 +5364,10 @@ public class Activity extends ContextThemeWrapper
             }
         }
     }
-    
+
     final void performRestart() {
         mFragments.noteStateNotSaved();
+        updateSplitViewMetrics(false);
 
         if (mStopped) {
             mStopped = false;
