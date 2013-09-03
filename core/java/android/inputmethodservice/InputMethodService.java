@@ -1057,6 +1057,25 @@ public class InputMethodService extends AbstractInputMethodService {
     }
 
     /**
+     * Splitview stuff - FIXME: This needs a proper doc entry
+     * @hide
+     */
+    public boolean onEvaluateSplitView() {
+        if (mCandidatesFrame.getChildCount() > 0) {
+            Context candidateContext = mCandidatesFrame.getChildAt(0).getContext();
+            if (candidateContext instanceof Activity) {
+                return ((Activity) candidateContext).isSplitView();
+            } else {
+                Log.e("XPLOD", "NOT ACTIVITY");
+                return false;
+            }
+        } else {
+            Log.e("XPLOD", "NO CHILD");
+            return false;
+        }
+    }
+
+    /**
      * Controls the visibility of the extracted text area.  This only applies
      * when the input method is in fullscreen mode, and thus showing extracted
      * text.  When false, the extracted text will not be shown, allowing some
