@@ -417,7 +417,7 @@ public class ActivityManager {
         }
         return staticGetLargeMemoryClass();
     }
-    
+
     /**
      * Return the approximate per-application memory class of the current
      * device when an application is running with a large heap.  This is the
