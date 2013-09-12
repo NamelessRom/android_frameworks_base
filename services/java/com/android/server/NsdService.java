@@ -412,12 +412,17 @@ public class NsdService extends INsdManager.Stub {
                     return handled;
                 }
 
-                /* This goes in response as msg.arg2 */
+                /* This goes in response as msg.arg2. Don't use indexOfValue
+                   here, as that doesn't work properly for Integer objects */
                 int clientId = -1;
-                int keyId = clientInfo.mClientIds.indexOfValue(id);
-                if (keyId != -1) {
-                    clientId = clientInfo.mClientIds.keyAt(keyId);
-                } else {
+                for (int i = 0; i < clientInfo.mClientIds.size(); i++) {
+                    if (clientInfo.mClientIds.valueAt(i) == id) {
+                        clientId = clientInfo.mClientIds.keyAt(i);
+                        break;
+                    }
+                }
+
+                if (clientId == -1) {
                     // This can happen because of race conditions. For example,
                     // SERVICE_FOUND may race with STOP_SERVICE_DISCOVERY,
                     // and we may get in this situation.
