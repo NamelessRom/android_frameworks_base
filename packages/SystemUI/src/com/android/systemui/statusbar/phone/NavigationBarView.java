@@ -294,14 +294,6 @@ public class NavigationBarView extends LinearLayout {
         return mInEditMode;
     }
 
-    /* package */ void setListeners(OnClickListener recentsClickListener,
-            OnTouchListener recentsPreloadListener, OnTouchListener homeSearchActionListener) {
-        mRecentsClickListener = recentsClickListener;
-        mRecentsPreloadListener = recentsPreloadListener;
-        mHomeSearchActionListener = homeSearchActionListener;
-        updateButtonListeners();
-    }
-
     private void removeButtonListeners() {
         ViewGroup container = (ViewGroup) mCurrentView.findViewById(R.id.container);
         int viewCount = container.getChildCount();
