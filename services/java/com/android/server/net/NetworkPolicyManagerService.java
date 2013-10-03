@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2013, The Linux Foundation. All rights reserved.
+ * Not a Contribution.
  * Copyright (C) 2011 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +36,6 @@ import static android.net.ConnectivityManager.TYPE_WIFI;
 import static android.net.ConnectivityManager.TYPE_WIMAX;
 import static android.net.ConnectivityManager.isNetworkTypeMobile;
 import static android.net.NetworkPolicy.CYCLE_NONE;
-import static android.net.NetworkPolicy.CYCLE_MONTHLY;
 import static android.net.NetworkPolicy.LIMIT_DISABLED;
 import static android.net.NetworkPolicy.SNOOZE_NEVER;
 import static android.net.NetworkPolicy.WARNING_DISABLED;
@@ -60,7 +61,6 @@ import static android.net.wifi.WifiManager.EXTRA_CHANGE_REASON;
 import static android.net.wifi.WifiManager.EXTRA_NETWORK_INFO;
 import static android.net.wifi.WifiManager.EXTRA_WIFI_CONFIGURATION;
 import static android.net.wifi.WifiManager.EXTRA_WIFI_INFO;
-import static android.telephony.TelephonyManager.SIM_STATE_READY;
 import static android.text.format.DateUtils.DAY_IN_MILLIS;
 import static com.android.internal.util.ArrayUtils.appendInt;
 import static com.android.internal.util.Preconditions.checkNotNull;
@@ -117,6 +117,7 @@ import android.os.RemoteException;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
 import android.text.format.Time;
@@ -134,7 +135,6 @@ import com.android.internal.R;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.util.FastXmlSerializer;
 import com.android.internal.util.IndentingPrintWriter;
-import com.android.internal.util.Objects;
 import com.google.android.collect.Lists;
 import com.google.android.collect.Maps;
 import com.google.android.collect.Sets;
@@ -156,6 +156,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import libcore.io.IoUtils;
 
@@ -202,7 +203,6 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
     private static final String ATTR_SUBSCRIBER_ID = "subscriberId";
     private static final String ATTR_NETWORK_ID = "networkId";
     private static final String ATTR_CYCLE_DAY = "cycleDay";
-    private static final String ATTR_CYCLE_LENGTH = "cycleLength";
     private static final String ATTR_CYCLE_TIMEZONE = "cycleTimezone";
     private static final String ATTR_WARNING_BYTES = "warningBytes";
     private static final String ATTR_LIMIT_BYTES = "limitBytes";
@@ -585,9 +585,9 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
                 if (policy == null && meteredHint) {
                     // policy doesn't exist, and AP is hinting that it's
                     // metered: create an inferred policy.
-                    policy = new NetworkPolicy(template, CYCLE_NONE, CYCLE_MONTHLY,
-                            Time.TIMEZONE_UTC, WARNING_DISABLED, LIMIT_DISABLED, SNOOZE_NEVER,
-                            SNOOZE_NEVER, meteredHint, true);
+                    policy = new NetworkPolicy(template, CYCLE_NONE, Time.TIMEZONE_UTC,
+                            WARNING_DISABLED, LIMIT_DISABLED, SNOOZE_NEVER, SNOOZE_NEVER,
+                            meteredHint, true);
                     addNetworkPolicyLocked(policy);
 
                 } else if (policy != null && policy.inferred) {
@@ -681,16 +681,16 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
      * data connection status.
      */
     private boolean isTemplateRelevant(NetworkTemplate template) {
-        final TelephonyManager tele = TelephonyManager.from(mContext);
-
         switch (template.getMatchRule()) {
             case MATCH_MOBILE_3G_LOWER:
             case MATCH_MOBILE_4G:
             case MATCH_MOBILE_ALL:
                 // mobile templates are relevant when SIM is ready and
                 // subscriberId matches.
-                if (tele.getSimState() == SIM_STATE_READY) {
-                    return Objects.equal(tele.getSubscriberId(), template.getSubscriberId());
+                if (NetworkIdentity.isDdsReady()) {
+                    // multi sim data traffic statistics
+                    return Objects.equals(NetworkIdentity.getDdsSubscriberId(),
+                            template.getSubscriberId());
                 } else {
                     return false;
                 }
@@ -939,16 +939,15 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
      * for the given {@link NetworkTemplate}.
      */
     private void setNetworkTemplateEnabled(NetworkTemplate template, boolean enabled) {
-        final TelephonyManager tele = TelephonyManager.from(mContext);
-
         switch (template.getMatchRule()) {
             case MATCH_MOBILE_3G_LOWER:
             case MATCH_MOBILE_4G:
             case MATCH_MOBILE_ALL:
                 // TODO: offer more granular control over radio states once
                 // 4965893 is available.
-                if (tele.getSimState() == SIM_STATE_READY
-                        && Objects.equal(tele.getSubscriberId(), template.getSubscriberId())) {
+                if (NetworkIdentity.isDdsReady()
+                        && Objects.equals(NetworkIdentity.getDdsSubscriberId(),
+                                template.getSubscriberId())) {
                     setPolicyDataEnable(TYPE_MOBILE, enabled);
                     setPolicyDataEnable(TYPE_WIMAX, enabled);
                 }
@@ -1099,12 +1098,10 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
         if (LOGV) Slog.v(TAG, "ensureActiveMobilePolicyLocked()");
         if (mSuppressDefaultPolicy) return;
 
-        final TelephonyManager tele = TelephonyManager.from(mContext);
-
         // avoid creating policy when SIM isn't ready
-        if (tele.getSimState() != SIM_STATE_READY) return;
+        if (!NetworkIdentity.isDdsReady()) return;
 
-        final String subscriberId = tele.getSubscriberId();
+        final String subscriberId = NetworkIdentity.getDdsSubscriberId();
         final NetworkIdentity probeIdent = new NetworkIdentity(
                 TYPE_MOBILE, TelephonyManager.NETWORK_TYPE_UNKNOWN, subscriberId, null, false);
 
@@ -1128,13 +1125,11 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
             time.setToNow();
 
             final int cycleDay = time.monthDay;
-            final int cycleLength = CYCLE_MONTHLY;
             final String cycleTimezone = time.timezone;
 
             final NetworkTemplate template = buildTemplateMobileAll(subscriberId);
-            final NetworkPolicy policy = new NetworkPolicy(template, cycleDay, cycleLength,
-                    cycleTimezone, warningBytes, LIMIT_DISABLED, SNOOZE_NEVER, SNOOZE_NEVER,
-                    true, true);
+            final NetworkPolicy policy = new NetworkPolicy(template, cycleDay, cycleTimezone,
+                    warningBytes, LIMIT_DISABLED, SNOOZE_NEVER, SNOOZE_NEVER, true, true);
             addNetworkPolicyLocked(policy);
         }
     }
@@ -1176,7 +1171,6 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
                             networkId = null;
                         }
                         final int cycleDay = readIntAttribute(in, ATTR_CYCLE_DAY);
-                        final int cycleLength = readIntAttribute(in, ATTR_CYCLE_LENGTH);
                         final String cycleTimezone;
                         if (version >= VERSION_ADDED_TIMEZONE) {
                             cycleTimezone = in.getAttributeValue(null, ATTR_CYCLE_TIMEZONE);
@@ -1223,8 +1217,8 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
                         final NetworkTemplate template = new NetworkTemplate(
                                 networkTemplate, subscriberId, networkId);
                         mNetworkPolicy.put(template, new NetworkPolicy(template, cycleDay,
-                                cycleLength, cycleTimezone, warningBytes, limitBytes,
-                                lastWarningSnooze, lastLimitSnooze, metered, inferred));
+                                cycleTimezone, warningBytes, limitBytes, lastWarningSnooze,
+                                lastLimitSnooze, metered, inferred));
 
                     } else if (TAG_UID_POLICY.equals(tag)) {
                         final int uid = readIntAttribute(in, ATTR_UID);
@@ -1308,7 +1302,6 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
                     out.attribute(null, ATTR_NETWORK_ID, networkId);
                 }
                 writeIntAttribute(out, ATTR_CYCLE_DAY, policy.cycleDay);
-                writeIntAttribute(out, ATTR_CYCLE_LENGTH, policy.cycleLength);
                 out.attribute(null, ATTR_CYCLE_TIMEZONE, policy.cycleTimezone);
                 writeLongAttribute(out, ATTR_WARNING_BYTES, policy.warningBytes);
                 writeLongAttribute(out, ATTR_LIMIT_BYTES, policy.limitBytes);
