@@ -3780,6 +3780,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     cleanupRibbon();
                     inflateRibbon();
                     mRibbonView.setVisibility(View.VISIBLE);
+            } else if (uri != null && uri.equals(Settings.Nameless.getUriFor(
+                    Settings.Nameless.QUICK_SETTINGS_HIDE_LABELS))) {
+                if (mSettingsContainer != null) {
+                    mQS.setupQuickSettings();
+                    mSettingsContainer.updateResources();
+                }
             } else if (mSettingsContainer != null) {
                 mQS.setupQuickSettings();
                 if (mQuickAccessLayoutLinked && mRibbonQS != null) {
@@ -3832,6 +3838,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
             cr.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.QUICK_SETTINGS_RIBBON_TILES),
+                    false, this, UserHandle.USER_ALL);
+
+            cr.registerContentObserver(
+                    Settings.Nameless.getUriFor(Settings.Nameless.QUICK_SETTINGS_HIDE_LABELS),
                     false, this, UserHandle.USER_ALL);
         }
     }

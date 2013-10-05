@@ -1215,7 +1215,19 @@ public final class Settings {
             return putStringForUser(cr, name, value ? "1" : "0", userHandle);
         }
 
+        /**
+         * Whether ACRA should be enabled or not.
+         *
+         * @hide
+         */
         public static final String ENABLE_ACRA = "enable_acra";
+
+        /**
+         * Whether to show text at quick settings or not.
+         *
+         * @hide
+         */
+        public static final String QUICK_SETTINGS_HIDE_LABELS = "quick_settings_hide_labels";
 
     }
 
