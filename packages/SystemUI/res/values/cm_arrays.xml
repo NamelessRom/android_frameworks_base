@@ -23,6 +23,7 @@
         <item>@drawable/ic_qs_perf_profile_perf</item>
     </string-array>
 
+<<<<<<< HEAD
     <array name="batterymeter_inverted_bolt_points" translatable="false">
         <item>743</item><item>73</item>
         <item>743</item><item>292</item>
@@ -74,4 +75,6 @@
         <item>302</item><item>286</item>
         <item>0</item><item>286</item>
     </array>
+=======
+>>>>>>> 7b4d855... Frameworks: QS performance profiles tile
 </resources>
