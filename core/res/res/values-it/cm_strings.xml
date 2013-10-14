@@ -72,4 +72,12 @@
     <string name="permlab_resetBatteryStats">reimposta statistiche batteria</string>
     <string name="permdesc_resetBatteryStats">Consente all\'applicazione di reimpostare i dati di utilizzo della batteria a basso livello.</string>
     <string name="immersive_mode_confirmation_bottom">Scorrere dal basso verso l\'alto per uscire dalla modalità schermo intero.</string>
+    <string name="permdesc_interceptSmsSent">Consente all\'applicazione di intercettare un SMS in uscita. Le applicazioni maligne potrebbero usarlo per impedire la spedizione di SMS.</string>
+    <string name="policylab_enforceSelinux">Forza SELinux</string>
+    <string name="policydesc_enforceSelinux">Alterna tra regole restrittive o permissive di SELinux.</string>
+    <string name="policylab_enforceMmac">Forza MMAC</string>
+    <string name="policydesc_enforceMmac">Alterna tra regole restrittive o permissive di MMAC.</string>
+    <string name="perf_profile_pwrsv">Risparmio energetico</string>
+    <string name="perf_profile_bal">Bilanciato</string>
+    <string name="perf_profile_perf">Prestazioni</string>
 </resources>
