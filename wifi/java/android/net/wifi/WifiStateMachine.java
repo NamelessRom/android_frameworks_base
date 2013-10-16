@@ -1940,6 +1940,7 @@ public class WifiStateMachine extends StateMachine {
 
         scanResults = scanResultsBuf.toString();
         if (TextUtils.isEmpty(scanResults)) {
+           mScanResults.clear();
            return;
         }
 
