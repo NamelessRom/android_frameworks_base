@@ -1308,18 +1308,20 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
             }
         }
 
+        if (customLabel != null && customLabel.length() > 0) {
+            combinedLabel = customLabel;
+            mobileLabel = customLabel;
+        }
+
         // Cleanup the double quotes
         if (wifiLabel.length() > 0) {
             wifiLabel = wifiLabel.replaceAll("^\"|\"$", "");
         }
 
-        final String customLabel = Settings.System.getString(mContext.getContentResolver(),
-                Settings.System.NOTIFICATION_CUSTOM_CARRIER_LABEL);
-        if (customLabel != null && customLabel.length() > 0) {
-            if (combinedLabel.equals(mobileLabel)) {
-                combinedLabel = customLabel;
-            }
-            mobileLabel = customLabel;
+        if (!mAirplaneMode && mSimState == IccCardConstants.State.ABSENT) {
+            // look again; your radios are now sim cards
+            mPhoneSignalIconId = mDataSignalIconId = mDataTypeIconId = mQSDataTypeIconId = 0;
+            mQSPhoneSignalIconId = 0;
         }
 
         if (DEBUG) {
