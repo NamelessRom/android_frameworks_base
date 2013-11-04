@@ -415,7 +415,6 @@ public final class PowerManagerService extends IPowerManager.Stub
     private static native void nativeSetInteractive(boolean enable);
     private static native void nativeSetAutoSuspend(boolean enable);
     private static native void nativeCpuBoost(int duration);
-    private boolean mKeyboardVisible = false;
 
     public PowerManagerService() {
         synchronized (mLock) {
