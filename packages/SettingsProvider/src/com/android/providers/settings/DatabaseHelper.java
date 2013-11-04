@@ -71,7 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // database gets upgraded properly. At a minimum, please confirm that 'upgradeVersion'
     // is properly propagated through your change.  Not doing so will result in a loss of user
     // settings.
-    private static final int DATABASE_VERSION = 114;
+    private static final int DATABASE_VERSION = 116;
 
     private Context mContext;
     private int mUserHandle;
@@ -1823,6 +1823,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             upgradeDeviceNameFromNone(db);
 
             upgradeVersion = 114;
+        }
+
+        // From here on out, we can assume the user is coming from CM and will have these rows
+        /*if (upgradeVersion < 115) {
+            moveSettingsToNewTable(db, TABLE_SYSTEM, TABLE_SECURE,
+                    new String[] { Settings.Secure.STATS_COLLECTION }, true);
+            upgradeVersion = 115;
+        }*/
+
+        if (upgradeVersion < 116) {
+            moveSettingsToNewTable(db, TABLE_SYSTEM, TABLE_SECURE,
+                    new String[] { Settings.Secure.VOLUME_LINK_NOTIFICATION }, true);
+            upgradeVersion = 116;
         }
 
         // *** Remember to update DATABASE_VERSION above!
