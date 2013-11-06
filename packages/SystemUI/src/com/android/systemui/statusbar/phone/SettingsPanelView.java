@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * This code has been modified. Portions copyright (C) 2013, ParanoidAndroid Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +39,6 @@ import com.android.systemui.statusbar.policy.RotationLockController;
 public class SettingsPanelView extends PanelView {
     public static final boolean DEBUG_GESTURES = true;
 
-    private QuickSettingsController mQS;
     private QuickSettingsContainerView mQSContainer;
 
     Drawable mHandleBar;
@@ -59,10 +59,6 @@ public class SettingsPanelView extends PanelView {
         mHandleBar = resources.getDrawable(R.drawable.status_bar_close);
         mHandleBarHeight = resources.getDimensionPixelSize(R.dimen.close_handle_height);
         mHandleView = findViewById(R.id.handle);
-    }
-
-    public void setQuickSettings(QuickSettingsController qs) {
-        mQS = qs;
     }
 
     @Override
@@ -136,6 +132,12 @@ public class SettingsPanelView extends PanelView {
             final int pr = getPaddingRight();
             mHandleBar.setBounds(pl, 0, getWidth() - pr, (int) mHandleBarHeight);
         }
+    }
+
+    @Override
+    public void collapse() {
+        if(mQSContainer.isEditModeEnabled()) mQSContainer.setEditModeEnabled(false);
+        super.collapse();
     }
 
     @Override
