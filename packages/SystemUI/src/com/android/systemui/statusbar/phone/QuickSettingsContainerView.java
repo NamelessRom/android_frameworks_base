@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * This code has been modified. Portions copyright (C) 2013, ParanoidAndroid Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +18,11 @@
 package com.android.systemui.statusbar.phone;
 
 import android.animation.LayoutTransition;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
@@ -26,6 +30,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.android.systemui.R;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -37,6 +43,19 @@ public class QuickSettingsContainerView extends FrameLayout {
 
     // The gap between tiles in the QuickSettings grid
     private float mCellGap;
+
+    // Default layout transition
+    private LayoutTransition mLayoutTransition;
+
+    // Edit mode status
+    private boolean mEditModeEnabled;
+
+    // Edit mode changed listener
+    private EditModeChangedListener mEditModeChangedListener;
+
+    public interface EditModeChangedListener {
+        public abstract void onEditModeChanged(boolean enabled);
+    }
 
     private boolean mSingleRow;
 
@@ -52,8 +71,8 @@ public class QuickSettingsContainerView extends FrameLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        // TODO: Setup the layout transitions
-        LayoutTransition transitions = getLayoutTransition();
+        mLayoutTransition = getLayoutTransition();
+        mLayoutTransition.enableTransitionType(LayoutTransition.CHANGING);
     }
 
     void updateResources() {
@@ -170,6 +189,49 @@ public class QuickSettingsContainerView extends FrameLayout {
                     x = getPaddingStart();
                     y += childHeight + cellGap;
                 }
+            }
+        }
+    }
+
+    public void setOnEditModeChangedListener(EditModeChangedListener listener) {
+        mEditModeChangedListener = listener;
+    }
+
+    public void enableLayoutTransitions() {
+        setLayoutTransition(mLayoutTransition);
+    }
+
+    public boolean isEditModeEnabled() {
+        return mEditModeEnabled;
+    }
+
+    public void setEditModeEnabled(boolean enabled) {
+        mEditModeEnabled = enabled;
+        mEditModeChangedListener.onEditModeChanged(enabled);
+        ArrayList<String> tiles = new ArrayList<String>();
+        for(int i = 0; i < getChildCount(); i++) {
+            View v = getChildAt(i);
+            if(v instanceof QuickSettingsTileView) {
+                QuickSettingsTileView qs = (QuickSettingsTileView) v;
+                qs.setEditMode(enabled);
+
+                // Add to provider string
+                if(!enabled && qs.getVisibility() == View.VISIBLE
+                        && !qs.isTemporary()) {
+                    tiles.add(qs.getTileId().toString());
+                }
+            }
+        }
+
+        if(!enabled) { // Store modifications
+            ContentResolver resolver = getContext().getContentResolver();
+            if(!tiles.isEmpty()) {
+                Settings.System.putString(resolver,
+                        Settings.System.QUICK_SETTINGS_TILES,
+                                TextUtils.join(QuickSettings.DELIMITER, tiles));
+            } else { // No tiles
+                Settings.System.putString(resolver,
+                        Settings.System.QUICK_SETTINGS_TILES, QuickSettings.NO_TILES);
             }
         }
     }
