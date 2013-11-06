@@ -50,9 +50,6 @@
     <!-- When true, show 1/2G networks as 3G. -->
     <bool name="config_showMin3G">false</bool>
 
-    <!-- Show rotation lock button in phone-style notification panel. -->
-    <bool name="config_showRotationLock">true</bool>
-
     <!-- Amount of time to hold off before showing the search panel when the user presses home -->
     <integer name="config_show_search_delay">200</integer>
 
