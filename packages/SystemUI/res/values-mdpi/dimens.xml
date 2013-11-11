@@ -19,3 +19,4 @@
     <!-- Padding under status bar battery icon -->
     <dimen name="status_bar_battery_bottom_padding">0px</dimen>
 </resources>
+
