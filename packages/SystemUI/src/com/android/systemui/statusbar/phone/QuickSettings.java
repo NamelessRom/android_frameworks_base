@@ -84,8 +84,27 @@ class QuickSettings {
     static final boolean DEBUG_GONE_TILES = false;
     private static final String TAG = "QuickSettings";
     public static final boolean SHOW_IME_TILE = false;
-
     public static final boolean LONG_PRESS_TOGGLES = true;
+    public enum Tile {
+        USER,
+        BRIGHTNESS,
+        SETTINGS,
+        WIFI,
+        RSSI,
+        ROTATION,
+        BATTERY,
+        AIRPLANE,
+        BLUETOOTH,
+        LOCATION,
+        IMMERSIVE
+    }
+
+    public static final String NO_TILES = "NO_TILES";
+    public static final String DELIMITER = ";";
+    public static final String DEFAULT_TILES = Tile.USER + DELIMITER + Tile.BRIGHTNESS
+        + DELIMITER + Tile.SETTINGS + DELIMITER + Tile.WIFI + DELIMITER + Tile.RSSI
+        + DELIMITER + Tile.ROTATION + DELIMITER + Tile.BATTERY + DELIMITER + Tile.BLUETOOTH
+        + DELIMITER + Tile.LOCATION + DELIMITER + Tile.IMMERSIVE;
 
     private Context mContext;
     private PanelBar mBar;
@@ -602,6 +621,65 @@ class QuickSettings {
                             R.string.accessibility_quick_settings_bluetooth,
                             bluetoothState.stateContentDescription));
                     bluetoothTile.setText(state.label);
+
+                } else if(Tile.LOCATION.toString().equals(tile.toString())) { // Location
+                    final QuickSettingsBasicTile locationTile
+                            = new QuickSettingsBasicTile(mContext);
+                    locationTile.setTileId(Tile.LOCATION);
+                    locationTile.setImageResource(R.drawable.ic_qs_location_on);
+                    locationTile.setTextResource(R.string.quick_settings_location_label);
+                    locationTile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            boolean newLocationEnabledState
+                                    = !mLocationController.isLocationEnabled();
+                            if (mLocationController.setLocationEnabled(newLocationEnabledState)
+                                    && newLocationEnabledState) {
+                                // If we've successfully switched from location off to on, close
+                                // the notifications tray to show the network location provider
+                                // consent dialog.
+                                Intent closeDialog
+                                        = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                                mContext.sendBroadcast(closeDialog);
+                            }
+                        }
+                    });
+
+                    locationTile.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            startSettingsActivity(
+                                    android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            return true; // Consume click
+                        }} );
+
+                    mModel.addLocationTile(locationTile,
+                            new QuickSettingsModel.BasicRefreshCallback(locationTile));
+                    parent.addView(locationTile);
+                    if(addMissing) locationTile.setVisibility(View.GONE);
+                } else if(Tile.IMMERSIVE.toString().equals(tile.toString())) { // Immersive mode
+                    final QuickSettingsBasicTile immersiveTile
+                            = new QuickSettingsBasicTile(mContext);
+                    immersiveTile.setTileId(Tile.IMMERSIVE);
+                    immersiveTile.setImageResource(R.drawable.ic_qs_immersive_off);
+                    immersiveTile.setTextResource(R.string.quick_settings_immersive_mode_off_label);
+                    immersiveTile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            boolean immersiveModeOn = Settings.System.getInt(mContext
+                                    .getContentResolver(), Settings.System.IMMERSIVE_MODE, 0) == 1;
+                            immersiveTile.setImageResource(immersiveModeOn
+                                    ? R.drawable.ic_qs_immersive_off :
+                                            R.drawable.ic_qs_immersive_on);
+                            immersiveTile.setTextResource(immersiveModeOn
+                                    ? R.string.quick_settings_immersive_mode_off_label :
+                                            R.string.quick_settings_immersive_mode_label);
+                            Settings.System.putInt(mContext.getContentResolver(),
+                                    Settings.System.IMMERSIVE_MODE, immersiveModeOn ? 0 : 1);
+                        }
+                    });
+                    parent.addView(immersiveTile);
+                    if(addMissing) immersiveTile.setVisibility(View.GONE);
                 }
             });
             parent.addView(bluetoothTile);
