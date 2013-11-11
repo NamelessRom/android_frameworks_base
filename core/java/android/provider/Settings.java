@@ -3839,6 +3839,14 @@ public final class Settings {
          */
         public static final String NON_INTRUSIVE_INCALL = "non_intrusive_incall";
 
+        /**
+         * Immersive mode global actions switch
+         * 0 = no
+         * 1 = yes
+         * @hide
+         */
+        public static final String IMMERSIVE_MODE = "immersive_mode";
+
         /*
          * Holds the text for the Carrier label. An empty string
          * will bring the default text back.
