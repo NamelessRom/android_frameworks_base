@@ -39,4 +39,11 @@
     <color name="batterymeter_low">#FFFF3300</color>
     <color name="batterymeter_full">#FFFFFFFF</color>
     <color name="status_bar_clock_color">#FFFFFFFF</color>
+
+    <!-- Notification Shortcuts -->
+    <drawable name="notification_shortcut_background_color">#00000000</drawable>
+    <drawable name="notification_item_background_color">#ff111111</drawable>
+    <drawable name="notification_item_background_color_pressed">#ff257390</drawable>
+    <color name="notification_shortcut_color">#FFFFFFFF</color>
+
 </resources>
