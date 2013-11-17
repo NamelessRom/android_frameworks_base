@@ -130,8 +130,9 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
                 final Locale newLocale = getResources().getConfiguration().locale;
                 if (! newLocale.equals(mLocale)) {
                     mLocale = newLocale;
-                    mClockFormatString = ""; // force refresh
                 }
+                updateSettings();
+                return;
             }
             updateClock();
         }
