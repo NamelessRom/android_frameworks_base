@@ -19,6 +19,7 @@
 
 package com.android.internal.policy.impl;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.IUiModeManager;
@@ -188,6 +189,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_VOICE_SEARCH = 4;
     private static final int KEY_ACTION_IN_APP_SEARCH = 5;
     private static final int KEY_ACTION_LAUNCH_CAMERA = 6;
+    private static final int KEY_ACTION_LAST_APP = 7;
     private static final int KEY_ACTION_BACK = 7;
     private static final int KEY_ACTION_HOME = 8;
 
@@ -1202,6 +1204,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KEY_ACTION_LAUNCH_CAMERA:
                 launchCameraAction();
+                break;
+            case KEY_ACTION_LAST_APP:
+                toggleLastApp();
                 break;
             default:
                 break;
@@ -3285,6 +3290,43 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             Slog.e(TAG, "RemoteException when showing recent apps", e);
             // re-acquire status bar service next time it is needed.
             mStatusBarService = null;
+        }
+    }
+
+    private void toggleLastApp() {
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        final ActivityManager am = (ActivityManager) mContext
+                .getSystemService(Activity.ACTIVITY_SERVICE);
+        String defaultHomePackage = "com.android.launcher";
+        intent.addCategory(Intent.CATEGORY_HOME);
+        final ResolveInfo res = mContext.getPackageManager().resolveActivity(intent, 0);
+        if (res.activityInfo != null && !res.activityInfo.packageName.equals("android")) {
+            defaultHomePackage = res.activityInfo.packageName;
+        }
+        final List<ActivityManager.RecentTaskInfo> tasks =
+                am.getRecentTasks(5, ActivityManager.RECENT_IGNORE_UNAVAILABLE);
+        // lets get enough tasks to find something to switch to
+        // Note, we'll only get as many as the system currently has - up to 5
+        int lastAppId = 0;
+        Intent lastAppIntent = null;
+        for (int i = 1; i < tasks.size() && lastAppIntent == null; i++) {
+            final String packageName = tasks.get(i).baseIntent.getComponent().getPackageName();
+            if (!packageName.equals(defaultHomePackage) && !packageName.equals("com.android.systemui")) {
+                final ActivityManager.RecentTaskInfo info = tasks.get(i);
+                lastAppId = info.id;
+                lastAppIntent = info.baseIntent;
+            }
+        }
+        if (lastAppId > 0) {
+            am.moveTaskToFront(lastAppId, am.MOVE_TASK_NO_USER_ACTION);
+        } else if (lastAppIntent != null) {
+            // last task is dead, restart it.
+            lastAppIntent.addFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
+            try {
+                mContext.startActivityAsUser(lastAppIntent, UserHandle.CURRENT);
+            } catch (ActivityNotFoundException e) {
+                Log.w("Recent", "Unable to launch recent task", e);
+            }
         }
     }
 
