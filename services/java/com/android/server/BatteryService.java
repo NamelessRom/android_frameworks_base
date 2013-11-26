@@ -151,6 +151,7 @@ public final class BatteryService extends IBatteryService.Stub {
     private int mBatteryLowARGB;
     private int mBatteryMediumARGB;
     private int mBatteryFullARGB;
+    private int mBatteryReallyFullARGB;
     private boolean mMultiColorLed;
 
     private boolean mSentLowBatteryBroadcast = false;
@@ -947,19 +948,25 @@ public final class BatteryService extends IBatteryService.Stub {
 
             final int level = mBatteryProps.batteryLevel;
             final int status = mBatteryProps.batteryStatus;
+            int quietHoursStart = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.QUIET_HOURS_START, 0);
+            int quietHoursEnd = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.QUIET_HOURS_END, 0);
             if (!mLightEnabled) {
                 // No lights if explicitly disabled
                 mBatteryLight.turnOff();
-            } else if (QuietHoursUtils.inQuietHours(mContext, Settings.System.QUIET_HOURS_DIM)) {
+            } else if (QuietHoursUtils.inQuietHours(quietHoursStart, quietHoursEnd)) {
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.QUIET_HOURS_DIM_BATTERY, 0) == 1) {
+                    // No lights if in Quiet Hours
+                    mBatteryLight.turnOff();
+                }
                 if (mLedPulseEnabled && level < mLowBatteryWarningLevel &&
                         status != BatteryManager.BATTERY_STATUS_CHARGING) {
                     // The battery is low, the device is not charging and the low battery pulse
                     // is enabled - ignore Quiet Hours
                     mBatteryLight.setFlashing(mBatteryLowARGB, LightsService.LIGHT_FLASH_TIMED,
                             mBatteryLedOn, mBatteryLedOff);
-                } else {
-                    // No lights if in Quiet Hours and battery not low
-                    mBatteryLight.turnOff();
                 }
             } else if (level < mLowBatteryWarningLevel) {
                 if (status == BatteryManager.BATTERY_STATUS_CHARGING) {
@@ -976,8 +983,13 @@ public final class BatteryService extends IBatteryService.Stub {
             } else if (status == BatteryManager.BATTERY_STATUS_CHARGING
                         || status == BatteryManager.BATTERY_STATUS_FULL) {
                 if (status == BatteryManager.BATTERY_STATUS_FULL || level >= 90) {
-                    // Battery is full or charging and nearly full
-                    mBatteryLight.setColor(mBatteryFullARGB);
+                    if (level == 100) {
+                        // Battery is really full
+                        mBatteryLight.setColor(mBatteryReallyFullARGB);
+                    } else {
+                        // Battery is full or charging and nearly full
+                        mBatteryLight.setColor(mBatteryFullARGB);
+                    }
                 } else {
                     // Battery is charging and halfway full
                     mBatteryLight.setColor(mBatteryMediumARGB);
@@ -1020,6 +1032,8 @@ public final class BatteryService extends IBatteryService.Stub {
                         Settings.System.BATTERY_LIGHT_MEDIUM_COLOR), false, this);
                 resolver.registerContentObserver(Settings.System.getUriFor(
                         Settings.System.BATTERY_LIGHT_FULL_COLOR), false, this);
+                resolver.registerContentObserver(Settings.System.getUriFor(
+                        Settings.System.BATTERY_LIGHT_REALLY_FULL_COLOR), false, this);
             }
 
             // Quiet Hours
@@ -1030,7 +1044,7 @@ public final class BatteryService extends IBatteryService.Stub {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QUIET_HOURS_END), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.QUIET_HOURS_DIM), false, this);
+                    Settings.System.QUIET_HOURS_DIM_BATTERY), false, this);
 
             update();
         }
@@ -1061,6 +1075,8 @@ public final class BatteryService extends IBatteryService.Stub {
             mBatteryFullARGB = Settings.System.getInt(resolver,
                     Settings.System.BATTERY_LIGHT_FULL_COLOR,
                     res.getInteger(com.android.internal.R.integer.config_notificationsBatteryFullARGB));
+            mBatteryReallyFullARGB = Settings.System.getInt(resolver,
+                    Settings.System.BATTERY_LIGHT_REALLY_FULL_COLOR, mBatteryFullARGB);
 
             updateLedPulse();
         }
