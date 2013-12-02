@@ -1,3 +1,24 @@
+<<<<<<< HEAD
+=======
+/*
+ * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 CyanogenMod Project
+ * Copyright (C) 2013 The SlimRoms Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+>>>>>>> d85304f... Quicksettings customizations Slim style
 package com.android.systemui.quicksettings;
 
 import android.app.ActivityManagerNative;
@@ -26,7 +47,11 @@ public class BugReportTile extends QuickSettingsTile{
     private boolean enabled = false;
     private final Handler mHandler;
 
+<<<<<<< HEAD
     public BugReportTile(Context context, 
+=======
+    public BugReportTile(Context context,
+>>>>>>> d85304f... Quicksettings customizations Slim style
             QuickSettingsController qsc, Handler handler) {
         super(context, qsc);
 
@@ -39,7 +64,12 @@ public class BugReportTile extends QuickSettingsTile{
                 showBugreportDialog();
             }
         };
+<<<<<<< HEAD
         qsc.registerObservedContent(Settings.Global.getUriFor(Settings.Global.BUGREPORT_IN_POWER_MENU), this);
+=======
+        qsc.registerObservedContent(Settings.Global.getUriFor(
+                Settings.Global.BUGREPORT_IN_POWER_MENU), this);
+>>>>>>> d85304f... Quicksettings customizations Slim style
     }
 
     @Override
