@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 CyanogenMod Project
+ * Copyright (C) 2013 The SlimRoms Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.android.systemui.quicksettings;
 
 import android.app.ActivityManagerNative;
@@ -9,6 +27,7 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.provider.Settings;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,6 +53,10 @@ public class QuickSettingsTile implements OnClickListener {
     protected final int mTileLayout;
     protected int mDrawable;
     protected String mLabel;
+    protected int mTileTextSize;
+    protected int mTileTextColor;
+    protected int mTileTextPadding;
+
     protected PhoneStatusBar mStatusbarService;
     protected QuickSettingsController mQsc;
     protected SharedPreferences mPrefs;
@@ -54,6 +77,11 @@ public class QuickSettingsTile implements OnClickListener {
 
     public void setupQuickSettingsTile(LayoutInflater inflater,
             QuickSettingsContainerView container) {
+        container.updateResources();
+        mTileTextSize = container.getTileTextSize();
+        mTileTextColor = container.getTileTextColor();
+        mTileTextPadding = container.getTileTextPadding();
+
         mTile = (QuickSettingsTileView) inflater.inflate(
                 R.layout.quick_settings_tile, container, false);
         mTile.setContent(mTileLayout, inflater);
@@ -98,10 +126,15 @@ public class QuickSettingsTile implements OnClickListener {
         TextView tv = (TextView) mTile.findViewById(R.id.text);
         if (tv != null) {
             tv.setText(mLabel);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTileTextSize);
+            tv.setPadding(0, mTileTextPadding, 0, 0);
+            if (mTileTextColor != -2) {
+                tv.setTextColor(mTileTextColor);
+            }
         }
-        View image = mTile.findViewById(R.id.image);
-        if (image != null && image instanceof ImageView) {
-            ((ImageView) image).setImageResource(mDrawable);
+        ImageView image = (ImageView) mTile.findViewById(R.id.image);
+        if (image != null) {
+            image.setImageResource(mDrawable);
         }
     }
 
