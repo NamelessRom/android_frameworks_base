@@ -3096,6 +3096,47 @@ public final class Settings {
         public static final String QUIET_HOURS_DIM = "quiet_hours_dim";
 
         /**
+         * Number of QuickSettings tiles per row
+         * @hide
+         */
+        public static final String QUICK_TILES_PER_ROW = "quick_tiles_per_row";
+
+        /**
+         * Whether on landscape tiles quantity per row are duplicated
+         * @hide
+         */
+        public static final String QUICK_TILES_PER_ROW_DUPLICATE_LANDSCAPE =
+                "quick_tiles_per_row_duplicate_landscape";
+
+        /**
+         * Color of QuickSettings tiles text
+         * @hide
+         */
+        public static final String QUICK_TILES_TEXT_COLOR = "quick_tiles_text_color";
+
+
+        /**
+         * QuickSettings tiles background color
+         *
+         * @hide
+         */
+        public static final String QUICK_TILES_BG_COLOR = "quick_tiles_bg_color";
+
+        /**
+         * QuickSettings tiles background color on pressed
+         *
+         * @hide
+         */
+        public static final String QUICK_TILES_BG_PRESSED_COLOR = "quick_tiles_bg_pressed_color";
+
+        /**
+         * QuickSettings tiles background alpha
+         *
+         * @hide
+         */
+        public static final String QUICK_TILES_BG_ALPHA = "quick_tiles_bg_alpha";
+
+        /**
          * Sets the lockscreen background style
          * @hide
          */
