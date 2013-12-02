@@ -1,3 +1,24 @@
+<<<<<<< HEAD
+=======
+/*
+ * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 CyanogenMod Project
+ * Copyright (C) 2013 The SlimRoms Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+>>>>>>> d85304f... Quicksettings customizations Slim style
 package com.android.systemui.quicksettings;
 
 import android.content.ContentResolver;
@@ -15,6 +36,12 @@ import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class QuietHoursTile extends QuickSettingsTile {
 
+<<<<<<< HEAD
+=======
+    private static final String SCHEDULE_SERVICE_COMMAND =
+            "com.android.settings.slim.service.SCHEDULE_SERVICE_COMMAND";
+
+>>>>>>> d85304f... Quicksettings customizations Slim style
     private boolean mEnabled;
 
     public QuietHoursTile(Context context, QuickSettingsController qsc) {
@@ -23,20 +50,37 @@ public class QuietHoursTile extends QuickSettingsTile {
         mOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+<<<<<<< HEAD
                 Settings.System.putIntForUser(mContext.getContentResolver(), Settings.System.QUIET_HOURS_ENABLED,
                         mEnabled ? 0 : 1, UserHandle.USER_CURRENT);
+=======
+                Settings.System.putIntForUser(mContext.getContentResolver(),
+                        Settings.System.QUIET_HOURS_ENABLED,
+                        mEnabled ? 0 : 1, UserHandle.USER_CURRENT);
+                autoSmsIntentBroadcast(mContext);
+>>>>>>> d85304f... Quicksettings customizations Slim style
             }
         };
         mOnLongClick = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_MAIN);
+<<<<<<< HEAD
                 intent.setClassName("com.android.settings", "com.android.settings.Settings$QuietHoursSettingsActivity");
+=======
+                intent.setClassName("com.android.settings",
+                    "com.android.settings.Settings$QuietHoursSettingsActivity");
+>>>>>>> d85304f... Quicksettings customizations Slim style
                 startSettingsActivity(intent);
                 return true;
             }
         };
+<<<<<<< HEAD
         qsc.registerObservedContent(Settings.System.getUriFor(Settings.System.QUIET_HOURS_ENABLED), this);
+=======
+        qsc.registerObservedContent(Settings.System.getUriFor(
+                Settings.System.QUIET_HOURS_ENABLED), this);
+>>>>>>> d85304f... Quicksettings customizations Slim style
     }
 
     @Override
@@ -51,6 +95,15 @@ public class QuietHoursTile extends QuickSettingsTile {
         super.updateResources();
     }
 
+<<<<<<< HEAD
+=======
+    private void autoSmsIntentBroadcast(Context context) {
+        Intent scheduleSms = new Intent();
+        scheduleSms.setAction(SCHEDULE_SERVICE_COMMAND);
+        context.sendBroadcast(scheduleSms);
+    }
+
+>>>>>>> d85304f... Quicksettings customizations Slim style
     private synchronized void updateTile() {
         mEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.QUIET_HOURS_ENABLED, 0, UserHandle.USER_CURRENT) == 1;
