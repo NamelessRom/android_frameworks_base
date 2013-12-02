@@ -47,6 +47,10 @@ interface ITelephony {
     /**
      * Toggle between 3G and LTE (NT_MODE_CDMA, NT_MODE_GLOBAL)
      * @param boolean to turn on and off LTE
+<<<<<<< HEAD
+=======
+     * {@hide}
+>>>>>>> d85304f... Quicksettings customizations Slim style
      */
     void toggleLTE(boolean on);
 
