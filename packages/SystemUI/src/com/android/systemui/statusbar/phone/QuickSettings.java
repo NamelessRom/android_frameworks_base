@@ -61,7 +61,10 @@ import android.view.WindowManagerGlobal;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+<<<<<<< HEAD
 import com.android.internal.app.MediaRouteDialogPresenter;
+=======
+>>>>>>> d85304f... Quicksettings customizations Slim style
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsModel.ActivityState;
 import com.android.systemui.statusbar.phone.QuickSettingsModel.BluetoothState;

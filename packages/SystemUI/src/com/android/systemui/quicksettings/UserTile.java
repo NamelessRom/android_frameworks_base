@@ -1,3 +1,24 @@
+<<<<<<< HEAD
+=======
+/*
+ * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2013 CyanogenMod Project
+ * Copyright (C) 2013 The SlimRoms Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+>>>>>>> d85304f... Quicksettings customizations Slim style
 package com.android.systemui.quicksettings;
 
 import android.app.ActivityManagerNative;
@@ -18,6 +39,10 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Profile;
 import android.util.Log;
 import android.util.Pair;
+<<<<<<< HEAD
+=======
+import android.util.TypedValue;
+>>>>>>> d85304f... Quicksettings customizations Slim style
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManagerGlobal;
@@ -51,7 +76,12 @@ public class UserTile extends QuickSettingsTile {
                         Log.e(TAG, "Couldn't show user switcher", e);
                     }
                 } else {
+<<<<<<< HEAD
                     Intent intent = new Intent(Intent.ACTION_VIEW, ContactsContract.Profile.CONTENT_URI);
+=======
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            ContactsContract.Profile.CONTENT_URI);
+>>>>>>> d85304f... Quicksettings customizations Slim style
                     startSettingsActivity(intent);
                 }
             }
@@ -80,7 +110,17 @@ public class UserTile extends QuickSettingsTile {
     void updateQuickSettings() {
         ImageView iv = (ImageView) mTile.findViewById(R.id.user_imageview);
         TextView tv = (TextView) mTile.findViewById(R.id.user_textview);
+<<<<<<< HEAD
         tv.setText(mLabel);
+=======
+        if (tv != null) {
+            tv.setText(mLabel);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTileTextSize);
+            if (mTileTextColor != -2) {
+                tv.setTextColor(mTileTextColor);
+            }
+        }
+>>>>>>> d85304f... Quicksettings customizations Slim style
         iv.setImageDrawable(userAvatar);
     }
 
@@ -105,7 +145,12 @@ public class UserTile extends QuickSettingsTile {
             @Override
             protected Pair<String, Drawable> doInBackground(Void... params) {
                 try {
+<<<<<<< HEAD
                     // The system needs some time to change the picture, if we try to load it when we receive the broadcast, we will load the old one
+=======
+                    // The system needs some time to change the picture,
+                    // if we try to load it when we receive the broadcast, we will load the old one
+>>>>>>> d85304f... Quicksettings customizations Slim style
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
