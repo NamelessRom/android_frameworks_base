@@ -615,7 +615,9 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     public void onBatteryMeterShowPercent(boolean showPercent) {/*Ignore*/}
 
     void refreshBatteryTile() {
-        mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+        if (mBatteryCallback != null) {
+            mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+        }
     }
 
     // Location
