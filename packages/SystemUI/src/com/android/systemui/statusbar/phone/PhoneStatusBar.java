@@ -3680,6 +3680,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     cleanupRibbon();
                     inflateRibbon();
                     mRibbonView.setVisibility(View.VISIBLE);
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QUICK_TILES_PER_ROW))) {
+                    recreateStatusBar();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QUICK_TILES_PER_ROW_DUPLICATE_LANDSCAPE))) {
+                    recreateStatusBar();
             } else if (mSettingsContainer != null) {
                 mQS.setupQuickSettings();
                 if (mQuickAccessLayoutLinked && mRibbonQS != null) {
