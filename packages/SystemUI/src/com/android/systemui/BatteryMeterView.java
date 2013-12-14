@@ -129,13 +129,8 @@ public class BatteryMeterView extends View implements DemoMode {
         }
 
         protected boolean shouldIndicateCharging() {
-            if (status == BatteryManager.BATTERY_STATUS_CHARGING) {
-                return true;
-            }
-            if (plugged) {
-                return status == BatteryManager.BATTERY_STATUS_FULL;
-            }
-            return false;
+            return status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    plugged && status == BatteryManager.BATTERY_STATUS_FULL;
         }
     }
 
@@ -186,7 +181,9 @@ public class BatteryMeterView extends View implements DemoMode {
         super.onDetachedFromWindow();
 
         mAttached = false;
-        getContext().unregisterReceiver(mTracker);
+        if(mTracker != null) {
+            getContext().unregisterReceiver(mTracker);
+        }
     }
 
     public BatteryMeterView(Context context) {
