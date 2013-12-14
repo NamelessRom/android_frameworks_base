@@ -43,6 +43,13 @@
     <!-- status message in phone options dialog for when expand desktop mode is off -->
     <string name="global_actions_expanded_desktop_mode_off_status">Disabled</string>
 
+    <!-- label for item that toggle mobile data -->
+    <string name="global_actions_toggle_mobile_data">Mobile data</string>
+    <!-- status message in phone options dialog for when mobile data is on -->
+    <string name="global_actions_mobile_data_on_status">Mobile data is ON</string>
+    <!-- status message in phone options dialog for when mobile data is off -->
+    <string name="global_actions_mobile_data_off_status">Mobile data is OFF</string>
+
     <!-- Button to reboot the phone, within the Phone Options dialog -->
     <string name="reboot_system" product="tablet">Reboot tablet</string>
     <string name="reboot_system" product="default">Reboot phone</string>

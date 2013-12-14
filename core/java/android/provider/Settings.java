@@ -4122,6 +4122,12 @@ public final class Settings {
         public static final String POWER_MENU_PROFILES_ENABLED = "power_menu_profiles_enabled";
 
         /**
+         * Show MobileData in Power Menu
+         * @hide
+         */
+        public static final String POWER_MENU_MOBILE_DATA_ENABLED = "power_menu_mobile_data_enabled";
+
+        /**
          * Enable Stylus Gestures
          *
          * @hide
