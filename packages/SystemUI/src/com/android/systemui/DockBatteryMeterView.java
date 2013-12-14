@@ -75,7 +75,7 @@ public class DockBatteryMeterView extends BatteryMeterView {
                     setVisibility(View.GONE);
 
                     // If dock is not supported then we don't need this receiver anymore
-                    getContext().unregisterReceiver(this);
+                    // getContext().unregisterReceiver(this);
                 }
             } else if (action.equals(ACTION_LEVEL_TEST)) {
                 testmode = true;
