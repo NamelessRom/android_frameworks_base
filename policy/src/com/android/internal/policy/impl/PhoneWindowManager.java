@@ -274,6 +274,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     WindowState mNavigationBar = null;
     boolean mHasNavigationBar = false;
     boolean mForceNavigationBar = false;
+    boolean mOverWriteHasNavigationBar = false;
     boolean mCanHideNavigationBar = false;
     boolean mNavigationBarCanMove = false; // can the navigation bar ever move to the side?
     boolean mNavigationBarOnBottom = true; // is the navigation bar on the bottom *right now*?
@@ -503,6 +504,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     int mIncallPowerBehavior;
 
     Display mDisplay;
+    
+    // Nav bar custom dimensions
+    int mShortSizeDp;
 
     // Behavior of HOME button during incomming call ring.
     // (See Settings.Secure.RING_HOME_BUTTON_BEHAVIOR.)
@@ -701,6 +705,17 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVBAR_FORCE_ENABLE), false, this,
+                    UserHandle.USER_ALL);
+
+            // Custom nav bar dimensions
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_SHOW), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_HEIGHT), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_WIDTH), false, this,
                     UserHandle.USER_ALL);
 
             updateSettings();
@@ -1520,14 +1535,21 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         // Allow the navigation bar to move on small devices (phones).
         mNavigationBarCanMove = shortSizeDp < 600;
 
-        mHasNavigationBar = res.getBoolean(com.android.internal.R.bool.config_showNavigationBar);
+        final int showByDefault = mContext.getResources().getBoolean(
+                    com.android.internal.R.bool.config_showNavigationBar) ? 1 : 0;
+        mHasNavigationBar = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.NAVIGATION_BAR_SHOW, showByDefault,
+                    UserHandle.USER_CURRENT) == 1;
+
         // Allow a system property to override this. Used by the emulator.
         // See also hasNavigationBar().
         final String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
         if ("1".equals(navBarOverride)) {
             mHasNavigationBar = false;
+	    mOverWriteHasNavigationBar = true;
         } else if ("0".equals(navBarOverride)) {
             mHasNavigationBar = true;
+	    mOverWriteHasNavigationBar = true;
         }
 
         // Allow system to override all *god mode on*
@@ -1666,6 +1688,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 resetScreen();
             }
 
+	    // Custom nav bar dimensions
+	    final int showByDefault = mContext.getResources().getBoolean(
+                    com.android.internal.R.bool.config_showNavigationBar) ? 1 : 0;
+            mHasNavigationBar = Settings.System.getIntForUser(resolver,
+                    Settings.System.NAVIGATION_BAR_SHOW, showByDefault,
+                    UserHandle.USER_CURRENT) == 1;
+
             if (!mHasNavigationBar) {
                 // Set the navigation bar's dimensions to 0 in expanded desktop mode
                 mNavigationBarWidthForRotation[mPortraitRotation]
@@ -1678,24 +1707,28 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         = mNavigationBarHeightForRotation[mSeascapeRotation] = 0;
             } else {
                 // Height of the navigation bar when presented horizontally at bottom *******
-                final int defaultHeight =
-                        Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.NAVIGATION_BAR_HEIGHT,
-                        mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_height),
-                        UserHandle.USER_CURRENT);
                 mNavigationBarHeightForRotation[mPortraitRotation] =
                 mNavigationBarHeightForRotation[mUpsideDownRotation] =
-                        (defaultHeight != 0 ? defaultHeight : 48);
+                    Settings.System.getIntForUser(
+                        mContext.getContentResolver(),
+                        Settings.System.NAVIGATION_BAR_HEIGHT,
+                        mContext.getResources()
+                                .getDimensionPixelSize(
+                                    com.android.internal.R.dimen.navigation_bar_height),
+                        UserHandle.USER_CURRENT);
 
                 // Width of the navigation bar when presented vertically along one side
-                final int defaultWidth =
-                        Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.NAVIGATION_BAR_WIDTH,
-                        mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_width),
-                        UserHandle.USER_CURRENT);
                 mNavigationBarWidthForRotation[mPortraitRotation] =
                 mNavigationBarWidthForRotation[mUpsideDownRotation] =
                 mNavigationBarWidthForRotation[mLandscapeRotation] =
                 mNavigationBarWidthForRotation[mSeascapeRotation] =
-                        (defaultWidth != 0 ? defaultWidth : 42);
+                    Settings.System.getIntForUser(
+                        mContext.getContentResolver(),
+                        Settings.System.NAVIGATION_BAR_WIDTH,
+                        mContext.getResources()
+                                .getDimensionPixelSize(
+                                    com.android.internal.R.dimen.navigation_bar_width),
+                        UserHandle.USER_CURRENT);
             }
 
             if (mSystemReady) {
@@ -6336,7 +6369,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // overridden by qemu.hw.mainkeys in the emulator.
     @Override
     public boolean hasNavigationBar() {
-        return mHasNavigationBar;
+        return mOverWriteHasNavigationBar
+            ? mHasNavigationBar
+            : mContext.getResources().getBoolean(
+                    com.android.internal.R.bool.config_showNavigationBar);
     }
 
     @Override
