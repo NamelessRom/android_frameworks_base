@@ -117,7 +117,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected H mHandler = createHandler();
 
     // all notifications
-    protected NotificationData mNotificationData = new NotificationData();
+    protected final NotificationData mNotificationData = new NotificationData();
     protected NotificationRowLayout mPile;
 
     protected NotificationData.Entry mInterruptingNotificationEntry;

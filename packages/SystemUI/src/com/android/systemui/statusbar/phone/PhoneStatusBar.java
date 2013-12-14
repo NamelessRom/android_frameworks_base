@@ -188,6 +188,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     int mIconHPadding = -1;
     Display mDisplay;
     Point mCurrentDisplaySize = new Point();
+    int mCurrUiThemeMode;
     private float mHeadsUpVerticalOffset;
     private int[] mPilePosition = new int[2];
 
@@ -196,7 +197,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     private int mStatusBarWindowState = WINDOW_STATE_SHOWING;
 
     int mPixelFormat;
-    Object mQueueLock = new Object();
+    final Object mQueueLock = new Object();
 
     // viewgroup containing the normal contents of the statusbar
     LinearLayout mStatusBarContents;
@@ -452,6 +453,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
             mCurrentTheme = (CustomTheme)currentTheme.clone();
         }
 
+        mCurrUiThemeMode = mContext.getResources().getConfiguration().uiThemeMode;
+
         super.start(); // calls createAndAddWindows()
 
         addNavigationBar();
@@ -483,7 +486,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         if (mRibbonView == null) {
             ViewStub ribbon_stub = (ViewStub) mStatusBarWindow.findViewById(R.id.ribbon_settings_stub);
             if (ribbon_stub != null) {
-                mRibbonView = (QuickSettingsHorizontalScrollView) ((ViewStub)ribbon_stub).inflate();
+                mRibbonView = (QuickSettingsHorizontalScrollView) ribbon_stub.inflate();
                 mRibbonView.setVisibility(View.VISIBLE);
             }
         }
@@ -2052,8 +2055,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         float value = (padded - BRIGHTNESS_CONTROL_PADDING) /
                 (1 - (2.0f * BRIGHTNESS_CONTROL_PADDING));
 
-        int newBrightness = mMinBrightness + (int) Math.round(value *
-                (android.os.PowerManager.BRIGHTNESS_ON - mMinBrightness));
+        int newBrightness = mMinBrightness + Math.round(value *
+                (PowerManager.BRIGHTNESS_ON - mMinBrightness));
         newBrightness = Math.min(newBrightness, android.os.PowerManager.BRIGHTNESS_ON);
         newBrightness = Math.max(newBrightness, mMinBrightness);
 
@@ -2643,7 +2646,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         mTrackingPosition = -mDisplayMetrics.heightPixels;
     }
 
-    static final float saturate(float a) {
+    static float saturate(float a) {
         return a < 0f ? 0f : (a > 1f ? 1f : a);
     }
 
@@ -2985,7 +2988,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
 
         makeStatusBarView();
         repositionNavigationBar();
-        mNavigationBarView.updateResources();
+        if (mNavigationBarView != null) {
+            mNavigationBarView.updateResources();
+        }
 
         // recreate StatusBarIconViews.
         for (int i = 0; i < nIcons; i++) {
@@ -3026,6 +3031,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
             mCurrentTheme = (CustomTheme)newTheme.clone();
             recreateStatusBar();
         } else {
+
+            // detect theme ui mode change
+            int uiThemeMode = res.getConfiguration().uiThemeMode;
+            if (uiThemeMode != mCurrUiThemeMode) {
+                mCurrUiThemeMode = uiThemeMode;
+                recreateStatusBar();
+                return;
+            }
 
             if (mClearButton instanceof TextView) {
                 ((TextView)mClearButton).setText(context.getText(R.string.status_bar_clear_all_button));

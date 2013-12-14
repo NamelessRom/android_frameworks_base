@@ -98,9 +98,9 @@ public class BatteryMeterView extends View implements DemoMode {
                 post(new Runnable() {
                     int curLevel = 0;
                     int incr = 1;
-                    int saveLevel = level;
-                    int savePlugged = plugType;
-                    Intent dummy = new Intent(Intent.ACTION_BATTERY_CHANGED);
+                    final int saveLevel = level;
+                    final int savePlugged = plugType;
+                    final Intent dummy = new Intent(Intent.ACTION_BATTERY_CHANGED);
                     @Override
                     public void run() {
                         if (curLevel < 0) {
@@ -129,13 +129,8 @@ public class BatteryMeterView extends View implements DemoMode {
         }
 
         protected boolean shouldIndicateCharging() {
-            if (status == BatteryManager.BATTERY_STATUS_CHARGING) {
-                return true;
-            }
-            if (plugged) {
-                return status == BatteryManager.BATTERY_STATUS_FULL;
-            }
-            return false;
+            return status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    plugged && status == BatteryManager.BATTERY_STATUS_FULL;
         }
     }
 
@@ -156,11 +151,11 @@ public class BatteryMeterView extends View implements DemoMode {
 
     final int[] mColors;
 
-    private String mWarningString;
+    private final String mWarningString;
     private final int mChargeColor;
 
     protected boolean mDemoMode;
-    protected BatteryTracker mDemoTracker = new BatteryTracker();
+    protected final BatteryTracker mDemoTracker = new BatteryTracker();
     protected BatteryTracker mTracker = new BatteryTracker();
     private BatteryMeterDrawable mBatteryMeterDrawable;
     private final Object mLock = new Object();
@@ -186,7 +181,9 @@ public class BatteryMeterView extends View implements DemoMode {
         super.onDetachedFromWindow();
 
         mAttached = false;
-        getContext().unregisterReceiver(mTracker);
+        try {
+            getContext().unregisterReceiver(mTracker);
+        } catch (Exception exception) { /* ignored */ }
     }
 
     public BatteryMeterView(Context context) {
@@ -374,7 +371,11 @@ public class BatteryMeterView extends View implements DemoMode {
 
         protected final boolean mHorizontal;
 
-        private Paint mFramePaint, mBatteryPaint, mWarningTextPaint, mTextPaint, mBoltPaint;
+        private final Paint mFramePaint;
+        private final Paint mBatteryPaint;
+        private final Paint mWarningTextPaint;
+        private final Paint mTextPaint;
+        private final Paint mBoltPaint;
         private int mButtonHeight;
         private float mTextHeight, mWarningTextHeight;
 
@@ -607,10 +608,10 @@ public class BatteryMeterView extends View implements DemoMode {
                                         // derived from mCircleSize
         private float   mTextX, mTextY; // precalculated position for drawText() to appear centered
 
-        private Paint   mTextPaint;
-        private Paint   mFrontPaint;
-        private Paint   mBackPaint;
-        private Paint   mBoltPaint;
+        private final Paint   mTextPaint;
+        private final Paint   mFrontPaint;
+        private final Paint   mBackPaint;
+        private final Paint   mBoltPaint;
 
         private final RectF mBoltFrame = new RectF();
         private final float[] mBoltPoints;
