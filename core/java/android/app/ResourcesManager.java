@@ -299,7 +299,8 @@ public class ResourcesManager {
                         }
                     }
                 }
-                if (!isDefaultDisplay || hasOverrideConfiguration) {
+                final boolean themeChanged = (changes & ActivityInfo.CONFIG_UI_THEME_MODE) != 0;
+                if ((!isDefaultDisplay || hasOverrideConfiguration)) {
                     if (tmpConfig == null) {
                         tmpConfig = new Configuration();
                     }
@@ -314,6 +315,9 @@ public class ResourcesManager {
                     r.updateConfiguration(tmpConfig, dm, compat);
                 } else {
                     r.updateConfiguration(config, dm, compat);
+                }
+                if (themeChanged) {
+                    r.updateStringCache();
                 }
                 if (themeChanged) {
                     r.updateStringCache();
