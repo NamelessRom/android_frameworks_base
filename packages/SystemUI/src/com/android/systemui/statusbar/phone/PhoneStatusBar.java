@@ -188,6 +188,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     int mIconHPadding = -1;
     Display mDisplay;
     Point mCurrentDisplaySize = new Point();
+    int mCurrUiThemeMode;
     private float mHeadsUpVerticalOffset;
     private int[] mPilePosition = new int[2];
 
@@ -451,6 +452,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         if (currentTheme != null) {
             mCurrentTheme = (CustomTheme)currentTheme.clone();
         }
+
+        mCurrUiThemeMode = mContext.getResources().getConfiguration().uiThemeMode;
 
         super.start(); // calls createAndAddWindows()
 
@@ -1110,7 +1113,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
                 notification.getNotification().fullScreenIntent.send();
             } catch (PendingIntent.CanceledException e) {
             }
-        } else if (!mRecreating) {
+        } else {
             // usual case: status bar visible & not immersive
 
             // show the ticker if there isn't already a heads up
@@ -2421,6 +2424,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
 
     @Override
     protected void tick(IBinder key, StatusBarNotification n, boolean firstTime) {
+        // we are in the process of recreating the statusbar
+        // so nothing to do right now
+        if (mRecreating) {
+            return;
+        }
         // no ticking in lights-out mode
         if (!areLightsOn()) return;
 
@@ -3031,6 +3039,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
                 ((TextView)mClearButton).setText(context.getText(R.string.status_bar_clear_all_button));
             }
             loadDimens();
+        }
+
+        // detect theme ui mode change
+        int uiThemeMode = res.getConfiguration().uiThemeMode;
+        if (uiThemeMode != mCurrUiThemeMode) {
+            mCurrUiThemeMode = uiThemeMode;
+            recreateStatusBar();
         }
 
         // Update the QuickSettings container
