@@ -3652,6 +3652,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     @Override
     public void setButtonDrawable(int buttonId, int iconId) {
+        if (mNavigationBarView == null) return;
         mNavigationBarView.setButtonDrawable(buttonId, iconId);
     }
 

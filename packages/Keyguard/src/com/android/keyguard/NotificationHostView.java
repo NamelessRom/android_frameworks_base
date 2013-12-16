@@ -333,7 +333,9 @@ public class NotificationHostView extends FrameLayout {
             mScrollView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                     Math.min(maxHeight, NotificationViewManager.config.notificationsHeight * mNotificationMinRowHeight)));
 
-            mDynamicWidth = NotificationViewManager.config.dynamicWidth;
+            if (NotificationViewManager.config != null) {
+                mDynamicWidth = NotificationViewManager.config.dynamicWidth;
+            }
         }
     }
 
@@ -365,9 +367,13 @@ public class NotificationHostView extends FrameLayout {
     }
 
     public boolean addNotification(StatusBarNotification sbn, boolean showNotification, boolean forceBigContentView) {
-        if ((!NotificationViewManager.config.hideLowPriority || sbn.getNotification().priority > Notification.PRIORITY_LOW)
-                && NotificationViewManager.NotificationListener.isValidNotification(sbn)
-                && (!NotificationViewManager.config.hideNonClearable || sbn.isClearable())) {
+        boolean isExcluded = NotificationViewManager.NotificationListener.isValidNotification(sbn);
+        boolean allowLowPriority = !NotificationViewManager.config.hideLowPriority
+                || NotificationViewManager.NotificationListener.isValidLowPriorityNotification(sbn);
+        boolean isNotLowPriority = sbn.getNotification().priority > Notification.PRIORITY_LOW;
+        boolean allowClearable = (NotificationViewManager.config.showNonClearable || sbn.isClearable());
+
+        if (isExcluded && (allowLowPriority || isNotLowPriority) && allowClearable) {
             mNotificationsToAdd.add(new NotificationView(mContext, sbn));
             Message msg = new Message();
             msg.arg1 = showNotification ? 1 : 0;
@@ -506,7 +512,7 @@ public class NotificationHostView extends FrameLayout {
     }
 
     public void removeNotification(final StatusBarNotification sbn) {
-        removeNotification(sbn, true);
+        removeNotification(sbn, NotificationViewManager.config.dismissNotification);
     }
 
     public void removeNotification(final StatusBarNotification sbn, boolean dismiss) {
@@ -530,7 +536,7 @@ public class NotificationHostView extends FrameLayout {
                     animateBackgroundColor(this, 0);
                 }
             }
-            if (!sbn.isClearable()) {
+            if (!sbn.isClearable() || !NotificationViewManager.config.dismissNotification) {
                 mDismissedNotifications.put(describeNotification(sbn), sbn);
             }
             int duration =  getDurationFromDistance(v.getChildAt(0), v.shown ? -mDisplayWidth : mDisplayWidth, 0);
