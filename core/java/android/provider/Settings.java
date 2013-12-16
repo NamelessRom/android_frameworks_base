@@ -3854,16 +3854,23 @@ public final class Settings {
         public static final String LOCKSCREEN_NOTIFICATIONS = "lockscreen_notifications";
 
         /**
-         * Turn screen on when device is pulled out of pocket
+         * Show non clearable notifications from lockscreen notifications
          * @hide
          */
-        public static final String LOCKSCREEN_NOTIFICATIONS_POCKET_MODE = "lockscreen_notifications_pocket_mode";
+        public static final String LOCKSCREEN_NOTIFICATIONS_SHOW_NON_CLEARABLE = "lockscreen_notifications_show_non_clearable";
 
         /**
-         * Whether to enable quiet hours.
+         * Allows dismissing even non-clearable notifications from lockscreen notifications.
+         * Of course, this doesn't really dismiss them, they're just not shown on lockscreen anymore.
          * @hide
          */
-        public static final String LOCKSCREEN_NOTIFICATIONS_SHOW_ALWAYS = "lockscreen_notifications_show_always";
+        public static final String LOCKSCREEN_NOTIFICATIONS_DISMISS_ALL = "lockscreen_notifications_dismiss_all";
+
+        /**
+         * Controls whether clearable notifications are dismissed when removed from view.
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_DISMISS_NOTIFICATION = "lockscreen_notifications_dismiss_notification";
 
         /**
          * Hide low priority notifications such as google now weather notifications from lockscreen notifications
@@ -3872,17 +3879,66 @@ public final class Settings {
         public static final String LOCKSCREEN_NOTIFICATIONS_HIDE_LOW_PRIORITY = "lockscreen_notifications_hide_low_priority";
 
         /**
-         * Hide non clearable notifications from lockscreen notifications
+         * A list of packages to include low priority notifications from even when show low priority has been disabled
+         * This should be a string of packages separated by |
          * @hide
          */
-        public static final String LOCKSCREEN_NOTIFICATIONS_HIDE_NON_CLEARABLE = "lockscreen_notifications_hide_non_clearable";
+        public static final String LOCKSCREEN_NOTIFICATIONS_INCLUDED_APPS = "lockscreen_notifications_included_apps";
 
         /**
-         * Allows dismissing even non-clearable notifications from lockscreen notifications.
-         * Of course, this doesn't really dismiss them, they're just not shown on lockscreen anymore.
+         * A list of packages to exclude from being displayed as lockscreen notifications.
+         * This should be a string of packages separated by |
          * @hide
          */
-        public static final String LOCKSCREEN_NOTIFICATIONS_DISMISS_ALL = "lockscreen_notifications_dismiss_all";
+        public static final String LOCKSCREEN_NOTIFICATIONS_EXCLUDED_APPS = "lockscreen_notifications_excluded_apps";
+
+        /**
+         * Turn screen on when device is pulled out of pocket
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_POCKET_MODE = "lockscreen_notifications_pocket_mode";
+
+        /**
+         * Turn screen on when pulled out of pocket even if no notifications are pending
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_SHOW_ALWAYS = "lockscreen_notifications_show_always";
+
+        /**
+         * Wakes the device when a new notifications is received
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_WAKE_ON_NOTIFICATION = "lockscreen_notifications_wake_on_notification";
+
+        /**
+         * Enables dynamic with for shown notifications on devices >= xxhdpi
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_DYNAMIC_WIDTH = "lockscreen_notifications_dynamic_width";
+
+        /**
+         * Changes the offset of the notifications to the top of the screen
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_OFFSET_TOP = "lockscreen_notifications_offset_top";
+
+        /**
+         * Sets the count of notifications shown at once
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_HEIGHT = "lockscreen_notifications_height";
+
+        /**
+         * Set a custom notification background color
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_COLOR = "lockscreen_notifications_color";
+
+        /**
+         * Enables a privacy mode which disables showing notifications.
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_PRIVACY_MODE = "lockscreen_notifications_privacy_mode";
 
         /**
          * Toggle between extended and normal view by longpressing the notification
@@ -3895,12 +3951,6 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_NOTIFICATIONS_FORCE_EXPANDED_VIEW = "lockscreen_notifications_force_expanded_view";
-
-        /**
-         * Wakes the device when a new notifications is received
-         * @hide
-         */
-        public static final String LOCKSCREEN_NOTIFICATIONS_WAKE_ON_NOTIFICATION = "lockscreen_notifications_wake_on_notification";
 
        /**
         * Sets the portrait background of notification drawer
@@ -3937,43 +3987,6 @@ public final class Settings {
          * @hide
          */
         public static final String NOTIFICATION_BRIGHTNESS_SLIDER = "notification_brightness_slider";
-
-        /**
-         * Sets the count of notifications shown at once
-         * @hide
-         */
-        public static final String LOCKSCREEN_NOTIFICATIONS_HEIGHT = "lockscreen_notifications_height";
-
-        /**
-         * Enables dynamic with for shown notifications on devices >= xxhdpi
-         * @hide
-         */
-        public static final String LOCKSCREEN_NOTIFICATIONS_DYNAMIC_WIDTH = "lockscreen_notifications_dynamic_width";
-
-        /**
-         * Changes the offset of the notifications to the top of the screen
-         * @hide
-         */
-        public static final String LOCKSCREEN_NOTIFICATIONS_OFFSET_TOP = "lockscreen_notifications_offset_top";
-
-        /**
-         * Enables a privacy mode which disables showing notifications.
-         * @hide
-         */
-        public static final String LOCKSCREEN_NOTIFICATIONS_PRIVACY_MODE = "lockscreen_notifications_privacy_mode";
-
-       /**
-         * A list of packages to exclude from being displayed as lockscreen notifications.
-         * This should be a string of packages separated by |
-         * @hide
-         */
-        public static final String LOCKSCREEN_NOTIFICATIONS_EXCLUDED_APPS = "lockscreen_notifications_excluded_apps";
-
-        /**
-         * Set a custom notification background color
-         * @hide
-         */
-        public static final String LOCKSCREEN_NOTIFICATIONS_COLOR = "lockscreen_notifications_color";
 
         /**
          * Whether to remove the vibration from outgoing notifications during quiet hours.
