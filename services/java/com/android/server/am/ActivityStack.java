@@ -3161,9 +3161,7 @@ final class ActivityStack {
 
         final TaskRecord task = mResumedActivity != null ? mResumedActivity.task : null;
         if (task == tr && task.mOnTopOfHome || numTasks <= 1) {
-            if (task != null) {
-                task.mOnTopOfHome = false;
-            }
+            tr.mOnTopOfHome = false;
             return mStackSupervisor.resumeHomeActivity(null);
         }
 
