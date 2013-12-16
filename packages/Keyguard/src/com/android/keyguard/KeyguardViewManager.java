@@ -175,7 +175,7 @@ public class KeyguardViewManager {
         void observe() {
             final ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.LOCKSCREEN_NOTIFICATIONS), false, this);
+                    Settings.System.LOCKSCREEN_NOTIFICATIONS), false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.Nameless.getUriFor(
                     Settings.Nameless.LOCKSCREEN_SEE_THROUGH), false, this);
 
@@ -194,8 +194,8 @@ public class KeyguardViewManager {
     }
 
     private void updateSettings() {
-        mLockscreenNotifications = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_NOTIFICATIONS, mLockscreenNotifications ? 1 : 0) == 1;
+        mLockscreenNotifications = Settings.System.getBooleanForUser(mContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_NOTIFICATIONS, false, UserHandle.USER_CURRENT);
         if (mLockscreenNotifications && mNotificationViewManager == null) {
             mNotificationViewManager = new NotificationViewManager(mContext, this);
         } else if(!mLockscreenNotifications && mNotificationViewManager != null) {
