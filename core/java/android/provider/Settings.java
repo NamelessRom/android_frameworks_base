@@ -3983,6 +3983,19 @@ public final class Settings {
         public static final String LOCKSCREEN_NOTIFICATIONS_COLOR = "lockscreen_notifications_color";
 
         /**
+         * Controls whether clearable notifications are dismissed when removed from view.
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_DISMISS_NOTIFICATION = "lockscreen_notifications_dismiss_notification";
+
+        /**
+         * A list of packages to include low priority notifications from even when show low priority has been disabled
+         * This should be a string of packages separated by |
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_INCLUDED_APPS = "lockscreen_notifications_included_apps";
+
+        /**
          * Whether to remove the vibration from outgoing notifications during quiet hours.
          * @hide
          */
