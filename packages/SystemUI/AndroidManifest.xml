@@ -85,6 +85,19 @@
     <!-- Wifi Display -->
     <uses-permission android:name="android.permission.CONFIGURE_WIFI_DISPLAY" />
 
+<<<<<<< HEAD
+=======
+    <!-- Active display -->
+    <uses-permission android:name="android.permission.SYSTEM_NOTIFICATION_LISTENER" />
+
+    <!-- Sync -->
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+
+>>>>>>> c59d05b... Base: QuickToggles (AOSPA) modification
     <application
         android:persistent="true"
         android:allowClearUserData="false"

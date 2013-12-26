@@ -64,8 +64,12 @@ public final class RotationPolicy {
      * settings.
      */
     public static boolean isRotationLockToggleSupported(Context context) {
+<<<<<<< HEAD
         return isRotationSupported(context)
                 && context.getResources().getConfiguration().smallestScreenWidthDp >= 600;
+=======
+        return true; // All of our devices support this
+>>>>>>> c59d05b... Base: QuickToggles (AOSPA) modification
     }
 
     /**

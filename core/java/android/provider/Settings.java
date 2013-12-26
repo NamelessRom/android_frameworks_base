@@ -3217,6 +3217,7 @@ public final class Settings {
         public static final String POWER_MENU_SOUND_ENABLED = "power_menu_silent_enabled";
 
         /**
+<<<<<<< HEAD
           * Swap volume buttons when the screen is rotated
           * 0 - Disabled
           * 1 - Enabled (screen is rotated by 90 or 180 degrees: phone, hybrid)
@@ -3246,6 +3247,16 @@ public final class Settings {
          * Whether to allow notification vibration while notification alerts are disabled
          * (e.g. during phone calls). The vibration pattern to be used will be a subtle one;
          * custom vibration is disabled at that point.
+=======
+         * Quick settings tiles to show on status bar
+         * @hide
+         */
+        public static final String QUICK_SETTINGS_TILES = "quick_settings_tiles";
+
+        /**
+         * Volume key controls ringtone or media sound stream
+         *
+>>>>>>> c59d05b... Base: QuickToggles (AOSPA) modification
          * @hide
          */
         public static final String NOTIFICATION_VIBRATE_DURING_ALERTS_DISABLED = "vibrate_while_no_alerts";
