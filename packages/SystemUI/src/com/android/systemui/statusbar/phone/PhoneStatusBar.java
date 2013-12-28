@@ -3042,7 +3042,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         int uiThemeMode = res.getConfiguration().uiThemeMode;
         if (uiThemeMode != mCurrUiThemeMode) {
             mCurrUiThemeMode = uiThemeMode;
-            recreateStatusBar();
+            recreateStatusBar(false);
+
+        } else {
+            if (mClearButton instanceof TextView) {
+                ((TextView)mClearButton).setText(
+                        context.getText(R.string.status_bar_clear_all_button));
+            }
+            loadDimens();
         }
 
         // Update the QuickSettings container
