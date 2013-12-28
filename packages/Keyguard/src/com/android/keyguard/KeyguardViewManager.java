@@ -43,8 +43,8 @@ import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -121,7 +121,7 @@ public class KeyguardViewManager {
 
     private NotificationHostView mNotificationView;
     private NotificationViewManager mNotificationViewManager;
-    private boolean mLockscreenNotifications = true;
+    private boolean mLockscreenNotifications = false;
 
     private static final String WALLPAPER_IMAGE_PATH =
             "/data/data/com.android.settings/files/lockscreen_wallpaper";
@@ -131,10 +131,10 @@ public class KeyguardViewManager {
     private KeyguardUpdateMonitorCallback mBackgroundChanger = new KeyguardUpdateMonitorCallback() {
         @Override
         public void onSetBackground(Bitmap bmp) {
-            if (bmp != null) mBlurredImage = null;
-            mIsCoverflow = true;
-            setCustomBackground (bmp);
-        }
+            mKeyguardHost.setCustomBackground(bmp != null ?
+                    new BitmapDrawable(mContext.getResources(), bmp) : null);
+             updateShowWallpaper(bmp == null);
+         }
     };
 
     public interface ShowListener {
@@ -159,9 +159,10 @@ public class KeyguardViewManager {
         @Override
         public void onChange(boolean selfChange) {
             updateSettings();
-            if (mKeyguardHost == null) {
-                maybeCreateKeyguardLocked(shouldEnableScreenRotation(), false, null);
-                hide();
+            try {
+                mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
+            } catch(IllegalArgumentException e) {
+                // Do nothing...
             }
             mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
         }
@@ -188,6 +189,7 @@ public class KeyguardViewManager {
      * @param viewManager Keyguard will be attached to this.
      * @param callback Used to notify of changes.
      * @param lockPatternUtils
+     * @param SettingsObserver used to observe lockscreen notifications changes
      */
     public KeyguardViewManager(Context context, ViewManager viewManager,
             KeyguardViewMediator.ViewMediatorCallback callback,
@@ -200,7 +202,6 @@ public class KeyguardViewManager {
 
         SettingsObserver observer = new SettingsObserver(new Handler());
         observer.observe();
-
         updateSettings();
     }
 
@@ -329,7 +330,7 @@ public class KeyguardViewManager {
             mLastConfiguration = context.getResources().getConfiguration();
         }
 
-       public void setCustomBackground(Drawable d) {
+        public void setCustomBackground(Drawable d) {
             if (!mAudioManager.isMusicActive()) {
 
                 int mBackgroundStyle = Settings.System.getInt(mContext.getContentResolver(),
@@ -359,39 +360,38 @@ public class KeyguardViewManager {
                 setBackground(mBackgroundDrawable);
             }
 
-            if (!ActivityManager.isHighEndGfx() || !mScreenOn) {
+            if (!ActivityManager.isHighEndGfx()) {
                 mCustomBackground = d;
                 if (d != null) {
                     d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
                 }
                 computeCustomBackgroundBounds(mCustomBackground);
-                setBackground(mBackgroundDrawable);
+                invalidate();
             } else {
                 if (getWidth() == 0 || getHeight() == 0) {
                     d = null;
                 }
-                Drawable old = mCustomBackground;
-                if (old == null && d == null) {
+                if (d == null) {
+                    mCustomBackground = null;
+                    setBackground(mBackgroundDrawable);
                     return;
                 }
-                boolean newIsNull = false;
+                Drawable old = mCustomBackground;
                 if (old == null) {
-                    old = new ColorDrawable(BACKGROUND_COLOR);
+                    old = new ColorDrawable(0);
+                    computeCustomBackgroundBounds(old);
                 }
-                if (d == null) {
-                    d = new ColorDrawable(BACKGROUND_COLOR);
-                    newIsNull = true;
-                } else {
-                    d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
-                }
+
+                d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
+                mCustomBackground = d;
                 computeCustomBackgroundBounds(d);
                 Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas c = new Canvas(b);
-                drawToCanvas(c, d);
+                mBackgroundDrawable.draw(c);
 
-                Drawable dd = new BitmapDrawable(mContext.getResources(), b);
+                Drawable dd = new BitmapDrawable(b);
 
-                mTransitionBackground = new TransitionDrawable(new Drawable[] {old, dd});
+                mTransitionBackground = new TransitionDrawable(new Drawable[]{old, dd});
                 mTransitionBackground.setCrossFadeEnabled(true);
                 setBackground(mTransitionBackground);
 
@@ -399,7 +399,7 @@ public class KeyguardViewManager {
 
                 mCustomBackground = dd;
                 invalidate();
-        }
+            }
 
             if (d != null) {
                 d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
@@ -708,7 +708,6 @@ public class KeyguardViewManager {
         if (v != null) {
             mKeyguardHost.removeView(v);
         }
-
         final LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.keyguard_host_view, mKeyguardHost, true);
         mKeyguardView = (KeyguardHostView) view.findViewById(R.id.keyguard_host_view);
@@ -785,6 +784,7 @@ public class KeyguardViewManager {
         } else {
             mWindowLayoutParams.flags &= ~WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
         }
+
         mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
     }
 
@@ -874,7 +874,6 @@ public class KeyguardViewManager {
                 Slog.w(TAG, "Exception calling onShown():", e);
             }
         }
-
         if (mLockscreenNotifications) {
             mNotificationViewManager.onScreenTurnedOn();
         }
@@ -960,4 +959,3 @@ public class KeyguardViewManager {
         }
     }
 }
-
