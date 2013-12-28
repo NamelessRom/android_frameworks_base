@@ -329,7 +329,7 @@ public class KeyguardViewManager {
             mLastConfiguration = context.getResources().getConfiguration();
         }
 
-       public void setCustomBackground(Drawable d) {
+        public void setCustomBackground(Drawable d) {
             if (!mAudioManager.isMusicActive()) {
 
                 int mBackgroundStyle = Settings.System.getInt(mContext.getContentResolver(),
@@ -359,39 +359,38 @@ public class KeyguardViewManager {
                 setBackground(mBackgroundDrawable);
             }
 
-            if (!ActivityManager.isHighEndGfx() || !mScreenOn) {
+            if (!ActivityManager.isHighEndGfx()) {
                 mCustomBackground = d;
                 if (d != null) {
                     d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
                 }
                 computeCustomBackgroundBounds(mCustomBackground);
-                setBackground(mBackgroundDrawable);
+                invalidate();
             } else {
                 if (getWidth() == 0 || getHeight() == 0) {
                     d = null;
                 }
-                Drawable old = mCustomBackground;
-                if (old == null && d == null) {
+                if (d == null) {
+                    mCustomBackground = null;
+                    setBackground(mBackgroundDrawable);
                     return;
                 }
-                boolean newIsNull = false;
+                Drawable old = mCustomBackground;
                 if (old == null) {
-                    old = new ColorDrawable(BACKGROUND_COLOR);
+                    old = new ColorDrawable(0);
+                    computeCustomBackgroundBounds(old);
                 }
-                if (d == null) {
-                    d = new ColorDrawable(BACKGROUND_COLOR);
-                    newIsNull = true;
-                } else {
-                    d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
-                }
+
+                d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
+                mCustomBackground = d;
                 computeCustomBackgroundBounds(d);
                 Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas c = new Canvas(b);
-                drawToCanvas(c, d);
+                mBackgroundDrawable.draw(c);
 
-                Drawable dd = new BitmapDrawable(mContext.getResources(), b);
+                Drawable dd = new BitmapDrawable(b);
 
-                mTransitionBackground = new TransitionDrawable(new Drawable[] {old, dd});
+                mTransitionBackground = new TransitionDrawable(new Drawable[]{old, dd});
                 mTransitionBackground.setCrossFadeEnabled(true);
                 setBackground(mTransitionBackground);
 
@@ -399,7 +398,7 @@ public class KeyguardViewManager {
 
                 mCustomBackground = dd;
                 invalidate();
-        }
+            }
 
             if (d != null) {
                 d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
@@ -960,4 +959,3 @@ public class KeyguardViewManager {
         }
     }
 }
-
