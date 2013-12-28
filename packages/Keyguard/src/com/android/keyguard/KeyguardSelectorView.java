@@ -39,10 +39,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -234,19 +236,108 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
+        Resources res = getResources();
+
+        LinearLayout glowPadContainer = (LinearLayout) findViewById(
+                R.id.keyguard_glow_pad_container);
+        if (glowPadContainer != null) {
+            glowPadContainer.bringToFront();
+        }
+        final boolean isLandscape = res.getSystem().getConfiguration()
+                .orientation == Configuration.ORIENTATION_LANDSCAPE;
+        if (glowPadContainer != null &&  isLandscape &&
+                LockscreenTargetUtils.isShortcuts(mContext) &&
+                DeviceUtils.isPhone(mContext) &&
+                !LockscreenTargetUtils.isEightTargets(mContext)) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL
+            );
+            int pxBottom = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                60,
+                res.getDisplayMetrics());
+            params.setMargins(0, 0, 0, -pxBottom);
+            glowPadContainer.setLayoutParams(params);
+        }
+
+        if (glowPadContainer != null &&
+                LockscreenTargetUtils.isEightTargets(mContext)) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER
+            );
+            int pxBottom = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                10,
+                res.getDisplayMetrics());
+            params.setMargins(0, 0, 0, -pxBottom);
+            glowPadContainer.setLayoutParams(params);
+        }
+
+        LinearLayout msgAndShortcutsContainer = (LinearLayout) findViewById(
+                R.id.keyguard_message_and_shortcuts);
+        msgAndShortcutsContainer.bringToFront();
+
+        int lockColor = Settings.Secure.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.Secure.LOCKSCREEN_LOCK_COLOR, -2,
+                UserHandle.USER_CURRENT);
+
+        int dotColor = Settings.Secure.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.Secure.LOCKSCREEN_DOTS_COLOR, -2,
+                UserHandle.USER_CURRENT);
+
+        String lockIcon = Settings.Secure.getStringForUser(
+                mContext.getContentResolver(),
+                Settings.Secure.LOCKSCREEN_LOCK_ICON,
+                UserHandle.USER_CURRENT);
+
         mGlowPadView = (GlowPadView) findViewById(R.id.glow_pad_view);
         mGlowPadView.setOnTriggerListener(mOnTriggerListener);
+
+        Bitmap lock = null;
+
+        if (lockIcon != null && lockIcon.length() > 0) {
+            File f = new File(lockIcon);
+            if (f.exists()) {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                lock = BitmapFactory.decodeFile(lockIcon, options);
+
+                if (Settings.Secure.getIntForUser(
+                        mContext.getContentResolver(),
+                        Settings.Secure.LOCKSCREEN_COLORIZE_LOCK, 0,
+                        UserHandle.USER_CURRENT) == 0) {
+                    lockColor = -2;
+                }
+            }
+        }
+
+        mGlowPadView.setColoredIcons(lockColor, dotColor, lock);
+
         updateTargets();
+
+        if (Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.LOCKSCREEN_VIBRATE_ENABLED, 1) == 0) {
+            mGlowPadView.setVibrateEnabled(false);
+        }
 
         mSecurityMessageDisplay = new KeyguardMessageArea.Helper(this);
         View bouncerFrameView = findViewById(R.id.keyguard_selector_view_frame);
-        mBouncerFrame = bouncerFrameView.getBackground();
+        mBouncerFrame =
+                KeyguardSecurityViewHelper.colorizeFrame(
+                mContext, bouncerFrameView.getBackground());
 
         mGlowTorchRunning = false;
-        mGlowTorch = (Settings.System.getIntForUser(
-                mContext.getContentResolver(), Settings.System.LOCKSCREEN_GLOWPAD_TORCH, 0,
-                UserHandle.USER_CURRENT) == 1)
-                && NamelessUtils.isPackageInstalled(mContext, FlashLightConstants.APP_PACKAGE_NAME);
+        mGlowTorch = Settings.System.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_GLOWPAD_TORCH, 0,
+                UserHandle.USER_CURRENT) == 1;
     }
 
     public void setCarrierArea(View carrierArea) {
