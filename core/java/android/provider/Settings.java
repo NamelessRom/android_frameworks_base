@@ -1977,12 +1977,6 @@ public final class Settings {
         public static final String VIBRATE_INPUT_DEVICES = "vibrate_input_devices";
 
         /**
-         * Empty volume.
-         * @hide
-         */
-        public static final String VOLUME_DEFAULT = "volume_default";
-
-        /**
          * Ringer volume. This is used internally, changing this value will not
          * change the volume. See AudioManager.
          */
@@ -3103,13 +3097,6 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_CUSTOM_HEADER = "status_bar_custom_header";
-
-        /**
-         * Volume key controls ringtone or media sound stream
-         *
-         * @hide
-         */
-        public static final String VOLUME_KEYS_DEFAULT = "volume_keys_default";
 
         /**
          * Should the non-intrsive incall ui be used
