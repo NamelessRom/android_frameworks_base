@@ -97,6 +97,7 @@ public class BluetoothTile extends QuickSettingsTile implements BluetoothStateCh
             mDrawable = R.drawable.ic_qs_bluetooth_off;
             mLabel = mContext.getString(R.string.quick_settings_bluetooth_off_label);
         }
+        flipTile(enabled);
     }
 
     @Override

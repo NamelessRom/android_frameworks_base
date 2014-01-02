@@ -62,6 +62,7 @@ public class BugReportTile extends QuickSettingsTile{
             enabled = (Settings.Global.getInt(cr, Settings.Global.BUGREPORT_IN_POWER_MENU) != 0);
         } catch (SettingNotFoundException e) {
         }
+        flipTile(enabled);
     }
 
     @Override

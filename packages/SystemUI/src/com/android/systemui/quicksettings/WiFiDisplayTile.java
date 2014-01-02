@@ -52,13 +52,14 @@ public class WiFiDisplayTile extends QuickSettingsTile{
     }
 
     private synchronized void updateTile() {
-        if(enabled && connected) {
+        if (enabled && connected) {
             mLabel = mContext.getString(R.string.quick_settings_wifi_display_label);
             mDrawable = R.drawable.ic_qs_cast_connected;
-        }else{
+        } else {
             mLabel = mContext.getString(R.string.quick_settings_wifi_display_no_connection_label);
             mDrawable = R.drawable.ic_qs_cast_available;
         }
+        flipTile(enabled && connected);
     }
 
     @Override

@@ -1,13 +1,18 @@
 package com.android.systemui.quicksettings;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.app.ActivityManagerNative;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.os.UserHandle;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +42,8 @@ public class QuickSettingsTile implements OnClickListener {
     protected PhoneStatusBar mStatusbarService;
     protected QuickSettingsController mQsc;
     protected SharedPreferences mPrefs;
+    protected Vibrator mVibrator;
+    private Handler mHandler = new Handler();
 
     public QuickSettingsTile(Context context, QuickSettingsController qsc) {
         this(context, qsc, R.layout.quick_settings_tile_basic);
@@ -50,6 +57,7 @@ public class QuickSettingsTile implements OnClickListener {
         mQsc = qsc;
         mTileLayout = layout;
         mPrefs = mContext.getSharedPreferences("quicksettings", Context.MODE_PRIVATE);
+        mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     public void setupQuickSettingsTile(LayoutInflater inflater,
@@ -105,6 +113,37 @@ public class QuickSettingsTile implements OnClickListener {
         }
     }
 
+    public boolean isVibrationEnabled() {
+        return true;
+    }
+
+    public void vibrateTile(int duration) {
+        if (!isVibrationEnabled()) return;
+        if (mVibrator != null) {
+            if (mVibrator.hasVibrator()) mVibrator.vibrate(duration);
+        }
+    }
+
+    public boolean isFlipTilesEnabled() {
+        return true;
+    }
+
+    public void flipTile(boolean flipRight){
+        final AnimatorSet anim = (AnimatorSet) AnimatorInflater.loadAnimator(
+                mContext, (flipRight ? R.anim.flip_right : R.anim.flip_left));
+        anim.setTarget(mTile);
+        anim.setDuration(200);
+
+        Runnable doAnimation = new Runnable(){
+            @Override
+            public void run() {
+                anim.start();
+            }
+        };
+
+        mHandler.postDelayed(doAnimation, 0);
+    }
+
     void startSettingsActivity(String action) {
         Intent intent = new Intent(action);
         startSettingsActivity(intent);
@@ -131,6 +170,8 @@ public class QuickSettingsTile implements OnClickListener {
         if (mOnClick != null) {
             mOnClick.onClick(v);
         }
+
+        vibrateTile(100);
 
         ContentResolver resolver = mContext.getContentResolver();
         boolean shouldCollapse = Settings.System.getIntForUser(resolver,

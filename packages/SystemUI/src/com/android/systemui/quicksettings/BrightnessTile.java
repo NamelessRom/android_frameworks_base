@@ -75,6 +75,7 @@ public class BrightnessTile extends QuickSettingsTile implements BrightnessState
         } catch (SettingNotFoundException e) {
             Log.e(TAG, "Brightness setting not found", e);
         }
+        flipTile(true);
     }
 
     @Override

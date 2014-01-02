@@ -61,6 +61,7 @@ public class QuietHoursTile extends QuickSettingsTile {
             mDrawable = R.drawable.ic_qs_quiet_hours_off;
             mLabel = mContext.getString(R.string.quick_settings_quiethours_off);
         }
+        flipTile(mEnabled);
     }
 
     @Override

@@ -50,6 +50,7 @@ public class SleepScreenTile extends QuickSettingsTile {
     private synchronized void updateTile() {
         mDrawable = R.drawable.ic_qs_sleep;
         mLabel = mContext.getString(R.string.quick_settings_screen_sleep);
+        flipTile(true);
     }
 
 }

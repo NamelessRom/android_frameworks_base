@@ -95,6 +95,7 @@ public class UsbTetherTile extends QuickSettingsTile {
             mDrawable = R.drawable.ic_qs_usb_tether_off;
             mLabel = mContext.getString(R.string.quick_settings_usb_tether_off_label);
         }
+        flipTile(mUsbConnected && !mMassStorageActive);
     }
 
     private void updateState() {

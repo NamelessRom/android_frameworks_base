@@ -46,6 +46,7 @@ public class WiFiTile extends NetworkTile {
             mDrawable = R.drawable.ic_qs_wifi_no_network;
             mLabel = mContext.getString(R.string.quick_settings_wifi_off_label);
         }
+        flipTile(mWifiConnected);
     }
 
     @Override
