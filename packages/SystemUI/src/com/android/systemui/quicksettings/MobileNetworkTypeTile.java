@@ -170,6 +170,7 @@ public class MobileNetworkTypeTile extends QuickSettingsTile implements NetworkS
                 }
                 break;
         }
+        flipTile(true);
     }
 
     private static int get2G3G(Context context) {

@@ -84,6 +84,7 @@ public class ScreenTimeoutTile extends QuickSettingsTile {
             mDrawable = R.drawable.ic_qs_screen_timeout_on;
         }
         */
+        flipTile(true);
     }
 
     protected void toggleState() {

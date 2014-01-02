@@ -132,6 +132,7 @@ public class InputMethodTile extends QuickSettingsTile {
         mLabel = getCurrentInputMethodName(mContext, mContext.getContentResolver(),
                 mImm, imis, mContext.getPackageManager());
         mDrawable = R.drawable.ic_qs_ime;
+        flipTile(true);
     }
 
     public void toggleVisibility(boolean show) {

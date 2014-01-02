@@ -78,6 +78,7 @@ public class ProfileTile extends QuickSettingsTile {
     private synchronized void updateTile() {
         mDrawable = R.drawable.ic_qs_profiles;
         mLabel = mProfileManager.getActiveProfile().getName();
+        flipTile(true);
     }
 
     @Override

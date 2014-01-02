@@ -74,6 +74,7 @@ public class MobileNetworkTile extends NetworkTile {
         mLabel = mEnabled
                 ? removeTrailingPeriod(mDescription)
                 : r.getString(R.string.quick_settings_rssi_emergency_only);
+        flipTile(mEnabled);
     }
 
     @Override
