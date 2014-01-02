@@ -76,10 +76,12 @@ public class LteTile extends QuickSettingsTile {
             case Phone.NT_MODE_LTE_WCDMA:
                 mDrawable = R.drawable.ic_qs_lte_on;
                 mLabel = mContext.getString(R.string.quick_settings_lte);
+                flipTile(true);
                 break;
             default:
                 mDrawable = R.drawable.ic_qs_lte_off;
                 mLabel = mContext.getString(R.string.quick_settings_lte_off);
+                flipTile(false);
                 break;
         }
     }

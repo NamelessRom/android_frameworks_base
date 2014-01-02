@@ -64,6 +64,7 @@ public class GPSTile extends QuickSettingsTile implements LocationSettingsChange
         mLabel = mContext.getText(textResId).toString();
         mDrawable = mLocationEnabled
                 ? R.drawable.ic_qs_location_on : R.drawable.ic_qs_location_off;
+        flipTile(mLocationEnabled);
     }
 
     @Override

@@ -97,6 +97,7 @@ public class RingerModeTile extends QuickSettingsTile {
         // The icon will change depending on index
         findCurrentState();
         mDrawable = mRingers.get(mRingerIndex).mDrawable;
+        flipTile(true);
     }
 
     protected void toggleState() {

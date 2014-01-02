@@ -52,5 +52,6 @@ public class VolumeTile extends QuickSettingsTile {
     private synchronized void updateTile() {
         mDrawable = R.drawable.ic_qs_volume;
         mLabel = mContext.getString(R.string.quick_settings_volume);
+        flipTile(true);
     }
 }

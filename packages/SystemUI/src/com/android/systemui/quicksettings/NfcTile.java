@@ -80,12 +80,14 @@ public class NfcTile extends QuickSettingsTile {
         case NfcAdapter.STATE_ON:
             mDrawable = R.drawable.ic_qs_nfc_on;
             mLabel = mContext.getString(R.string.quick_settings_nfc);
+            flipTile(false);
             break;
         case NfcAdapter.STATE_TURNING_OFF:
         case NfcAdapter.STATE_OFF:
         default:
             mDrawable = R.drawable.ic_qs_nfc_off;
             mLabel = mContext.getString(R.string.quick_settings_nfc_off);
+            flipTile(true);
             break;
         }
     }

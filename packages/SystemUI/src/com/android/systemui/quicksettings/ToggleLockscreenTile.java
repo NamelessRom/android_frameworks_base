@@ -80,6 +80,7 @@ public class ToggleLockscreenTile extends QuickSettingsTile
         mLabel = mContext.getString(R.string.quick_settings_lockscreen);
         mDrawable = sDisabledLockscreen ?
                 R.drawable.ic_qs_lock_screen_off : R.drawable.ic_qs_lock_screen_on;
+        flipTile(true);
     }
 
     private void updateLockscreenState() {

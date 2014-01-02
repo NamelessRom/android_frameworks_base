@@ -290,8 +290,10 @@ public class CameraTile extends QuickSettingsTile {
     public void onClick(View v) {
         if (mCamera == null) {
             mHandler.post(mStartRunnable);
+            flipTile(true);
         } else {
             mHandler.post(mTakePictureRunnable);
+            flipTile(false);
         }
     }
 

@@ -61,6 +61,7 @@ public class TorchTile extends QuickSettingsTile {
             mDrawable = R.drawable.ic_qs_torch_off;
             mLabel = mContext.getString(R.string.quick_settings_torch_off);
         }
+        flipTile(mActive);
     }
 
     @Override

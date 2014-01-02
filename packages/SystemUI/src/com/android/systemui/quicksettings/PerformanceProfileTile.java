@@ -105,6 +105,7 @@ public class PerformanceProfileTile extends QuickSettingsTile {
     private synchronized void updateTile() {
         mDrawable = mTypedArrayDrawables.getResourceId(mCurrentValue, -1);
         mLabel = mEntries[mCurrentValue];
+        flipTile(true);
     }
 
 
