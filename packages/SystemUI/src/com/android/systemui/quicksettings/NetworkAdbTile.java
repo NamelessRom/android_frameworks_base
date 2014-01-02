@@ -75,6 +75,7 @@ public class NetworkAdbTile extends QuickSettingsTile {
             mLabel = mContext.getString(R.string.quick_settings_network_adb_disabled_label);
             mDrawable = R.drawable.ic_qs_network_adb_off;
         }
+        flipTile(!getEnabled());
     }
 
     private boolean getEnabled() {

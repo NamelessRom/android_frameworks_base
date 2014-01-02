@@ -37,5 +37,6 @@ public class PreferencesTile extends QuickSettingsTile{
     private synchronized void updateTile() {
         mDrawable = R.drawable.ic_qs_settings;
         mLabel = mContext.getString(R.string.quick_settings_settings_label);
+        flipTile(true);
     }
 }

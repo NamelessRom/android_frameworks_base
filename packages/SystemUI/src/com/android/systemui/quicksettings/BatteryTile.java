@@ -103,6 +103,7 @@ public class BatteryTile extends QuickSettingsTile implements BatteryStateChange
                 : mContext.getString(R.string.status_bar_settings_battery_meter_format,
                         mBatteryLevel);
         }
+        flipTile(true);
     }
 
     @Override

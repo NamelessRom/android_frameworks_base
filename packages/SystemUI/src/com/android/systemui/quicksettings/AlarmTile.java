@@ -49,6 +49,7 @@ public class AlarmTile extends QuickSettingsTile {
         mDrawable = R.drawable.ic_qs_alarm_on;
         mLabel = Settings.System.getStringForUser(mContext.getContentResolver(),
                 Settings.System.NEXT_ALARM_FORMATTED, UserHandle.USER_CURRENT);
+        flipTile(true);
     }
 
     @Override

@@ -60,6 +60,7 @@ public class SyncTile extends QuickSettingsTile {
             mDrawable = R.drawable.ic_qs_sync_off;
             mLabel = mContext.getString(R.string.quick_settings_sync_off);
         }
+        flipTile(getSyncState());
     }
 
     @Override

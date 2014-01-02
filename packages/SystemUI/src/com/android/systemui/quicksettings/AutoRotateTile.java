@@ -52,6 +52,7 @@ public class AutoRotateTile extends QuickSettingsTile {
             mDrawable = R.drawable.ic_qs_auto_rotate;
             mLabel = mContext.getString(R.string.quick_settings_rotation_unlocked_label);
         }
+        flipTile(getAutoRotation());
     }
 
     @Override
