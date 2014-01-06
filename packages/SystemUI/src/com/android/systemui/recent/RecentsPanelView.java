@@ -47,6 +47,7 @@ import android.os.RemoteException;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -359,13 +360,29 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
 
             if (showMemoryIndicator) {
 
+                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)
+                        mRecentsMemoryIndicator.getLayoutParams();
+
+                // Set margins programicaly if there is no HW buttons
+                if (!hasHWbuttons()) {
+                    final Configuration config = getResources().getConfiguration();
+                    if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        layoutParams.setMargins(pxToDp(15, mContext), 0, 0, pxToDp(65, mContext));
+                    } else {
+                        // phablet or tablet
+                        if (isTablet(mContext)) {
+                            layoutParams.setMargins(0, pxToDp(30, mContext), pxToDp(15, mContext), 0);
+                        // phone
+                        } else {
+                            layoutParams.setMargins(0, pxToDp(30, mContext), pxToDp(65, mContext), 0);
+                        }
+                    }
+                }
+
                 int recentsMemoryIndicatorLocation = Settings.System.getInt(
                         mContext.getContentResolver(),
                         Settings.System.RECENTS_MEMORY_INDICATOR_LOCATION,
                         Constants.CLEAR_ALL_BUTTON_BOTTOM_LEFT);
-
-                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)
-                        mRecentsMemoryIndicator.getLayoutParams();
 
                 switch (recentsMemoryIndicatorLocation) {
                     case Constants.CLEAR_ALL_BUTTON_TOP_LEFT:
@@ -382,6 +399,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
                         layoutParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
                         break;
                 }
+
                 mRecentsMemoryIndicator.setLayoutParams(layoutParams);
                 mRecentsMemoryIndicator.setVisibility(View.VISIBLE);
                 mUpdateMemoryIndicator = true;
@@ -394,30 +412,50 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
 
                 mClearAllRecents.setVisibility(noApps ? View.GONE : View.VISIBLE);
 
-                int clearAllButtonLocation = Settings.System.getInt(
-                        mContext.getContentResolver(),
-                        Settings.System.CLEAR_RECENTS_BUTTON_LOCATION,
-                        Constants.CLEAR_ALL_BUTTON_BOTTOM_LEFT);
+                if (!noApps) {
 
-                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)
-                        mClearAllRecents.getLayoutParams();
+                    FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)
+                            mClearAllRecents.getLayoutParams();
 
-                switch (clearAllButtonLocation) {
-                    case Constants.CLEAR_ALL_BUTTON_TOP_LEFT:
-                        layoutParams.gravity = Gravity.TOP | Gravity.LEFT;
-                        break;
-                    case Constants.CLEAR_ALL_BUTTON_TOP_RIGHT:
-                        layoutParams.gravity = Gravity.TOP | Gravity.RIGHT;
-                        break;
-                    case Constants.CLEAR_ALL_BUTTON_BOTTOM_RIGHT:
-                        layoutParams.gravity = Gravity.BOTTOM | Gravity.RIGHT;
-                        break;
-                    case Constants.CLEAR_ALL_BUTTON_BOTTOM_LEFT:
-                    default:
-                        layoutParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
-                        break;
+                    // Set margins programicaly if there is no HW buttons
+                    if (!hasHWbuttons()) {
+                        final Configuration config = getResources().getConfiguration();
+                        if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                            layoutParams.setMargins(pxToDp(15, mContext), 0, 0, pxToDp(65, mContext));
+                        } else {
+                            // phablet or tablet
+                            if (isTablet(mContext)) {
+                                layoutParams.setMargins(0, pxToDp(30, mContext), pxToDp(15, mContext), 0);
+                            // phone
+                            } else {
+                                layoutParams.setMargins(0, pxToDp(30, mContext), pxToDp(65, mContext), 0);
+                            }
+                        }
+                    }
+
+                    int clearAllButtonLocation = Settings.System.getInt(
+                            mContext.getContentResolver(),
+                            Settings.System.CLEAR_RECENTS_BUTTON_LOCATION,
+                            Constants.CLEAR_ALL_BUTTON_BOTTOM_LEFT);
+
+                    switch (clearAllButtonLocation) {
+                        case Constants.CLEAR_ALL_BUTTON_TOP_LEFT:
+                            layoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+                            break;
+                        case Constants.CLEAR_ALL_BUTTON_TOP_RIGHT:
+                            layoutParams.gravity = Gravity.TOP | Gravity.RIGHT;
+                            break;
+                        case Constants.CLEAR_ALL_BUTTON_BOTTOM_RIGHT:
+                            layoutParams.gravity = Gravity.BOTTOM | Gravity.RIGHT;
+                            break;
+                        case Constants.CLEAR_ALL_BUTTON_BOTTOM_LEFT:
+                        default:
+                            layoutParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
+                            break;
+                    }
+
+                    mClearAllRecents.setLayoutParams(layoutParams);
                 }
-                mClearAllRecents.setLayoutParams(layoutParams);
             } else {
                 mClearAllRecents.setVisibility(View.GONE);
             }
@@ -961,6 +999,23 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             bottom += getBottomPaddingOffset();
         }
         mRecentsContainer.drawFadedEdges(canvas, left, right, top, bottom);
+    }
+
+    private boolean hasHWbuttons() {
+        int hardwareKeyMask = mContext.getResources()
+                .getInteger(com.android.internal.R.integer.config_deviceHardwareKeys);
+        return (hardwareKeyMask != 0);
+    }
+
+    private int pxToDp(int px, Context context) {
+        float d = context.getResources().getDisplayMetrics().density;
+        return (int)(px * d);
+    }
+
+    private static boolean isTablet(Context context) {
+        boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
+        boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+        return (xlarge || large);
     }
 
     class FakeClearUserDataObserver extends IPackageDataObserver.Stub {
