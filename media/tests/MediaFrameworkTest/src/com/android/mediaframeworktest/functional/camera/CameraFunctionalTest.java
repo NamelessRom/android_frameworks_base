@@ -161,7 +161,7 @@ public class CameraFunctionalTest extends ActivityInstrumentationTestCase2<Media
     }
 
     /**
-     * Functional test iterating on the various flash modes (on, off, auto, torch)
+     * Functional test iterating on the various flash modes (on, off, auto, flashlight)
      */
     @LargeTest
     public void testFunctionalCameraFlashModes() throws Exception {
