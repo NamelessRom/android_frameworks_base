@@ -10632,7 +10632,7 @@ package android.hardware {
     field public static final java.lang.String FLASH_MODE_OFF = "off";
     field public static final java.lang.String FLASH_MODE_ON = "on";
     field public static final java.lang.String FLASH_MODE_RED_EYE = "red-eye";
-    field public static final java.lang.String FLASH_MODE_TORCH = "torch";
+    field public static final java.lang.String FLASH_MODE_FLASHLIGHT = "flashlight";
     field public static final int FOCUS_DISTANCE_FAR_INDEX = 2; // 0x2
     field public static final int FOCUS_DISTANCE_NEAR_INDEX = 0; // 0x0
     field public static final int FOCUS_DISTANCE_OPTIMAL_INDEX = 1; // 0x1

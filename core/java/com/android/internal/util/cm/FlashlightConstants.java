@@ -18,14 +18,14 @@ package com.android.internal.util.cm;
 
 import android.content.Intent;
 
-public class TorchConstants {
+public class FlashlightConstants {
     /**
-     * Package name of the torch app
+     * Package name of the flashlight app
      */
     public static final String APP_PACKAGE_NAME = "net.cactii.flash2";
 
     /**
-     * Intent broadcast action for toggling the torch state
+     * Intent broadcast action for toggling the flashlight state
      */
     public static final String ACTION_TOGGLE_STATE = APP_PACKAGE_NAME + ".TOGGLE_FLASHLIGHT";
 
@@ -37,19 +37,19 @@ public class TorchConstants {
     public static final String EXTRA_BRIGHT_MODE = "bright";
 
     /**
-     * Intent action for 'torch state changed' broadcast
+     * Intent action for 'flashlight state changed' broadcast
      */
-    public static final String ACTION_STATE_CHANGED = APP_PACKAGE_NAME + ".TORCH_STATE_CHANGED";
+    public static final String ACTION_STATE_CHANGED = APP_PACKAGE_NAME + ".FLASHLIGHT_STATE_CHANGED";
 
     /**
      * Extra for {@link ACTION_STATE_CHANGED}:
-     * Current torch state
+     * Current flashlight state
      * Type: integer (0/1)
      */
     public static final String EXTRA_CURRENT_STATE = "state";
 
     /**
-     * Intent for launching the torch application
+     * Intent for launching the flashlight application
      */
     public static Intent INTENT_LAUNCH_APP = new Intent(Intent.ACTION_MAIN)
             .setClassName(APP_PACKAGE_NAME, APP_PACKAGE_NAME + ".MainActivity");

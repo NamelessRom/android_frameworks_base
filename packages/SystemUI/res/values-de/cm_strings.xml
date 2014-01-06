@@ -33,8 +33,8 @@
     <string name="quick_settings_report_bug">Fehlerprotokollierung</string>
     <string name="quick_settings_sync">Sync</string>
     <string name="quick_settings_sync_off">Sync aus</string>
-    <string name="quick_settings_torch">Lampe</string>
-    <string name="quick_settings_torch_off">Lampe aus</string>
+    <string name="quick_settings_flashlight">Taschenlampe</string>
+    <string name="quick_settings_flashlight_off">Taschenlampe aus</string>
     <string name="quick_settings_nfc">NFC</string>
     <string name="quick_settings_nfc_off">NFC aus</string>
     <string name="quick_settings_screen_timeout">Timeout</string>

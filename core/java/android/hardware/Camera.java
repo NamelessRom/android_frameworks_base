@@ -2119,7 +2119,7 @@ public class Camera {
          * Constant emission of light during preview, auto-focus and snapshot.
          * This can also be used for video recording.
          */
-        public static final String FLASH_MODE_TORCH = "torch";
+        public static final String FLASH_MODE_FLASHLIGHT = "flashlight";
 
         //Values for ISO settings
         /** @hide */
@@ -3315,7 +3315,7 @@ public class Camera {
          * @see #FLASH_MODE_AUTO
          * @see #FLASH_MODE_ON
          * @see #FLASH_MODE_RED_EYE
-         * @see #FLASH_MODE_TORCH
+         * @see #FLASH_MODE_FLASHLIGHT
          */
         public String getFlashMode() {
             return get(KEY_FLASH_MODE);

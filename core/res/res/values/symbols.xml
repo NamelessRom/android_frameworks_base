@@ -1867,7 +1867,7 @@
   <java-symbol type="array" name="config_disabledComponents" />
 
   <!-- LED flashlight -->
-  <java-symbol type="bool" name="config_enableTorch" />
+  <java-symbol type="bool" name="config_enableFlashlight" />
 
   <!-- Navigation Ring -->
   <java-symbol type="drawable" name="ic_navigation_ring_blank_normal" />
@@ -1879,8 +1879,8 @@
   <java-symbol type="drawable" name="ic_navigation_ring_screenshot" />
   <java-symbol type="drawable" name="ic_navigation_ring_silent" />
   <java-symbol type="drawable" name="ic_navigation_ring_sound_on" />
-  <java-symbol type="drawable" name="ic_navigation_ring_torch_on" />
-  <java-symbol type="drawable" name="ic_navigation_ring_torch_off" />
+  <java-symbol type="drawable" name="ic_navigation_ring_flashlight_on" />
+  <java-symbol type="drawable" name="ic_navigation_ring_flashlight_off" />
   <java-symbol type="drawable" name="ic_navigation_ring_vibrate" />
 
   <!-- Performance Profiles -->
