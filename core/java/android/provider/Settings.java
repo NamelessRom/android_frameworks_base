@@ -5503,12 +5503,12 @@ public final class Settings {
         public static final String KILL_APP_LONGPRESS_BACK = "kill_app_longpress_back";
 
         /**
-         * Whether to include options in power menu for rebooting into recovery or bootloader
+         * Whether developer settings are enabled.
          * @hide
          */
-        public static final String ADVANCED_REBOOT = "advanced_reboot";
+         public static final String DEVELOPER_OPTIONS_ENABLED = "developer_options_enabled";
 
-        /**
+         /**
          * Whether to display the 'Wipe data' and 'Force close' options in the notification
          * area and in the recent app list
          * @hide
@@ -5571,11 +5571,11 @@ public final class Settings {
             MOUNT_UMS_PROMPT,
             MOUNT_UMS_NOTIFY_ENABLED,
             UI_NIGHT_MODE,
-            ADVANCED_REBOOT,
             UI_THEME_MODE,
             UI_THEME_AUTO_MODE,
             PRIVACY_GUARD_DEFAULT,
-            DEVELOPMENT_SHORTCUT
+            DEVELOPMENT_SHORTCUT,
+            ADVANCED_REBOOT
         };
 
         /**
