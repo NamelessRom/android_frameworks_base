@@ -32,8 +32,7 @@
         android:background="@drawable/status_bar_recents_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:fitsSystemWindows="true">
+        android:layout_alignParentBottom="true">
 
         <com.android.systemui.recent.RecentsVerticalScrollView
             android:id="@+id/recents_container"
@@ -64,19 +63,19 @@
             android:id="@+id/circle_meter"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_gravity="top|left" />
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="top|left"
+            android:scaleType="center" />
 
         <ImageView
             android:id="@+id/recents_clear_all"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginRight="2dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
             android:layout_gravity="top|right"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
+            android:scaleType="center"
             android:src="@drawable/ic_notify_clear" />
 
     </FrameLayout>
