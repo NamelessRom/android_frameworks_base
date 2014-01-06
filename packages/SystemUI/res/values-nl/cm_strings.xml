@@ -49,8 +49,8 @@
     <string name="quick_settings_report_bug">Fout melden</string>
     <string name="quick_settings_sync">Synchr.</string>
     <string name="quick_settings_sync_off">Synchr. uit</string>
-    <string name="quick_settings_torch">Zaklamp</string>
-    <string name="quick_settings_torch_off">Zaklamp uit</string>
+    <string name="quick_settings_flashlight">Zaklamp</string>
+    <string name="quick_settings_flashlight_off">Zaklamp uit</string>
     <string name="quick_settings_nfc">NFC</string>
     <string name="quick_settings_nfc_off">NFC uit</string>
     <string name="quick_settings_screen_timeout">Time-out</string>

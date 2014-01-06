@@ -34,7 +34,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import static com.android.internal.util.cm.NavigationRingConstants.*;
-import com.android.internal.util.cm.TorchConstants;
+import com.android.internal.util.cm.FlashlightConstants;
 import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.TargetDrawable;
 
@@ -45,8 +45,8 @@ public class NavigationRingHelpers {
 
     private static final String ASSIST_ICON_METADATA_NAME = "com.android.systemui.action_assist_icon";
 
-    private static final IntentFilter TORCH_STATE_FILTER =
-            new IntentFilter(TorchConstants.ACTION_STATE_CHANGED);
+    private static final IntentFilter FLASHLIGHT_STATE_FILTER =
+            new IntentFilter(FlashlightConstants.ACTION_STATE_CHANGED);
 
     private NavigationRingHelpers() {
     }
@@ -68,7 +68,7 @@ public class NavigationRingHelpers {
         }
 
         filterAction(result, ACTION_ASSIST, isAssistantAvailable(context));
-        filterAction(result, ACTION_TORCH, isTorchAvailable(context));
+        filterAction(result, ACTION_FLASHLIGHT, isFlashlightAvailable(context));
 
         return result;
     }
@@ -96,10 +96,10 @@ public class NavigationRingHelpers {
                 .getAssistIntent(context, true, UserHandle.USER_CURRENT) != null;
     }
 
-    public static boolean isTorchAvailable(Context context) {
+    public static boolean isFlashlightAvailable(Context context) {
         PackageManager pm = context.getPackageManager();
         try {
-            return pm.getPackageInfo(TorchConstants.APP_PACKAGE_NAME, 0) != null;
+            return pm.getPackageInfo(FlashlightConstants.APP_PACKAGE_NAME, 0) != null;
         } catch (PackageManager.NameNotFoundException e) {
             // ignored, just catched so we can return false below
         }
@@ -126,8 +126,8 @@ public class NavigationRingHelpers {
             resourceId = com.android.internal.R.drawable.ic_navigation_ring_killtask;
         } else if (action.equals(ACTION_POWER)) {
             resourceId = com.android.internal.R.drawable.ic_navigation_ring_power;
-        } else if (action.equals(ACTION_TORCH)) {
-            resourceId = getTorchDrawableResId(context);
+        } else if (action.equals(ACTION_FLASHLIGHT)) {
+            resourceId = getFlashlightDrawableResId(context);
         } else if (action.equals(ACTION_ASSIST)) {
             resourceId = com.android.internal.R.drawable.ic_action_assist_generic;
         }
@@ -208,15 +208,15 @@ public class NavigationRingHelpers {
         }
     }
 
-    private static int getTorchDrawableResId(Context context) {
-        Intent stateIntent = context.registerReceiver(null, TORCH_STATE_FILTER);
+    private static int getFlashlightDrawableResId(Context context) {
+        Intent stateIntent = context.registerReceiver(null, FLASHLIGHT_STATE_FILTER);
         boolean active = stateIntent != null
-                && stateIntent.getIntExtra(TorchConstants.EXTRA_CURRENT_STATE, 0) != 0;
+                && stateIntent.getIntExtra(FlashlightConstants.EXTRA_CURRENT_STATE, 0) != 0;
 
         if (active) {
-            return com.android.internal.R.drawable.ic_navigation_ring_torch_on;
+            return com.android.internal.R.drawable.ic_navigation_ring_flashlight_on;
         }
-        return com.android.internal.R.drawable.ic_navigation_ring_torch_off;
+        return com.android.internal.R.drawable.ic_navigation_ring_flashlight_off;
     }
 
     public static void updateDynamicIconIfNeeded(Context context,
@@ -229,8 +229,8 @@ public class NavigationRingHelpers {
             resourceId = getSilentDrawableResId(context);
         } else if (TextUtils.equals(action, ACTION_RING_SILENT_VIBRATE)) {
             resourceId = getRingerDrawableResId(context);
-        } else if (TextUtils.equals(action, ACTION_TORCH)) {
-            resourceId = getTorchDrawableResId(context);
+        } else if (TextUtils.equals(action, ACTION_FLASHLIGHT)) {
+            resourceId = getFlashlightDrawableResId(context);
         }
 
         if (resourceId > 0) {

@@ -31,7 +31,7 @@ public class NavigationRingConstants {
     public static final String ACTION_SILENT =                "ringSilent";
     public static final String ACTION_VIBRATE =               "ringVibrate";
     public static final String ACTION_RING_SILENT_VIBRATE =   "ringVibrateSilent";
-    public static final String ACTION_TORCH =                 "torch";
+    public static final String ACTION_FLASHLIGHT =             "flashlight";
     public static final String ACTION_NONE =                  "none";
     public static final String ACTION_APP =                   "app";
 }
