@@ -20,18 +20,18 @@
         android:state_enabled="true"
         android:state_active="false"
         android:state_focused="false"
-        android:drawable="@drawable/ic_navigation_ring_torch_on_normal" />
+        android:drawable="@drawable/ic_navigation_ring_flashlight_on_normal" />
 
     <item
         android:state_enabled="true"
         android:state_active="true"
         android:state_focused="false"
-        android:drawable="@drawable/ic_navigation_ring_torch_on_activated" />
+        android:drawable="@drawable/ic_navigation_ring_flashlight_on_activated" />
 
     <item
         android:state_enabled="true"
         android:state_active="false"
         android:state_focused="true"
-        android:drawable="@drawable/ic_navigation_ring_torch_on_activated" />
+        android:drawable="@drawable/ic_navigation_ring_flashlight_on_activated" />
 
 </selector>

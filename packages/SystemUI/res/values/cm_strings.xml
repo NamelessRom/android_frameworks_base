@@ -49,8 +49,8 @@
     <string name="quick_settings_report_bug">Report bug</string>
     <string name="quick_settings_sync">Sync</string>
     <string name="quick_settings_sync_off">Sync off</string>
-    <string name="quick_settings_torch">Torch</string>
-    <string name="quick_settings_torch_off">Torch off</string>
+    <string name="quick_settings_flashlight">Flashlight</string>
+    <string name="quick_settings_flashlight_off">Flashlight off</string>
     <string name="quick_settings_nfc">NFC</string>
     <string name="quick_settings_nfc_off">NFC off</string>
     <string name="quick_settings_screen_timeout">Timeout</string>

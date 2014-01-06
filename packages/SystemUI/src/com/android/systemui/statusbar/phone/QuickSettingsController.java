@@ -40,7 +40,7 @@ import static com.android.internal.util.cm.QSConstants.TILE_SCREENTIMEOUT;
 import static com.android.internal.util.cm.QSConstants.TILE_SETTINGS;
 import static com.android.internal.util.cm.QSConstants.TILE_SLEEP;
 import static com.android.internal.util.cm.QSConstants.TILE_SYNC;
-import static com.android.internal.util.cm.QSConstants.TILE_TORCH;
+import static com.android.internal.util.cm.QSConstants.TILE_FLASHLIGHT;
 import static com.android.internal.util.cm.QSConstants.TILE_USER;
 import static com.android.internal.util.cm.QSConstants.TILE_VOLUME;
 import static com.android.internal.util.cm.QSConstants.TILE_WIFI;
@@ -90,7 +90,7 @@ import com.android.systemui.quicksettings.ScreenTimeoutTile;
 import com.android.systemui.quicksettings.SleepScreenTile;
 import com.android.systemui.quicksettings.SyncTile;
 import com.android.systemui.quicksettings.ToggleLockscreenTile;
-import com.android.systemui.quicksettings.TorchTile;
+import com.android.systemui.quicksettings.FlashlightTile;
 import com.android.systemui.quicksettings.UsbTetherTile;
 import com.android.systemui.quicksettings.UserTile;
 import com.android.systemui.quicksettings.VolumeTile;
@@ -166,7 +166,7 @@ public class QuickSettingsController {
         boolean mobileDataSupported = QSUtils.deviceSupportsMobileData(mContext);
         boolean lteSupported = QSUtils.deviceSupportsLte(mContext);
         boolean gpsSupported = QSUtils.deviceSupportsGps(mContext);
-        boolean torchSupported = QSUtils.deviceSupportsTorch(mContext);
+        boolean flashlightSupported = QSUtils.deviceSupportsFlashlight(mContext);
 
         if (!bluetoothSupported) {
             TILES_DEFAULT.remove(TILE_BLUETOOTH);
@@ -186,8 +186,8 @@ public class QuickSettingsController {
             TILES_DEFAULT.remove(TILE_GPS);
         }
 
-        if (!torchSupported) {
-            TILES_DEFAULT.remove(TILE_TORCH);
+        if (!flashlightSupported) {
+            TILES_DEFAULT.remove(TILE_FLASHLIGHT);
         }
 
         // Read the stored list of tiles
@@ -240,8 +240,8 @@ public class QuickSettingsController {
                 qs = new AutoRotateTile(mContext, this, mHandler);
             } else if (tile.equals(TILE_AIRPLANE)) {
                 qs = new AirplaneModeTile(mContext, this, mStatusBarService.mNetworkController);
-            } else if (tile.equals(TILE_TORCH)) {
-                qs = new TorchTile(mContext, this, mHandler);
+            } else if (tile.equals(TILE_FLASHLIGHT)) {
+                qs = new FlashlightTile(mContext, this, mHandler);
             } else if (tile.equals(TILE_SLEEP)) {
                 qs = new SleepScreenTile(mContext, this);
             } else if (tile.equals(TILE_PROFILE)) {
