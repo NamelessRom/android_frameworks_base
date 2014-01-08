@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * This code has been modified. Portions copyright (C) 2013, ParanoidAndroid Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +27,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.GestureDetector;
-import android.os.PowerManager;
-import android.provider.Settings;
 
 import com.android.systemui.EventLogTags;
 import com.android.systemui.R;
@@ -49,7 +47,7 @@ public class PhoneStatusBarView extends PanelBar {
     PanelView mNotificationPanel, mSettingsPanel;
     private boolean mShouldFade;
     private final PhoneStatusBarTransitions mBarTransitions;
-    private GestureDetector mDoubleTapGesture;
+    private QuickSettingsContainerView mQSContainer;
 
     public PhoneStatusBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -64,20 +62,6 @@ public class PhoneStatusBarView extends PanelBar {
         }
         mFullWidthNotifications = mSettingsPanelDragzoneFrac <= 0f;
         mBarTransitions = new PhoneStatusBarTransitions(this);
-
-        mDoubleTapGesture = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-                Log.d(TAG, "Gesture!!");
-                if(pm != null)
-                    pm.goToSleep(e.getEventTime());
-                else
-                    Log.d(TAG, "getSystemService returned null PowerManager");
-
-                return true;
-            }
-        });
     }
 
     public BarTransitions getBarTransitions() {
@@ -184,6 +168,13 @@ public class PhoneStatusBarView extends PanelBar {
     @Override
     public void onAllPanelsCollapsed() {
         super.onAllPanelsCollapsed();
+
+        mQSContainer = (QuickSettingsContainerView)
+            mBar.mStatusBarWindow.findViewById(R.id.quick_settings_container);
+        if(mQSContainer != null && mQSContainer.isEditModeEnabled()) {
+            mQSContainer.setEditModeEnabled(false);
+        }
+
         // give animations time to settle
         mBar.makeExpandedInvisibleSoon();
         mFadingPanel = null;
@@ -216,10 +207,6 @@ public class PhoneStatusBarView extends PanelBar {
             }
         }
 
-        if (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.DOUBLE_TAP_SLEEP_GESTURE, 0) == 1)
-            mDoubleTapGesture.onTouchEvent(event);
-
         return barConsumedEvent || super.onTouchEvent(event);
     }
 
@@ -236,8 +223,7 @@ public class PhoneStatusBarView extends PanelBar {
             Log.v(TAG, "panelExpansionChanged: f=" + frac);
         }
 
-        if ((panel == mFadingPanel || mFadingPanel == null)
-                && mScrimColor != 0 && ActivityManager.isHighEndGfx()) {
+        if (panel == mFadingPanel && mScrimColor != 0 && ActivityManager.isHighEndGfx()) {
             if (mShouldFade) {
                 frac = mPanelExpandedFractionSum; // don't judge me
                 // let's start this 20% of the way down the screen

@@ -27,21 +27,28 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
+import android.hardware.usb.UsbManager;
 import android.media.MediaRouter;
 import android.media.MediaRouter.RouteInfo;
 import android.net.ConnectivityManager;
 import android.os.Handler;
+import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 
-import com.android.systemui.BatteryMeterView.BatteryMeterMode;
+import com.android.internal.telephony.Phone;
+import com.android.internal.telephony.PhoneConstants;
+import com.android.internal.util.paranoid.DeviceUtils;
+import com.android.internal.util.paranoid.LightbulbConstants;
 import com.android.systemui.R;
 import com.android.systemui.settings.BrightnessController.BrightnessStateChangeCallback;
 import com.android.systemui.settings.CurrentUserTracker;
@@ -71,7 +78,6 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     static class BatteryState extends State {
         int batteryLevel;
         boolean pluggedIn;
-        boolean present;
     }
     static class ActivityState extends State {
         boolean activityIn;
@@ -143,6 +149,47 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         }
     };
 
+    /** Broadcast receive to determine if device boot is complete*/
+    private BroadcastReceiver mBootReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+                refreshMobileNetworkTile();
+            }
+            context.unregisterReceiver(mBootReceiver);
+        }
+    };
+
+    /** Broadcast receive to determine lightbulb state. */
+    private BroadcastReceiver mLightbulbReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mLightbulbActive = intent.getIntExtra(LightbulbConstants.EXTRA_CURRENT_STATE, 0) != 0;
+            onLightbulbChanged();
+        }
+    };
+
+    /** Broadcast receive to determine usb tether. */
+    private BroadcastReceiver mUsbIntentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(UsbManager.ACTION_USB_STATE)) {
+                mUsbConnected = intent.getBooleanExtra(UsbManager.USB_CONNECTED, false);
+            }
+
+            if (intent.getAction().equals(Intent.ACTION_MEDIA_SHARED)) {
+                mMassStorageActive = true;
+            }
+
+            if (intent.getAction().equals(Intent.ACTION_MEDIA_UNSHARED)) {
+                mMassStorageActive = false;
+            }
+
+            onUsbChanged();
+        }
+    };
+
     /** ContentObserver to determine the next alarm */
     private class NextAlarmObserver extends ContentObserver {
         public NextAlarmObserver(Handler handler) {
@@ -201,6 +248,23 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         }
     }
 
+    /** ContentObserver to watch Network State */
+    private class NetworkObserver extends ContentObserver {
+        public NetworkObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override public void onChange(boolean selfChange) {
+            onMobileNetworkChanged();
+        }
+
+        public void startObserving() {
+            final ContentResolver cr = mContext.getContentResolver();
+            cr.registerContentObserver(Settings.Global.getUriFor(
+                    Settings.Global.PREFERRED_NETWORK_MODE), false, this);
+        }
+    }
+
     /** Callback for changes to remote display routes. */
     private class RemoteDisplayRouteCallback extends MediaRouter.SimpleCallback {
         @Override
@@ -231,11 +295,18 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private final NextAlarmObserver mNextAlarmObserver;
     private final BugreportObserver mBugreportObserver;
     private final BrightnessObserver mBrightnessObserver;
+    private final NetworkObserver mMobileNetworkObserver;
+    private boolean mUsbTethered = false;
+    private boolean mUsbConnected = false;
+    private boolean mMassStorageActive = false;
+    private String[] mUsbRegexs;
+    private ConnectivityManager mCM;
 
     private final MediaRouter mMediaRouter;
     private final RemoteDisplayRouteCallback mRemoteDisplayRouteCallback;
 
     private final boolean mHasMobileData;
+    protected boolean mLightbulbActive;
 
     private QuickSettingsTileView mUserTile;
     private RefreshCallback mUserCallback;
@@ -252,6 +323,10 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private QuickSettingsTileView mAirplaneModeTile;
     private RefreshCallback mAirplaneModeCallback;
     private State mAirplaneModeState = new State();
+
+    private QuickSettingsTileView mUsbModeTile;
+    private RefreshCallback mUsbModeCallback;
+    private State mUsbModeState = new State();
 
     private QuickSettingsTileView mWifiTile;
     private RefreshCallback mWifiCallback;
@@ -301,6 +376,14 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private RefreshCallback mSslCaCertWarningCallback;
     private State mSslCaCertWarningState = new State();
 
+    private QuickSettingsTileView mMobileNetworkTile;
+    private RefreshCallback mMobileNetworkCallback;
+    private State mMobileNetworkState = new State();
+
+    private QuickSettingsTileView mLightbulbTile;
+    private RefreshCallback mLightbulbCallback;
+    private State mLightbulbState = new State();
+
     private RotationLockController mRotationLockController;
 
     public QuickSettingsModel(Context context) {
@@ -315,6 +398,7 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
                 onNextAlarmChanged();
                 onBugreportChanged();
                 rebindMediaRouterAsCurrentUser();
+                onUsbChanged();
             }
         };
 
@@ -324,19 +408,38 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mBugreportObserver.startObserving();
         mBrightnessObserver = new BrightnessObserver(mHandler);
         mBrightnessObserver.startObserving();
+        mMobileNetworkObserver = new NetworkObserver(mHandler);
+        mMobileNetworkObserver.startObserving();
 
         mMediaRouter = (MediaRouter)context.getSystemService(Context.MEDIA_ROUTER_SERVICE);
         rebindMediaRouterAsCurrentUser();
 
         mRemoteDisplayRouteCallback = new RemoteDisplayRouteCallback();
 
-        ConnectivityManager cm = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        mHasMobileData = cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
+        mCM = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        mHasMobileData = mCM.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
 
         IntentFilter alarmIntentFilter = new IntentFilter();
         alarmIntentFilter.addAction(Intent.ACTION_ALARM_CHANGED);
         context.registerReceiver(mAlarmIntentReceiver, alarmIntentFilter);
+
+        IntentFilter bootFilter = new IntentFilter();
+        bootFilter.addAction(Intent.ACTION_BOOT_COMPLETED);
+        context.registerReceiver(mBootReceiver, bootFilter);
+
+        IntentFilter lightbulbFilter = new IntentFilter();
+        lightbulbFilter.addAction(LightbulbConstants.ACTION_STATE_CHANGED);
+        context.registerReceiver(mLightbulbReceiver, lightbulbFilter);
+
+        // Only register for devices that support usb tethering
+        if (DeviceUtils.deviceSupportsUsbTether(context)) {
+            IntentFilter usbIntentFilter = new IntentFilter();
+            usbIntentFilter.addAction(ConnectivityManager.ACTION_TETHER_STATE_CHANGED);
+            usbIntentFilter.addAction(UsbManager.ACTION_USB_STATE);
+            usbIntentFilter.addAction(Intent.ACTION_MEDIA_SHARED);
+            usbIntentFilter.addAction(Intent.ACTION_MEDIA_UNSHARED);
+            context.registerReceiver(mUsbIntentReceiver, usbIntentFilter);
+        }
     }
 
     void updateResources() {
@@ -347,6 +450,7 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         refreshRotationLockTile();
         refreshRssiTile();
         refreshLocationTile();
+        refreshMobileNetworkTile();
     }
 
     // Settings
@@ -401,6 +505,40 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mAlarmState.enabled = ! TextUtils.isEmpty(alarmText);
 
         mAlarmCallback.refreshView(mAlarmTile, mAlarmState);
+    }
+
+    // Usb Mode
+    void addUsbModeTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mUsbModeTile = view;
+        mUsbModeTile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mUsbConnected) {
+                    setUsbTethering(!mUsbTethered);
+                }
+            }
+        });
+        mUsbModeCallback = cb;
+        onUsbChanged();
+    }
+
+    void onUsbChanged() {
+        updateState();
+        if (mUsbConnected && !mMassStorageActive) {
+            if (mUsbTethered) {
+                mUsbModeState.iconId = R.drawable.ic_qs_usb_tether_on;
+                mUsbModeState.label =
+                        mContext.getString(R.string.quick_settings_usb_tether_on_label);
+            } else {
+                mUsbModeState.iconId = R.drawable.ic_qs_usb_tether_connected;
+                mUsbModeState.label =
+                        mContext.getString(R.string.quick_settings_usb_tether_connected_label);
+            }
+            mUsbModeState.enabled = true;
+        } else {
+            mUsbModeState.enabled = false;
+        }
+        mUsbModeCallback.refreshView(mUsbModeTile, mUsbModeState);
     }
 
     // Airplane Mode
@@ -504,6 +642,14 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         return mHasMobileData;
     }
 
+    boolean deviceSupportsLTE() {
+        return DeviceUtils.deviceSupportsLte(mContext);
+    }
+
+    boolean deviceHasCameraFlash() {
+        return DeviceUtils.deviceSupportsCameraFlash();
+    }
+
     // RSSI
     void addRSSITile(QuickSettingsTileView view, RefreshCallback cb) {
         mRSSITile = view;
@@ -546,6 +692,114 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             // taken place due to a configuration change.
             mRSSITile.reinflateContent(LayoutInflater.from(mContext));
         }
+    }
+
+    // Mobile Network
+    void addMobileNetworkTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mMobileNetworkTile = view;
+        mMobileNetworkCallback = cb;
+        mMobileNetworkCallback.refreshView(view, mMobileNetworkState);
+    }
+
+    void onMobileNetworkChanged() {
+        if (deviceHasMobileData()) {
+            mMobileNetworkState.label = getNetworkType(mContext.getResources());
+            mMobileNetworkState.iconId = getNetworkTypeIcon();
+            mMobileNetworkState.enabled = true;
+            mMobileNetworkCallback.refreshView(mMobileNetworkTile, mMobileNetworkState);
+        }
+    }
+
+    void refreshMobileNetworkTile() {
+        onMobileNetworkChanged();
+    }
+
+    protected void toggleMobileNetworkState() {
+        TelephonyManager tm = (TelephonyManager)
+            mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        boolean usesQcLte = SystemProperties.getBoolean(
+                        "ro.config.qc_lte_network_modes", false);
+        int network = getCurrentPreferredNetworkMode(mContext);
+        switch(network) {
+            case Phone.NT_MODE_GLOBAL:
+            case Phone.NT_MODE_LTE_GSM_WCDMA:
+            case Phone.NT_MODE_LTE_ONLY:
+            case Phone.NT_MODE_LTE_WCDMA:
+            case Phone.NT_MODE_LTE_CDMA_AND_EVDO:
+            case Phone.NT_MODE_LTE_CMDA_EVDO_GSM_WCDMA:
+                // 2G Only
+                tm.toggleMobileNetwork(Phone.NT_MODE_GSM_ONLY);
+                break;
+            case Phone.NT_MODE_GSM_ONLY:
+            case Phone.NT_MODE_CDMA:
+                // 3G Only
+                tm.toggleMobileNetwork(Phone.NT_MODE_WCDMA_ONLY);
+                break;
+            case Phone.NT_MODE_WCDMA_ONLY:
+            case Phone.NT_MODE_CDMA_NO_EVDO:
+                // 2G/3G Pref
+                tm.toggleMobileNetwork(Phone.NT_MODE_WCDMA_PREF);
+                break;
+            case Phone.NT_MODE_WCDMA_PREF:
+            case Phone.NT_MODE_GSM_UMTS:
+            case Phone.NT_MODE_EVDO_NO_CDMA:
+                // LTE
+                if (deviceSupportsLTE()) {
+                    if (usesQcLte) {
+                        tm.toggleMobileNetwork(Phone.NT_MODE_LTE_CDMA_AND_EVDO);
+                    } else {
+                        tm.toggleMobileNetwork(Phone.NT_MODE_LTE_GSM_WCDMA);
+                    }
+                } else {
+                    tm.toggleMobileNetwork(Phone.NT_MODE_GSM_ONLY);
+                }
+                break;
+        }
+    }
+
+    private String getNetworkType(Resources r) {
+        int network = getCurrentPreferredNetworkMode(mContext);
+        switch (network) {
+            case Phone.NT_MODE_GLOBAL:
+            case Phone.NT_MODE_LTE_CDMA_AND_EVDO:
+            case Phone.NT_MODE_LTE_GSM_WCDMA:
+            case Phone.NT_MODE_LTE_CMDA_EVDO_GSM_WCDMA:
+            case Phone.NT_MODE_LTE_ONLY:
+            case Phone.NT_MODE_LTE_WCDMA:
+            case Phone.NT_MODE_GSM_UMTS:
+            case Phone.NT_MODE_WCDMA_ONLY:
+            case Phone.NT_MODE_GSM_ONLY:
+            case Phone.NT_MODE_WCDMA_PREF:
+                return r.getString(R.string.quick_settings_network_type);
+        }
+        return r.getString(R.string.quick_settings_network_unknown);
+    }
+
+    private int getNetworkTypeIcon() {
+        int network = getCurrentPreferredNetworkMode(mContext);
+        switch (network) {
+            case Phone.NT_MODE_GLOBAL:
+            case Phone.NT_MODE_LTE_CDMA_AND_EVDO:
+            case Phone.NT_MODE_LTE_GSM_WCDMA:
+            case Phone.NT_MODE_LTE_CMDA_EVDO_GSM_WCDMA:
+            case Phone.NT_MODE_LTE_ONLY:
+            case Phone.NT_MODE_LTE_WCDMA:
+                return R.drawable.ic_qs_lte_on;
+            case Phone.NT_MODE_WCDMA_ONLY:
+                return R.drawable.ic_qs_3g_on;
+            case Phone.NT_MODE_GSM_ONLY:
+                return R.drawable.ic_qs_2g_on;
+            case Phone.NT_MODE_WCDMA_PREF:
+            case Phone.NT_MODE_GSM_UMTS:
+                return R.drawable.ic_qs_2g3g_on;
+        }
+        return R.drawable.ic_qs_unexpected_network;
+    }
+
+    public static int getCurrentPreferredNetworkMode(Context context) {
+        int network = Settings.Global.getInt(context.getContentResolver(),
+                    Settings.Global.PREFERRED_NETWORK_MODE, -1);
+        return network;
     }
 
     // Bluetooth
@@ -603,18 +857,15 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     }
     // BatteryController callback
     @Override
-    public void onBatteryLevelChanged(boolean present, int level, boolean pluggedIn, int status) {
+    public void onBatteryLevelChanged(int level, boolean pluggedIn) {
         mBatteryState.batteryLevel = level;
         mBatteryState.pluggedIn = pluggedIn;
-        mBatteryState.present = present;
         mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
     }
-    @Override
-    public void onBatteryMeterModeChanged(BatteryMeterMode mode) {/*Ignore*/}
-    @Override
-    public void onBatteryMeterShowPercent(boolean showPercent) {/*Ignore*/}
-
     void refreshBatteryTile() {
+        if (mBatteryCallback == null) {
+            return;
+        }
         mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
     }
 
@@ -872,5 +1123,56 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         }
         mSslCaCertWarningState.label = r.getString(R.string.ssl_ca_cert_warning);
         mSslCaCertWarningCallback.refreshView(mSslCaCertWarningTile, mSslCaCertWarningState);
+    }
+
+    // Lightbulb
+    void addLightbulbTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mLightbulbTile = view;
+        mLightbulbCallback = cb;
+        onLightbulbChanged();
+    }
+
+    void onLightbulbChanged() {
+        if (mLightbulbActive) {
+            mLightbulbState.iconId = R.drawable.ic_qs_lightbulb_on;
+            mLightbulbState.label = mContext.getString(R.string.quick_settings_lightbulb_label);
+        } else {
+            mLightbulbState.iconId = R.drawable.ic_qs_lightbulb_off;
+            mLightbulbState.label = mContext.getString(R.string.quick_settings_lightbulb_off_label);
+        }
+        mLightbulbState.enabled = mLightbulbActive;
+        mLightbulbCallback.refreshView(mLightbulbTile, mLightbulbState);
+    }
+
+    private void updateState() {
+        mUsbRegexs = mCM.getTetherableUsbRegexs();
+
+        String[] available = mCM.getTetherableIfaces();
+        String[] tethered = mCM.getTetheredIfaces();
+        String[] errored = mCM.getTetheringErroredIfaces();
+        updateState(available, tethered, errored);
+    }
+
+    private void updateState(String[] available, String[] tethered,
+            String[] errored) {
+        updateUsbState(available, tethered, errored);
+    }
+
+    private void updateUsbState(String[] available, String[] tethered,
+            String[] errored) {
+
+        mUsbTethered = false;
+        for (String s : tethered) {
+            for (String regex : mUsbRegexs) {
+                if (s.matches(regex)) mUsbTethered = true;
+            }
+        }
+
+    }
+
+    private void setUsbTethering(boolean enabled) {
+        if (mCM.setUsbTethering(enabled) != ConnectivityManager.TETHER_ERROR_NO_ERROR) {
+            return;
+        }
     }
 }
