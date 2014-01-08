@@ -20,9 +20,13 @@ package com.android.systemui.statusbar.phone;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+<<<<<<< HEAD
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+=======
+import android.view.LayoutInflater;
+>>>>>>> 3aba40d... [WIP] Quicksettings 3.0
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;

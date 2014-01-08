@@ -543,7 +543,7 @@ class QuickSettings {
                             return true; // Consume click
                         }
                     });
-                    mModel.addWifiTile(wifiTile.getBack(), new QuickSettingsModel.RefreshCallback() {
+                    mModel.addWifiApTile(wifiTile.getBack(), new QuickSettingsModel.RefreshCallback() {
                         @Override
                         public void refreshView(QuickSettingsTileView unused, State state) {
                             wifiTile.setBackImageResource(state.iconId);
@@ -779,11 +779,13 @@ class QuickSettings {
                                     != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
                                     mBluetoothAdapter.setScanMode(
                                             BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE, 300);
+                                    bluetoothTile.setBackImageResource(R.drawable.ic_qs_bluetooth_discoverable);
                                     bluetoothTile.setBackText(
                                             mContext.getString(R.string.quick_settings_bluetooth_discoverable_label));
                                 } else {
                                     mBluetoothAdapter.setScanMode(
                                             BluetoothAdapter.SCAN_MODE_CONNECTABLE, 300);
+                                    bluetoothTile.setBackImageResource(R.drawable.ic_qs_bluetooth_discoverable_off);
                                     bluetoothTile.setBackText(
                                             mContext.getString(R.string.quick_settings_bluetooth_not_discoverable_label));
                                 }
@@ -801,7 +803,7 @@ class QuickSettings {
                                 bluetoothTile.setFrontText(state.label);
                             }
                         });
-                        mModel.addBluetoothTile(bluetoothTile.getBack(), new QuickSettingsModel.RefreshCallback() {
+                        mModel.addBluetoothExtraTile(bluetoothTile.getBack(), new QuickSettingsModel.RefreshCallback() {
                             @Override
                             public void refreshView(QuickSettingsTileView unused, State state) {
                                 BluetoothState bluetoothState = (BluetoothState) state;
@@ -812,9 +814,11 @@ class QuickSettings {
                                 bluetoothTile.setBackText(state.label);
                                 if (mBluetoothAdapter.getScanMode()
                                     == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+                                    bluetoothTile.setBackImageResource(R.drawable.ic_qs_bluetooth_discoverable);
                                     bluetoothTile.setBackText(
                                             mContext.getString(R.string.quick_settings_bluetooth_discoverable_label));
                                 } else {
+                                    bluetoothTile.setBackImageResource(R.drawable.ic_qs_bluetooth_discoverable_off);
                                     bluetoothTile.setBackText(
                                             mContext.getString(R.string.quick_settings_bluetooth_not_discoverable_label));
                                 }
@@ -861,15 +865,17 @@ class QuickSettings {
                 } else if(Tile.IMMERSIVE.toString().equals(tile.toString())) { // Immersive mode tile
                     final QuickSettingsBasicTile immersiveTile
                             = new QuickSettingsBasicTile(mContext);
+                    final Handler delayActivationHandler = new Handler();
                     immersiveTile.setTileId(Tile.IMMERSIVE);
-                    mModel.setImmersiveTileInitialResources(immersiveTile);
+                    mModel.setImmersiveTileInitialState(immersiveTile);
                     immersiveTile.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             collapsePanels();
-                            mModel.setImmersiveTileOnClickActionResources(immersiveTile);
-                            Settings.System.putInt(mContext.getContentResolver(),
-                                    Settings.System.IMMERSIVE_MODE, mModel.immersiveEnabled() ? 0 : 1);
+                            mModel.setImmersiveTileOnClickState(immersiveTile);
+                            // Delay immersive activation when turning it on,
+                            // will let quick settings panel finish collapse animation.
+                            delayActivationHandler.postDelayed(mModel.setImmersiveRunnable, mModel.immersiveEnabled() ? 0 : 500);
                         }
                     });
                     parent.addView(immersiveTile);
@@ -916,8 +922,8 @@ class QuickSettings {
                     = new QuickSettingsDualTile(mContext);
                     sleepTile.setTileId(Tile.SLEEP);
                     // Front side (Put device into sleep mode)
-                    sleepTile.setFrontImageResource(R.drawable.ic_qs_sleep_front);
-                    sleepTile.setFrontTextResource(R.string.quick_settings_sleep_label_front);
+                    sleepTile.setFrontImageResource(R.drawable.ic_qs_sleep_action);
+                    sleepTile.setFrontTextResource(R.string.quick_settings_sleep_action_label);
                     sleepTile.setFrontOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -934,8 +940,8 @@ class QuickSettings {
                         }
                     });
                     // Back side (Toggle screen off timeout)
-                    sleepTile.setBackImageResource(R.drawable.ic_qs_sleep_back);
-                    mModel.addSleepModeTile(sleepTile.getBack(), new QuickSettingsModel.RefreshCallback() {
+                    sleepTile.setBackImageResource(R.drawable.ic_qs_sleep_time);
+                    mModel.addSleepTimeTile(sleepTile.getBack(), new QuickSettingsModel.RefreshCallback() {
                         @Override
                         public void refreshView(QuickSettingsTileView view, State state) {
                             sleepTile.setBackImageResource(state.iconId);

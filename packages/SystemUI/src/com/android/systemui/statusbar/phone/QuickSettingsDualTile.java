@@ -55,9 +55,15 @@ class QuickSettingsDualTile extends QuickSettingsTileView {
         setFocusable(true);
 
         mBack.setVisibility(View.GONE);
+<<<<<<< HEAD
     
         // mFront.setTemporary(true);
         // mBack.setTemporary(true);
+=======
+
+        mFront.setTemporary(true);
+        mBack.setTemporary(true);
+>>>>>>> 3aba40d... [WIP] Quicksettings 3.0
 
         addView(mFront,
                 new FrameLayout.LayoutParams(

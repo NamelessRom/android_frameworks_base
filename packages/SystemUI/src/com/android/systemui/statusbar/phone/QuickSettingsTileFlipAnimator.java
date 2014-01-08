@@ -54,6 +54,17 @@ implements View.OnTouchListener, TimeInterpolator {
         return (mFront.getVisibility() == View.VISIBLE);
     }
 
+<<<<<<< HEAD
+=======
+    public ViewGroup getFront() {
+        return mFront;
+    }
+
+    public ViewGroup getBack() {
+        return mBack;
+    }
+
+>>>>>>> 3aba40d... [WIP] Quicksettings 3.0
     public void rotateToFront(boolean fromLeft) {
         if (fromLeft) {
             if (mDegrees >= 180) {
