@@ -22,25 +22,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 
-import com.android.systemui.BatteryMeterView.BatteryMeterMode;
-
 import java.util.ArrayList;
 
 public class BatteryController extends BroadcastReceiver {
+    private static final String TAG = "StatusBar.BatteryController";
 
-    protected ArrayList<BatteryStateChangeCallback> mChangeCallbacks =
+
+    private ArrayList<BatteryStateChangeCallback> mChangeCallbacks =
             new ArrayList<BatteryStateChangeCallback>();
 
-    protected int mBatteryLevel = 0;
-    protected int mBatteryStatus = BatteryManager.BATTERY_STATUS_UNKNOWN;
-    protected boolean mBatteryPlugged = false;
-    protected boolean mBatteryPresent = true;
-
     public interface BatteryStateChangeCallback {
-        public void onBatteryLevelChanged(boolean present, int level, boolean pluggedIn,
-                int status);
-        public void onBatteryMeterModeChanged(BatteryMeterMode mode);
-        public void onBatteryMeterShowPercent(boolean showPercent);
+        public void onBatteryLevelChanged(int level, boolean pluggedIn);
     }
 
     public BatteryController(Context context) {
@@ -51,8 +43,6 @@ public class BatteryController extends BroadcastReceiver {
 
     public void addStateChangedCallback(BatteryStateChangeCallback cb) {
         mChangeCallbacks.add(cb);
-        // trigger initial update
-        cb.onBatteryLevelChanged(mBatteryPresent, mBatteryLevel, mBatteryPlugged, mBatteryStatus);
     }
 
     public void removeStateChangedCallback(BatteryStateChangeCallback cb) {
@@ -62,28 +52,21 @@ public class BatteryController extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
         if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
-            mBatteryPresent = intent.getBooleanExtra(BatteryManager.EXTRA_PRESENT, true);
-            mBatteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            mBatteryPlugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
-            mBatteryStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS,
+            final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            final int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS,
                     BatteryManager.BATTERY_STATUS_UNKNOWN);
 
-            for (BatteryStateChangeCallback cb : mChangeCallbacks) {
-                cb.onBatteryLevelChanged(mBatteryPresent, mBatteryLevel, mBatteryPlugged,
-                        mBatteryStatus);
+            boolean plugged = false;
+            switch (status) {
+                case BatteryManager.BATTERY_STATUS_CHARGING:
+                case BatteryManager.BATTERY_STATUS_FULL:
+                    plugged = true;
+                    break;
             }
-        }
-    }
 
-    public void onBatteryMeterModeChanged(BatteryMeterMode mode) {
-        for (BatteryStateChangeCallback cb : mChangeCallbacks) {
-            cb.onBatteryMeterModeChanged(mode);
-        }
-    }
-
-    public void onBatteryMeterShowPercent(boolean showPercent) {
-        for (BatteryStateChangeCallback cb : mChangeCallbacks) {
-            cb.onBatteryMeterShowPercent(showPercent);
+            for (BatteryStateChangeCallback cb : mChangeCallbacks) {
+                cb.onBatteryLevelChanged(level, plugged);
+            }
         }
     }
 }
