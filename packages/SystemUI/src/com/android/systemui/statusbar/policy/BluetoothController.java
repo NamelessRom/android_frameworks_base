@@ -58,12 +58,12 @@ public class BluetoothController extends BroadcastReceiver {
         mChangeCallbacks.add(cb);
     }
 
-    public void removeStateChangedCallback(BluetoothStateChangeCallback cb) {
-        mChangeCallbacks.remove(cb);
-    }
-
     public Set<BluetoothDevice> getBondedBluetoothDevices() {
         return mBondedDevices;
+    }
+
+    public void removeStateChangedCallback(BluetoothStateChangeCallback cb) {
+        mChangeCallbacks.remove(cb);
     }
 
     @Override
@@ -86,7 +86,8 @@ public class BluetoothController extends BroadcastReceiver {
             Set<BluetoothDevice> devices = adapter.getBondedDevices();
             if (devices != null) {
                 for (BluetoothDevice device : devices) {
-                    if (device.getBondState() != BluetoothDevice.BOND_NONE) {
+                    if (device != null &&
+                           device.getBondState() != BluetoothDevice.BOND_NONE) {
                         mBondedDevices.add(device);
                     }
                 }
