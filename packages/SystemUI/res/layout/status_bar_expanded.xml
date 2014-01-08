@@ -29,6 +29,12 @@
     android:layout_marginStart="@dimen/notification_panel_margin_left"
     >
 
+    <ImageView
+        android:id="@+id/notification_wallpaper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
     <View
         android:id="@+id/handle"
         android:layout_width="match_parent"
@@ -56,12 +62,6 @@
         <include layout="@layout/status_bar_expanded_header"
             android:layout_width="match_parent"
             android:layout_height="@dimen/notification_panel_header_height"
-            />
-
-        <ViewStub android:id="@+id/ribbon_settings_stub"
-            android:layout="@layout/ribbon_settings"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/notification_min_height"
             />
 
         <TextView
@@ -100,4 +100,23 @@
             </ScrollView>
         </FrameLayout>
     </LinearLayout>
+    <HorizontalScrollView
+        android:id="@+id/custom_notification_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:requiresFadingEdge="none"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:layout_above="@id/handle"
+        android:layout_gravity="bottom"
+        android:visibility="invisible"
+        android:layout_marginBottom="@dimen/notification_shortcuts_close_handle_height">
+
+        <com.android.systemui.statusbar.phone.ShortcutsWidget
+            android:id="@+id/custom_notificiation_shortcuts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            />
+    </HorizontalScrollView>
 </com.android.systemui.statusbar.phone.NotificationPanelView><!-- end of sliding panel -->

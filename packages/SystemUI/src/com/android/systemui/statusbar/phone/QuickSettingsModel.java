@@ -41,7 +41,6 @@ import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
 
-import com.android.systemui.BatteryMeterView.BatteryMeterMode;
 import com.android.systemui.R;
 import com.android.systemui.settings.BrightnessController.BrightnessStateChangeCallback;
 import com.android.systemui.settings.CurrentUserTracker;
@@ -67,11 +66,11 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         int iconId;
         String label;
         boolean enabled = false;
+        int mode;
     }
     static class BatteryState extends State {
         int batteryLevel;
         boolean pluggedIn;
-        boolean present;
     }
     static class ActivityState extends State {
         boolean activityIn;
@@ -603,19 +602,15 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     }
     // BatteryController callback
     @Override
-    public void onBatteryLevelChanged(boolean present, int level, boolean pluggedIn, int status) {
+    public void onBatteryLevelChanged(int level, boolean pluggedIn) {
         mBatteryState.batteryLevel = level;
         mBatteryState.pluggedIn = pluggedIn;
-        mBatteryState.present = present;
         mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
     }
-    @Override
-    public void onBatteryMeterModeChanged(BatteryMeterMode mode) {/*Ignore*/}
-    @Override
-    public void onBatteryMeterShowPercent(boolean showPercent) {/*Ignore*/}
-
     void refreshBatteryTile() {
-        mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+        if (mBatteryCallback != null) {
+            mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+        }
     }
 
     // Location
@@ -627,18 +622,19 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
 
     void refreshLocationTile() {
         if (mLocationTile != null) {
-            onLocationSettingsChanged(mLocationState.enabled);
+            onLocationSettingsChanged(mLocationState.enabled, mLocationState.mode);
         }
     }
 
     @Override
-    public void onLocationSettingsChanged(boolean locationEnabled) {
+    public void onLocationSettingsChanged(boolean locationEnabled, int locationMode) {
         int textResId = locationEnabled ? R.string.quick_settings_location_label
                 : R.string.quick_settings_location_off_label;
         String label = mContext.getText(textResId).toString();
         int locationIconId = locationEnabled
                 ? R.drawable.ic_qs_location_on : R.drawable.ic_qs_location_off;
         mLocationState.enabled = locationEnabled;
+        mLocationState.mode = locationMode;
         mLocationState.label = label;
         mLocationState.iconId = locationIconId;
         mLocationCallback.refreshView(mLocationTile, mLocationState);
