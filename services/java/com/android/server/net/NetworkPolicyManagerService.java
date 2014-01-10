@@ -88,6 +88,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.UserInfo;
 import android.content.res.Resources;
+import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.IConnectivityManager;
 import android.net.INetworkManagementEventObserver;
@@ -100,6 +101,7 @@ import android.net.NetworkPolicy;
 import android.net.NetworkQuotaInfo;
 import android.net.NetworkState;
 import android.net.NetworkTemplate;
+import android.net.TrafficStats;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -131,6 +133,8 @@ import android.util.Xml;
 
 import com.android.internal.R;
 import com.android.internal.annotations.VisibleForTesting;
+import com.android.internal.telephony.Phone;
+import com.android.internal.telephony.PhoneConstants;
 import com.android.internal.util.FastXmlSerializer;
 import com.android.internal.util.IndentingPrintWriter;
 import com.android.internal.util.Objects;
@@ -231,12 +235,22 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
     private static final int MSG_ADVISE_PERSIST_THRESHOLD = 7;
     private static final int MSG_SCREEN_ON_CHANGED = 8;
 
+    private static final String STORED_NETWORK_TYPE = "stored_network_type";
+    private static final String STORED_BATTERY_SAVER_STATUS = "battery_saver_status";
+    private static final long TRAFFIC_BYTES_THRESHOLD = 10 * 1024 * 1024; // 10mb
+    private static final int SCREEN_OFF_DELAY_MINUTES = 5; // 5min
+
+    private static final int PREFERRED_NETWORK_MODE = Phone.PREFERRED_NT_MODE;
+
     private final Context mContext;
     private final IActivityManager mActivityManager;
     private final IPowerManager mPowerManager;
     private final INetworkStatsService mNetworkStats;
     private final INetworkManagementService mNetworkManager;
     private final TrustedTime mTime;
+    private AudioManager mAudioManager;
+    private ConnectivityManager mConnectivityManager;
+    private TelephonyManager mTelephonyManager;
 
     private IConnectivityManager mConnManager;
     private INotificationManager mNotifManager;
@@ -278,6 +292,10 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
 
     private final AtomicFile mPolicyFile;
 
+    private boolean mBatterySaverActive = false;
+    private long mTrafficBytes;
+    private BroadcastReceiver mPowerSaverReceiver;
+
     // TODO: keep whitelist of system-critical services that should never have
     // rules enforced, such as system, phone, and radio UIDs.
 
@@ -304,6 +322,9 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
         mNetworkStats = checkNotNull(networkStats, "missing networkStats");
         mNetworkManager = checkNotNull(networkManagement, "missing networkManagement");
         mTime = checkNotNull(time, "missing TrustedTime");
+        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
 
         HandlerThread thread = new HandlerThread(TAG);
         thread.start();
@@ -400,7 +421,67 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
         mContext.registerReceiver(
                 mWifiStateReceiver, wifiStateFilter, CONNECTIVITY_INTERNAL, mHandler);
 
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
+        mPowerSaverReceiver = new PowerSaverReceiver();
+        mContext.registerReceiver(mPowerSaverReceiver, filter);
     }
+
+    private class PowerSaverReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final boolean enabled = Settings.System.getInt(mContext
+                    .getContentResolver(), STORED_BATTERY_SAVER_STATUS, 0) == 1;
+            if (enabled && intent.getAction().equals(Intent.ACTION_SCREEN_OFF) && !mBatterySaverActive) {
+                NetworkInfo wifiInfo = mConnectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                // If music is playing or wifi is connected, do not change network type
+                if (!mAudioManager.isMusicActive() && !wifiInfo.isConnected()) {
+                    setNetworkTo2G();
+                }
+            } else if (intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+                resetNetwork();
+            }
+        }
+    }
+
+    private void setNetworkTo2G() {
+        mTrafficBytes = TrafficStats.getTotalRxBytes() + TrafficStats.getTotalTxBytes();
+        mHandler.postDelayed(mSetNetwork2G, SCREEN_OFF_DELAY_MINUTES * 60 * 1000); // timed delay before switching to 2G
+    }
+
+    private void resetNetwork() {
+        if (mBatterySaverActive) {
+            // reset network type to original state
+            final int storedNetworkMode = Settings.System.getInt(mContext.getContentResolver(),
+                    STORED_NETWORK_TYPE, PREFERRED_NETWORK_MODE);
+            mTelephonyManager.toggleMobileNetwork(storedNetworkMode);
+            mBatterySaverActive = false;
+        } else {
+            // cancel changing network mode if device is unlocked before delay
+            mHandler.removeCallbacks(mSetNetwork2G);
+        }
+    }
+
+    private Runnable mSetNetwork2G = new Runnable() {
+        public void run() {
+            final long traffic = TrafficStats.getTotalRxBytes() + TrafficStats.getTotalTxBytes();
+            if ((traffic - mTrafficBytes) > TRAFFIC_BYTES_THRESHOLD) {
+                // traffic too heavy, delay 2g
+                mHandler.postDelayed(mSetNetwork2G, SCREEN_OFF_DELAY_MINUTES * 60 * 1000);
+                return;
+            }
+
+            // store current preferred network mode
+            final int currentNetworkMode = Settings.Global.getInt(mContext.getContentResolver(),
+                    Settings.Global.PREFERRED_NETWORK_MODE,
+                    PREFERRED_NETWORK_MODE);
+            Settings.System.putInt(mContext.getContentResolver(),
+                    STORED_NETWORK_TYPE, currentNetworkMode);
+
+            mTelephonyManager.toggleMobileNetwork(Phone.NT_MODE_GSM_ONLY);
+            mBatterySaverActive = true;
+        }
+    };
 
     private IProcessObserver mProcessObserver = new IProcessObserver.Stub() {
         @Override
