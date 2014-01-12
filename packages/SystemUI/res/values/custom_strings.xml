@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 -->
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Screenrecord Notification Ticker -->
     <string name="screenrecord_notif_ticker">Screen is being recorded</string>
 
@@ -31,4 +31,46 @@
 
     <!-- Screen record notification error title -->
     <string name="screenrecord_notif_error">Unable to record screen</string>
+
+    <!-- QS Battery Tile -->
+    <string name="quick_settings_battery_charging">Charging</string>
+    <string name="quick_settings_battery_discharging">Discharging</string>
+    <!--Screenshot delete -->
+    <string name="screenshot_delete_action">Delete</string>
+    <string name="screenshot_delete_confirmation">Screenshot deleted</string>
+    <!-- QuickSettings: Immersive mode [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_immersive_mode_label">Immersive</string>
+    <!-- QuickSettings: Immersive mode (Off) [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_immersive_mode_off_label">Immersive Off</string>
+    <!-- QuickSettings: LTE On [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lte">LTE</string>
+    <!-- QuickSettings: LTE Off [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lte_off">LTE Off</string>
+    <!-- QuickSettings: Mobile Network (2G/3G) [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_network_type">Network</string>
+    <string name="quick_settings_network_unknown">Unknown</string>
+    <!-- QuickSettings: Lightbulb tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lightbulb_label">Lightbulb</string>
+    <string name="quick_settings_lightbulb_off_label">Lightbulb off</string>
+    <!-- USB Tether Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_usb_tether_connected_label">Tethering off</string>
+    <string name="quick_settings_usb_tether_on_label">Tethering on</string>
+    <!-- QuickSettings: Sleep Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_sleep_label_front">Sleep</string>
+    <string name="quick_settings_sleep_label_back_15">15s</string>
+    <string name="quick_settings_sleep_label_back_30">30s</string>
+    <string name="quick_settings_sleep_label_back_60">60s</string>
+    <string name="quick_settings_sleep_label_back_120">2m</string>
+    <string name="quick_settings_sleep_label_back_300">5m</string>
+    <string name="quick_settings_sleep_label_back_600">10m</string>
+    <string name="quick_settings_sleep_label_back_1800">30m</string>
+    <string name="quick_settings_sleep_label_back_unknown">0000</string>
+    <!-- QuickSettings: Wifi AP Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_wifi_ap_label">Wi-Fi AP</string>
+    <string name="quick_settings_wifi_ap_off_label">Wi-Fi AP Off</string>
+    <!-- Quick Settings Bluetooth Extra Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_bluetooth_not_discoverable_label">Not discoverable</string>
+    <string name="quick_settings_bluetooth_discoverable_label">Discoverable</string>
+    <string name="quick_settings_bluetooth_disabled">Disabled</string>
+    <string name="quick_settings_bluetooth_number_paired"><xliff:g id="number">%d</xliff:g> Devices paired</string>
 </resources>
