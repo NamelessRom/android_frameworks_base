@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * This code has been modified. Portions copyright (C) 2013, ParanoidAndroid Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +51,7 @@ public class PhoneStatusBarView extends PanelBar {
     private boolean mShouldFade;
     private final PhoneStatusBarTransitions mBarTransitions;
     private GestureDetector mDoubleTapGesture;
+    private QuickSettingsContainerView mQSContainer;
 
     public PhoneStatusBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -184,6 +186,13 @@ public class PhoneStatusBarView extends PanelBar {
     @Override
     public void onAllPanelsCollapsed() {
         super.onAllPanelsCollapsed();
+
+        mQSContainer = (QuickSettingsContainerView)
+            mBar.mStatusBarWindow.findViewById(R.id.quick_settings_container);
+        if(mQSContainer != null && mQSContainer.isEditModeEnabled()) {
+            mQSContainer.setEditModeEnabled(false);
+        }
+
         // give animations time to settle
         mBar.makeExpandedInvisibleSoon();
         mFadingPanel = null;

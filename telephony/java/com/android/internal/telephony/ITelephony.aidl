@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2013 ParanoidAndroid Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,6 +191,13 @@ interface ITelephony {
     boolean handlePinMmi(String dialString);
 
     /**
+     * Toggle between LTE/3G/2G
+     * @param networkState {RILConstants.NETWORK_MODE}
+     * {@hide}
+     */
+        void toggleMobileNetwork(int networkState);
+
+    /**
      * Toggles the radio on or off.
      */
     void toggleRadioOnOff();
@@ -306,6 +314,8 @@ interface ITelephony {
       */
     int getVoiceNetworkType();
 
+    int getLteOnGsmMode();
+
     /**
      * Return true if an ICC card is present
      */
@@ -330,7 +340,5 @@ interface ITelephony {
      * Sets minimum time in milli-seconds between onCellInfoChanged
      */
     void setCellInfoListRate(int rateInMillis);
-
-    int getLteOnGsmMode();
 }
 
