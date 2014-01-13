@@ -2823,12 +2823,19 @@ public final class Settings {
          */
         public static final String QS_QUICK_ACCESS_LINKED = "qs_quick_access_linked";
 
+<<<<<<< HEAD
        /**
          * Quick Settings Ribbon Tiles to Use
          *
          * @hide
          */
         public static final String QUICK_SETTINGS_RIBBON_TILES = "quick_settings_ribbon_tiles";
+
+        /**
+         * Whether national data roaming should be used.
+         * @hide
+         */
+        public static final String MVNO_ROAMING = "mvno_roaming";
 
         /**
          * Whether to hide the notification screen after clicking on a widget
