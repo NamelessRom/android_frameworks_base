@@ -2785,7 +2785,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
                 removeCallbacks(mFlingRunnable);
                 // let the fling runnable report it's new state which
                 // should be idle
-                endFling(false); // Don't disable the scrolling cache right after it was enabled
+                mFlingRunnable.endFling(false); // Don't disable the scrolling cache right after it was enabled
                 if (mPositionScroller != null) {
                     mPositionScroller.stop();
                 }
