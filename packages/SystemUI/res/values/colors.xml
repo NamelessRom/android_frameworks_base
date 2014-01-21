@@ -39,7 +39,6 @@
     <color name="batterymeter_low">#FFFF0000</color>
     <color name="batterymeter_full">#FFFFFFFF</color>
     <color name="status_bar_clock_color">#FFFFFFFF</color>
-    <color name="status_bar_traffic_color">#FFFFFFFF</color>
 
     <!-- Slim recent -->
     <color name="recent_background">#80f5f5f5</color>
