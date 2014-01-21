@@ -13,8 +13,8 @@ import android.util.DisplayMetrics;
 import android.widget.LinearLayout;
 
 public class LinearColorBar extends LinearLayout {
-    static final int LEFT_COLOR = 0xff0099cc;
-    static final int MIDDLE_COLOR = 0xff0099cc;
+    static final int LEFT_COLOR = 0xffbebebe;
+    static final int MIDDLE_COLOR = 0xffbebebe;
     static final int RIGHT_COLOR = 0xff888888;
 
     private float mRedRatio;
