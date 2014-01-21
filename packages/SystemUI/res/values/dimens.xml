@@ -58,10 +58,6 @@
     <dimen name="status_bar_recents_app_icon_left_margin">0dp</dimen>
     <dimen name="status_bar_recents_app_icon_top_margin">8dp</dimen>
 
-    <!-- Status bar battery icons dimensions -->
-    <dimen name="status_bar_battery_height">16dp</dimen>
-    <dimen name="status_bar_battery_width">10.5dp</dimen>
-
     <!-- Amount to offset bottom of notification peek window from top of status bar. -->
     <dimen name="peek_window_y_offset">-12dp</dimen>
 
@@ -214,8 +210,6 @@
     <dimen name="qs_tile_margin_above_icon">27dp</dimen>
     <!-- Quick Settings tile geometry: gap between icon and text -->
     <dimen name="qs_tile_margin_below_icon">17dp</dimen>
-    <!-- Quick Settings tile geometry: interior margin, above and below icon (ribbon mode) -->
-    <dimen name="qs_tile_ribbon_icon_margin">16dp</dimen>
     <!-- Quick Settings tile geometry: icon size -->
     <dimen name="qs_tile_icon_size">32dp</dimen>
     <!-- Quick Settings CA Cert Warning tile geometry: gap between icon and text -->
