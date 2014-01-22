@@ -17,6 +17,7 @@
 package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
@@ -43,11 +44,14 @@ import android.widget.ImageView;
 
 import com.android.systemui.EventLogTags;
 import com.android.systemui.R;
+import com.android.systemui.settings.BrightnessController;
+import com.android.systemui.settings.ToggleSlider;
 import com.android.systemui.statusbar.GestureRecorder;
 
 import java.io.File;
 
-public class NotificationPanelView extends PanelView {
+public class NotificationPanelView extends PanelView implements
+        BrightnessController.BrightnessStateChangeCallback {
     public static final boolean DEBUG_GESTURES = false;
 
     private static final float STATUS_BAR_SETTINGS_LEFT_PERCENTAGE = 0.8f;
@@ -56,15 +60,20 @@ public class NotificationPanelView extends PanelView {
     private static final float STATUS_BAR_SWIPE_VERTICAL_MAX_PERCENTAGE = 0.025f;
     private static final float STATUS_BAR_SWIPE_MOVE_PERCENTAGE = 0.2f;
 
+    private Context mContext;
+
     Drawable mHandleBar;
     Drawable mBackgroundDrawable;
     Drawable mBackgroundDrawableLandscape;
     int mHandleBarHeight;
     View mHandleView;
     ImageView mBackground;
-    int mFingers;
     PhoneStatusBar mStatusBar;
     boolean mOkToFlip;
+
+    private ToggleSlider mSlider;
+    private View mSetupButtonDivider;
+    private ImageView mSetupButton;
 
     private float mGestureStartX;
     private float mGestureStartY;
@@ -75,6 +84,7 @@ public class NotificationPanelView extends PanelView {
 
     public NotificationPanelView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
     }
 
     public void setStatusBar(PhoneStatusBar bar) {
@@ -92,15 +102,50 @@ public class NotificationPanelView extends PanelView {
 
         mBackground = (ImageView) findViewById(R.id.notification_wallpaper);
         setBackgroundDrawables();
+
+        mSlider = (ToggleSlider) findViewById(R.id.brightness_slider);
+        mSetupButtonDivider = findViewById(R.id.brightness_setup_button_divider);
+        mSetupButton = (ImageView) findViewById(R.id.brightness_setup_button);
+        mSetupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClassName("com.android.settings",
+                        "com.android.settings.cyanogenmod.AutoBrightnessSetup");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                getContext().startActivity(intent);
+                mStatusBar.mNotificationPanel.collapse();
+            }
+        });
+
+        final BrightnessController mBrightnessController = new BrightnessController(getContext(),
+                (ImageView) findViewById(R.id.brightness_icon), mSlider);
+        mBrightnessController.addStateChangedCallback(this);
+        updateSetupButtonVisibility();
+    }
+
+    public void onBrightnessLevelChanged() {
+        updateSetupButtonVisibility();
+    }
+
+    private void updateSetupButtonVisibility() {
+        boolean isAuto = mSlider.isChecked();
+        mSetupButtonDivider.setVisibility(isAuto ? View.VISIBLE : View.GONE);
+        mSetupButton.setVisibility(isAuto ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void fling(float vel, boolean always) {
-        GestureRecorder gr = ((PhoneStatusBarView) mBar).mBar.getGestureRecorder();
-        if (gr != null) {
-            gr.tag(
-                "fling " + ((vel > 0) ? "open" : "closed"),
-                "notifications,v=" + vel);
+        if (DEBUG_GESTURES) {
+            GestureRecorder gr = ((PhoneStatusBarView) mBar).mBar.getGestureRecorder();
+            if (gr != null) {
+                gr.tag(
+                    "fling " + ((vel > 0) ? "open" : "closed"),
+                    "notifications,v=" + vel);
+            }
         }
         super.fling(vel, always);
     }
@@ -130,7 +175,7 @@ public class NotificationPanelView extends PanelView {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        final int off = (int) (getHeight() - mHandleBarHeight - getPaddingBottom());
+        final int off = (getHeight() - mHandleBarHeight - getPaddingBottom());
         canvas.translate(0, off);
         mHandleBar.setState(mHandleView.getDrawableState());
         mHandleBar.draw(canvas);
