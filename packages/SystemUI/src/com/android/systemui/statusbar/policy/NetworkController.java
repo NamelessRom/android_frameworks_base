@@ -362,10 +362,6 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
         notifySignalsChangedCallbacks(cb);
     }
 
-    public void removeNetworkSignalChangedCallback(NetworkSignalChangedCallback cb) {
-        mSignalsChangedCallbacks.remove(cb);
-    }
-
     public void addSignalStrengthChangedCallback(SignalStrengthChangedCallback cb) {
         mSignalStrengthChangedCallbacks.add(cb);
         notifySignalStrengthChangedCallbacks(cb);
