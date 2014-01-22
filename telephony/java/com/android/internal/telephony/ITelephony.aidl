@@ -190,6 +190,13 @@ interface ITelephony {
     boolean handlePinMmi(String dialString);
 
     /**
+     * Toggle between LTE/3G/2G
+     * @param networkState {RILConstants.NETWORK_MODE}
+     * {@hide}
+     */
+        void toggleMobileNetwork(int networkState);
+
+    /**
      * Toggles the radio on or off.
      */
     void toggleRadioOnOff();

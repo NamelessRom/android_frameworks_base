@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 -->
-
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-        android:src="@drawable/stat_sys_adb_egg"
-        android:autoMirrored="true">
-</bitmap>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- QS Battery Tile -->
+    <string name="quick_settings_battery_charging">Charging</string>
+    <string name="quick_settings_battery_discharging">Discharging</string>
+    <!--Screenshot delete -->
+    <string name="screenshot_delete_action">Delete</string>
+</resources>

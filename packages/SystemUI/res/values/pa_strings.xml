@@ -18,4 +18,28 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="status_bar_notification_hide_icon_packages">Hide app\'s notification icon(s)</string>
+    <!-- QS Battery Tile -->
+    <string name="quick_settings_battery_charging">Charging</string>
+    <string name="quick_settings_battery_discharging">Discharging</string>
+    <!--Screenshot delete -->
+    <string name="screenshot_delete_action">Delete</string>
+    <!-- QuickSettings: Immersive mode [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_immersive_mode_label">Immersive</string>
+    <!-- QuickSettings: Immersive mode (Off) [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_immersive_mode_off_label">Immersive Off</string>
+    <!-- QuickSettings: LTE On [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lte">LTE</string>
+    <!-- QuickSettings: LTE Off [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lte_off">LTE Off</string>
+    <!-- QuickSettings: Mobile Network (2G/3G) [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_network_type">Network</string>
+    <string name="quick_settings_network_unknown">Unknown</string>
+    <!-- QuickSettings: Lightbulb tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lightbulb_label">Lightbulb</string>
+    <string name="quick_settings_lightbulb_off_label">Lightbulb off</string>
+    <!-- QuickSettings: Sleep Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_sleep_label">Sleep</string>
+    <!-- USB Tether Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_usb_tether_connected_label">Tethering off</string>
+    <string name="quick_settings_usb_tether_on_label">Tethering on</string>
 </resources>
