@@ -117,9 +117,6 @@
     <string name="permdesc_sendMockSms">Permite ao aplicativo simular envio de mensagens SMS.
         Isto permite um aplicativo enviar SMS para aplicações confiáveis. Aplicativos maliciosos pode enviar mensagens continuamente, bloqueando o sistema de notificação do dispositivo e perturbar o usuário.</string>
     <string name="progress_nomediapresent" product="default">Nenhuma mídia removível presente\u2026</string>
-    <string name="perf_profile_pwrsv">Economia</string>
-    <string name="perf_profile_bal">Balanceado</string>
-    <string name="perf_profile_perf">Performance</string>
     <string name="permlab_interceptSmsSent">interceptar SMS enviadas</string>
     <string name="permdesc_interceptSmsSent">Permitir o aplicativo a interceptar um SMS enviado. Aplicativos maliciosos podem usar isto para previnir o envio de mensagens SMS.</string>
     <string name="permlab_resetBatteryStats">redefinir estatísticas da bateria</string>
