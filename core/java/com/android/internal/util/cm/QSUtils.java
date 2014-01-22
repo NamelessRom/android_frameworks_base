@@ -1,20 +1,17 @@
 package com.android.internal.util.cm;
 
+import android.R;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.WifiDisplayStatus;
 import android.net.ConnectivityManager;
 import android.nfc.NfcAdapter;
-import android.os.BatteryManager;
-import android.os.UserHandle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 
 import com.android.internal.telephony.PhoneConstants;
 
@@ -47,13 +44,6 @@ public class QSUtils {
             return (Settings.System.getInt(resolver, Settings.System.SYSTEM_PROFILES_ENABLED, 1) == 1);
         }
 
-        public static boolean deviceSupportsPerformanceProfiles(Context ctx) {
-            Resources res = ctx.getResources();
-            String perfProfileProp = res.getString(
-                    com.android.internal.R.string.config_perf_profile_prop);
-            return !TextUtils.isEmpty(perfProfileProp);
-        }
-
         public static boolean expandedDesktopEnabled(ContentResolver resolver) {
             return Settings.System.getIntForUser(resolver, Settings.System.EXPANDED_DESKTOP_STYLE,
                     0, UserHandle.USER_CURRENT_OR_SELF) != 0;
@@ -66,15 +56,6 @@ public class QSUtils {
         public static boolean deviceSupportsLte(Context ctx) {
             final TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             return (tm.getLteOnCdmaMode() == PhoneConstants.LTE_ON_CDMA_TRUE) || tm.getLteOnGsmMode() != 0;
-        }
-
-        public static boolean deviceSupportsDockBattery(Context ctx) {
-            BatteryManager bm = (BatteryManager) ctx.getSystemService(Context.BATTERY_SERVICE);
-            return bm.isDockBatterySupported();
-        }
-
-        public static boolean deviceSupportsCamera() {
-            return Camera.getNumberOfCameras() > 0;
         }
 
         public static boolean deviceSupportsGps(Context context) {
