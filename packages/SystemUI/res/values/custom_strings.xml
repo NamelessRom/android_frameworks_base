@@ -59,4 +59,51 @@
     <!-- [CHAR LIMIT=NONE] Label of a running process that represents another user -->
     <string name="running_process_item_user_label">User: <xliff:g id="user_name">%1$s</xliff:g></string>
 
+    <!-- Quick pulldown confirmation dialog -->
+    <string name="quick_settings_quick_pull_down_title">Quick pull down</string>
+    <string name="quick_settings_quick_pull_down_message">Would you like the edge of the status bar to pull down quick settings?</string>
+    <!-- QS Battery Tile -->
+    <string name="quick_settings_battery_charging">Charging</string>
+    <string name="quick_settings_battery_discharging">Discharging</string>
+    <!-- QuickSettings: Immersive mode [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_immersive_mode_full_label">Immersive</string>
+    <!-- QuickSettings: Immersive mode (Off) [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_immersive_mode_off_label">Immersive Off</string>
+    <!-- QuickSettings: Immersive extra modes [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_immersive_mode_no_status_bar_label">Navigation bar</string>
+    <string name="quick_settings_immersive_mode_no_navigation_bar_label">Status bar</string>
+    <!-- QuickSettings: LTE On [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lte">LTE</string>
+    <!-- QuickSettings: LTE Off [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lte_off">LTE Off</string>
+    <!-- QuickSettings: Mobile Network (2G/3G) [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_network_type">Network</string>
+    <string name="quick_settings_network_unknown">Unknown</string>
+    <!-- QuickSettings: Lightbulb tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_lightbulb_label">Lightbulb</string>
+    <string name="quick_settings_lightbulb_off_label">Lightbulb Off</string>
+    <!-- USB Tether Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_usb_tether_connected_label">USB Tethering Off</string>
+    <string name="quick_settings_usb_tether_on_label">USB Tethering</string>
+    <!-- QuickSettings: Sleep Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_sleep_action_label">Sleep</string>
+    <string name="quick_settings_sleep_time_15_label">15 seconds</string>
+    <string name="quick_settings_sleep_time_30_label">30 seconds</string>
+    <string name="quick_settings_sleep_time_60_label">60 seconds</string>
+    <string name="quick_settings_sleep_time_120_label">2 minutes</string>
+    <string name="quick_settings_sleep_time_300_label">5 minutes</string>
+    <string name="quick_settings_sleep_time_600_label">10 minutes</string>
+    <string name="quick_settings_sleep_time_1800_label">30 minutes</string>
+    <string name="quick_settings_sleep_time_unknown_label">@string/quick_settings_network_unknown</string>
+    <!-- QuickSettings: Wifi AP Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_wifi_ap_label">Wi-Fi AP</string>
+    <string name="quick_settings_wifi_ap_off_label">Wi-Fi AP Off</string>
+    <!-- Quick Settings Bluetooth Extra Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_bluetooth_not_discoverable_label">Not discoverable</string>
+    <string name="quick_settings_bluetooth_discoverable_label">Discoverable</string>
+    <string name="quick_settings_bluetooth_disabled">Disabled</string>
+    <!-- Quick Settings Location Extra Tile [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_location_mode_high_label">High</string>
+    <string name="quick_settings_location_mode_battery_label">Battery</string>
+    <string name="quick_settings_location_mode_sensors_label">Device</string>
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (C) 2013 The Android Open Source Project
+     Copyright (C) 2014 ParanoidAndroid Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -19,9 +20,15 @@
     android:layout_height="match_parent"
     android:layout_gravity="top"
     android:orientation="vertical">
+    <include
+        layout="@layout/quick_settings_switch_button"
+        android:layout_width="@dimen/qs_dual_tile_switch_icon_size"
+        android:layout_height="@dimen/qs_dual_tile_switch_icon_size"
+        android:layout_gravity="top|right"
+        />
     <ImageView
         android:id="@+id/image"
-        android:layout_marginTop="@dimen/qs_tile_margin_above_icon"
+        android:layout_marginTop="@dimen/qs_dual_tile_margin_above_icon"
         android:layout_marginBottom="@dimen/qs_tile_margin_below_icon"
         android:layout_width="@dimen/qs_tile_icon_size"
         android:layout_height="@dimen/qs_tile_icon_size"
