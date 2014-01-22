@@ -1211,7 +1211,6 @@
   <java-symbol type="layout" name="restrictions_pin_challenge" />
   <java-symbol type="layout" name="restrictions_pin_setup" />
   <java-symbol type="layout" name="immersive_mode_cling" />
-  <java-symbol type="layout" name="immersive_mode_cling_bottom" />
 
   <java-symbol type="anim" name="slide_in_child_bottom" />
   <java-symbol type="anim" name="slide_in_right" />
@@ -1883,15 +1882,6 @@
   <java-symbol type="drawable" name="ic_navigation_ring_torch_on" />
   <java-symbol type="drawable" name="ic_navigation_ring_torch_off" />
   <java-symbol type="drawable" name="ic_navigation_ring_vibrate" />
-
-  <!-- Performance Profiles -->
-  <java-symbol type="string" name="config_perf_profile_prop" />
-  <java-symbol type="string" name="config_perf_profile_default_entry" />
-  <java-symbol type="array" name="perf_profile_entries" />
-  <java-symbol type="array" name="perf_profile_values" />
-  <java-symbol type="string" name="perf_profile_pwrsv" />
-  <java-symbol type="string" name="perf_profile_bal" />
-  <java-symbol type="string" name="perf_profile_perf" />
 
   <!-- Options that show upon long-pressing a key on the physical keyboard -->
   <java-symbol type="string" name="symbol_picker_0" />

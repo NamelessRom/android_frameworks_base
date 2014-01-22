@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
+ * This code has been modified. Portions copyright (C) 2014 ParanoidAndroid Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +21,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,8 +29,9 @@ import android.widget.TextView;
 import com.android.systemui.R;
 
 class QuickSettingsBasicTile extends QuickSettingsTileView {
-    private final TextView mTextView;
-    private final ImageView mImageView;
+    public TextView mTextView;
+    public ImageView mImageView;
+    public ImageView mSwitchView;
 
     public QuickSettingsBasicTile(Context context) {
         this(context, null);
@@ -55,7 +58,7 @@ class QuickSettingsBasicTile extends QuickSettingsTileView {
     }
 
     @Override
-    public void setContent(int layoutId, LayoutInflater inflater) {
+    void setContent(int layoutId, LayoutInflater inflater) {
         throw new RuntimeException("why?");
     }
 
@@ -81,5 +84,31 @@ class QuickSettingsBasicTile extends QuickSettingsTileView {
 
     public void setTextResource(int resId) {
         mTextView.setText(resId);
+    }
+
+    @Override
+    public void setEditMode(boolean enabled) {
+        // No hover on edit mode
+        setBackgroundResource(enabled ? R.drawable.qs_tile_background_no_hover :
+                R.drawable.qs_tile_background);
+        super.setEditMode(enabled);
+    }
+
+    public void setupDualTile(final QuickSettingsDualBasicTile dualTile) {
+        if(dualTile != null) {
+            // Set up switch
+            mSwitchView = (ImageView) findViewById(R.id.switch_button_image);
+            mSwitchView.setVisibility(View.VISIBLE);
+            mSwitchView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dualTile.swapTiles();
+                }
+            });
+        }
+    }
+
+    public void setSwitchViewVisibility(int vis) {
+        mSwitchView.setVisibility(vis);
     }
 }
