@@ -2849,13 +2849,6 @@ public final class Settings {
          *
          * @hide
          */
-        public static final String QS_DYNAMIC_DOCK_BATTERY = "qs_dyanmic_dock_battery";
-
-        /**
-         * Quick Settings Panel Dynamic Tiles
-         *
-         * @hide
-         */
         public static final String QS_DYNAMIC_WIFI = "qs_dyanmic_wifi";
 
         /**
@@ -2873,25 +2866,11 @@ public final class Settings {
         public static final String QS_COLLAPSE_PANEL = "qs_collapse_panel";
 
         /**
-         * Quick Settings Quick access ribbon
+         * Use the Notification Power Widget? (Who wouldn't!)
          *
          * @hide
          */
-        public static final String QS_QUICK_ACCESS = "qs_quick_access";
-
-        /**
-         * Quick Settings Quick access ribbon - linked layout
-         *
-         * @hide
-         */
-        public static final String QS_QUICK_ACCESS_LINKED = "qs_quick_access_linked";
-
-       /**
-         * Quick Settings Ribbon Tiles to Use
-         *
-         * @hide
-         */
-        public static final String QUICK_SETTINGS_RIBBON_TILES = "quick_settings_ribbon_tiles";
+        public static final String EXPANDED_VIEW_WIDGET = "expanded_view_widget";
 
         /**
          * Whether to hide the notification screen after clicking on a widget
@@ -2984,23 +2963,15 @@ public final class Settings {
 
         /**
          * Display style of the status bar battery information
-         * 0: Display the battery an icon in portrait mode
-         * 2: Display the battery as a circle
-         * 4: Hide the battery status information
-         * 5: Display the battery an icon in landscape mode
-         * 6: Display the battery as plain text
+         * 0: Display the stock battery information
+         * 1: Display cm battery percentage implementation / dont show stock icon
+         * 2: Display cm circle battery implementation without percentage
+         * 3: Display cm circle battery implementation with percentage
+         * 4: Hide the battery information
          * default: 0
          * @hide
          */
         public static final String STATUS_BAR_BATTERY = "status_bar_battery";
-
-        /**
-         * Display percentage in text of the battery level on the status bar
-         * default: 0
-         * @hide
-         */
-        public static final String STATUS_BAR_BATTERY_SHOW_PERCENT =
-                "status_bar_battery_show_percent";
 
         /**
          * Whether to show the clock in status bar
@@ -3030,36 +3001,10 @@ public final class Settings {
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
         /**
-         * Battery warning preferences
-         *
-         * 0 = show dialog + play sound (default)
-         * 1 = fire notification + play sound
-         * 2 = show dialog only
-         * 3 = fire notification only
-         * 4 = play sound only
-         * 5 = none
-         * @hide
-         */
-        public static final String POWER_UI_LOW_BATTERY_WARNING_POLICY = "power_ui_low_battery_warning_policy";
-
-        /**
          * Whether to show the IME switcher in the status bar
          * @hide
          */
         public static final String STATUS_BAR_IME_SWITCHER = "status_bar_ime_switcher";
-
-        /**
-         * Whether to collapse the notification area after dismissing the last notification
-         * @hide
-         */
-        public static final String STATUS_BAR_COLLAPSE_ON_DISMISS = "status_bar_collapse_on_dismiss";
-
-        /** @hide */
-        public static final int STATUS_BAR_COLLAPSE_NEVER = 0;
-        /** @hide */
-        public static final int STATUS_BAR_COLLAPSE_IF_EMPTIED = 1;
-        /** @hide */
-        public static final int STATUS_BAR_COLLAPSE_IF_NO_CLEARABLE = 2;
 
         /**
          * Whether to use a separate delay for "slide to unlock" and security
@@ -3381,36 +3326,6 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_NOTIFICATIONS_WAKE_ON_NOTIFICATION = "lockscreen_notifications_wake_on_notification";
-
-       /**
-        * Sets the portrait background of notification drawer
-        * @hide
-        */
-        public static final String NOTIFICATION_BACKGROUND = "notification_background";
-
-       /**
-        * Sets the landscape background of notification drawer
-        * @hide
-        */
-        public static final String NOTIFICATION_BACKGROUND_LANDSCAPE = "notification_background_landscape";
-
-       /**
-        * Sets the alpha (transparency) of notification wallpaper
-        * @hide
-        */
-        public static final String NOTIFICATION_BACKGROUND_ALPHA = "notification_background_alpha";
-
-       /**
-        * Sets the alpha (transparency) of the notification
-        * @hide
-        */
-        public static final String NOTIFICATION_ALPHA = "notification_alpha";
-
-        /**
-         * Show brightness slider in notification panel
-         * @hide
-         */
-        public static final String NOTIFICATION_BRIGHTNESS_SLIDER = "notification_brightness_slider";
 
         /**
          * Sets the count of notifications shown at once
@@ -3734,12 +3649,6 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_VIBRATE_ENABLED = "lockscreen.vibrate_enabled";
 
-        /**
-         *  Enable statusbar double tap gesture on to put device to sleep
-         * @hide
-         */
-        public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
-
          /**
          * show clear all recents button
          *  @hide
@@ -3771,6 +3680,30 @@ public final class Settings {
          */
         public static final String STATUS_BAR_CUSTOM_HEADER = "status_bar_custom_header";
 
+        /**
+         * Sets the portrait background of notification drawer
+         * @hide
+         */
+        public static final String NOTIFICATION_BACKGROUND = "notification_background";
+
+        /**
+         * Sets the landscape background of notification drawer
+         * @hide
+         */
+        public static final String NOTIFICATION_BACKGROUND_LANDSCAPE = "notification_background_landscape";
+
+        /**
+         * Sets the alpha (transparency) of notification wallpaper
+         * @hide
+         */
+        public static final String NOTIF_WALLPAPER_ALPHA = "notif_wallpaper_alpha";
+
+        /**
+         * Sets the alpha (transparency) of notifications
+         * @hide
+         */
+        public static final String NOTIF_ALPHA = "notif_alpha";
+
          /**
          * Allows blurring the lockscreen background
          * @hide
@@ -3780,6 +3713,7 @@ public final class Settings {
         /**
          * Volume key controls ringtone or media sound stream
          *
+         * Show the content behind the lockscreen
          * @hide
          */
         public static final String VOLUME_KEYS_DEFAULT = "volume_keys_default";
@@ -3790,6 +3724,22 @@ public final class Settings {
          * @hide
          */
         public static final String NON_INTRUSIVE_INCALL = "non_intrusive_incall";
+
+
+         /**
+         * Immersive mode global actions switch
+         * 0 = no
+         * 1 = yes
+         * @hide
+         */
+        public static final String IMMERSIVE_MODE = "immersive_mode";
+
+        /**
+
+         * Setting to show the battery percentage text
+         * @hide
+         */
+        public static final String STATUS_BAR_BATTERY_STYLE = "status_bar_battery_style";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
