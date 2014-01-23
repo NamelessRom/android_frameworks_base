@@ -958,6 +958,19 @@ class ServerThread {
         }
 
         // It is now time to start up the app processes...
+        try {
+            IBinder surfaceFlinger = ServiceManager.getService("SurfaceFlinger");
+            if (surfaceFlinger != null) {
+                //Slog.i(TAG, "******* TELLING SURFACE FLINGER WE ARE BOOTED!");
+                android.os.Parcel data = android.os.Parcel.obtain();
+                data.writeInterfaceToken("android.ui.ISurfaceComposer");
+                surfaceFlinger.transact(IBinder.FIRST_CALL_TRANSACTION, // BOOT_FINISHED
+                                        data, null, 0);
+                data.recycle();
+            }
+        } catch (RemoteException ex) {
+            Slog.e(TAG, "Boot completed: SurfaceFlinger is dead!");
+        }
 
         try {
             vibrator.systemReady();
