@@ -22,7 +22,7 @@ public class TorchConstants {
     /**
      * Package name of the torch app
      */
-    public static final String APP_PACKAGE_NAME = "net.cactii.flash2";
+    public static final String APP_PACKAGE_NAME = "com.nameless.flashlight";
 
     /**
      * Intent broadcast action for toggling the torch state
