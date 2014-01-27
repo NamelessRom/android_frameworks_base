@@ -25,4 +25,8 @@
     -->
     <java-symbol type="array" name="shutdown_reboot_actions" />
     <java-symbol type="array" name="shutdown_reboot_options" />
+
+    <java-symbol type="string" name="kg_wrong_gesture" />
+    <java-symbol type="string" name="kg_gesture_instructions" />
+    <java-symbol type="string" name="kg_too_many_failed_gesture_attempts_dialog_message" />
 </resources>
