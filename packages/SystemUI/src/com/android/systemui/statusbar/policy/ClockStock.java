@@ -19,15 +19,10 @@ package com.android.systemui.statusbar.policy;
 import android.app.ActivityManagerNative;
 import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.ContentObserver;
-import android.net.Uri
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.Settings;
 import android.provider.AlarmClock;
 import android.provider.Settings;
 import android.text.Spannable;
@@ -42,7 +37,6 @@ import android.view.View.OnLongClickListener;
 import android.widget.TextView;
 
 import com.android.systemui.DemoMode;
-import com.android.systemui.R;
 
 import com.android.internal.R;
 
@@ -56,7 +50,7 @@ import libcore.icu.LocaleData;
 /**
  * Digital clock for the status bar.
  */
-public class Clock extends TextView implements DemoMode, OnClickListener, OnLongClickListener {
+public class ClockStock extends TextView implements DemoMode, OnClickListener, OnLongClickListener {
     private boolean mAttached;
     private Calendar mCalendar;
     private String mClockFormatString;
@@ -68,26 +62,6 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
     private static final int AM_PM_STYLE_GONE    = 2;
 
     private static final int AM_PM_STYLE = AM_PM_STYLE_GONE;
-
-    public static final int STYLE_HIDE_CLOCK     = 0;
-    public static final int STYLE_CLOCK_RIGHT    = 1;
-    public static final int STYLE_CLOCK_CENTER   = 2;
-
-    protected int mClockStyle = STYLE_CLOCK_RIGHT;
-
-    private ContentObserver mSettingsObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            updateSettings();
-            updateView();
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            updateSettings();
-            updateView();
-        }
-    };
 
     public Clock(Context context) {
         this(context, null);
@@ -113,7 +87,6 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
         if (!mAttached) {
             mAttached = true;
             IntentFilter filter = new IntentFilter();
-            ContentResolver resolver = mContext.getContentResolver();
 
             filter.addAction(Intent.ACTION_TIME_TICK);
             filter.addAction(Intent.ACTION_TIME_CHANGED);
@@ -122,9 +95,6 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
             filter.addAction(Intent.ACTION_USER_SWITCHED);
 
             getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
-            resolver.registerContentObserver(Settings.System
-                    .getUriFor(Settings.System.STATUSBAR_CLOCK_STYLE),
-                    false, mSettingsObserver);
         }
 
         // NOTE: It's safe to do these after registering the receiver since the receiver always runs
@@ -132,8 +102,9 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
 
         // The time zone may have changed while the receiver wasn't registered, so update the Time
         mCalendar = Calendar.getInstance(TimeZone.getDefault());
-        updateSettings();
-        updateView();
+
+        // Make sure we update to the current time
+        updateClock();
     }
 
     @Override
@@ -141,7 +112,6 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
         super.onDetachedFromWindow();
         if (mAttached) {
             getContext().unregisterReceiver(mIntentReceiver);
-            getContext().getContentResolver().unregisterContentObserver(mSettingsObserver);
             mAttached = false;
         }
     }
@@ -284,28 +254,7 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
         return true;
     }
 
-    protected void updateSettings() {
-        ContentResolver resolver = mContext.getContentResolver();
-
-        mClockStyle = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_CLOCK_STYLE, STYLE_CLOCK_RIGHT);
-    }
-
-    protected void updateView() {
-        setTextColor(mClockColor);
-        updateClockVisibility();
-        updateClock();
-    }
-
-    protected void updateClockVisibility() {
-        if (mClockStyle == STYLE_CLOCK_RIGHT)
-            setVisibility(View.VISIBLE);
-        else
-            setVisibility(View.GONE);
-    }
-
     private boolean mDemoMode;
-
 
     @Override
     public void dispatchDemoCommand(String command, Bundle args) {
@@ -329,4 +278,5 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
         }
     }
 }
+
 
