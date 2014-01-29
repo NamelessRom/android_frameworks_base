@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 The Android Open Source Project
+ * Copyright (C) 2013 The Android Open Kang Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,51 +16,42 @@
 
 package com.android.systemui.statusbar.policy;
 
-import android.app.ActivityManagerNative;
-import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.ContentObserver;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.provider.Settings;
-import android.provider.AlarmClock;
-import android.provider.Settings;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
 import android.text.style.CharacterStyle;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.TextView;
-
-import com.android.systemui.DemoMode;
-
-import com.android.internal.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
-import libcore.icu.LocaleData;
+import com.android.internal.R;
 
 /**
- * Digital clock for the status bar.
+ * This widget display an analogic clock with two hands for hours and
+ * minutes.
  */
-public class Clock extends TextView implements DemoMode, OnClickListener, OnLongClickListener {
+public class ClockStock extends TextView {
     private boolean mAttached;
     private Calendar mCalendar;
     private String mClockFormatString;
     private SimpleDateFormat mClockFormat;
-    private Locale mLocale;
 
     private static final int AM_PM_STYLE_NORMAL  = 0;
     private static final int AM_PM_STYLE_SMALL   = 1;
@@ -68,41 +59,16 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
 
     private static final int AM_PM_STYLE = AM_PM_STYLE_GONE;
 
-    public static final int STYLE_HIDE_CLOCK     = 0;
-    public static final int STYLE_CLOCK_RIGHT    = 1;
-    public static final int STYLE_CLOCK_CENTER   = 2;
-
-    protected int mClockStyle = STYLE_CLOCK_RIGHT;
-
-    private ContentObserver mSettingsObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            updateSettings();
-            updateView();
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            updateSettings();
-            updateView();
-        }
-    };
-
-    public Clock(Context context) {
+    public ClockStock(Context context) {
         this(context, null);
     }
 
-    public Clock(Context context, AttributeSet attrs) {
+    public ClockStock(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public Clock(Context context, AttributeSet attrs, int defStyle) {
+    public ClockStock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-        if (isClickable()) {
-            setOnClickListener(this);
-            setOnLongClickListener(this);
-        }
     }
 
     @Override
@@ -112,18 +78,13 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
         if (!mAttached) {
             mAttached = true;
             IntentFilter filter = new IntentFilter();
-            ContentResolver resolver = mContext.getContentResolver();
 
             filter.addAction(Intent.ACTION_TIME_TICK);
             filter.addAction(Intent.ACTION_TIME_CHANGED);
             filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
             filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
-            filter.addAction(Intent.ACTION_USER_SWITCHED);
 
             getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
-            resolver.registerContentObserver(Settings.System
-                    .getUriFor(Settings.System.STATUSBAR_CLOCK_STYLE),
-                    false, mSettingsObserver);
         }
 
         // NOTE: It's safe to do these after registering the receiver since the receiver always runs
@@ -131,8 +92,9 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
 
         // The time zone may have changed while the receiver wasn't registered, so update the Time
         mCalendar = Calendar.getInstance(TimeZone.getDefault());
-        updateSettings();
-        updateView();
+
+        // Make sure we update to the current time
+        updateClock();
     }
 
     @Override
@@ -140,7 +102,6 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
         super.onDetachedFromWindow();
         if (mAttached) {
             getContext().unregisterReceiver(mIntentReceiver);
-            getContext().getContentResolver().unregisterContentObserver(mSettingsObserver);
             mAttached = false;
         }
     }
@@ -155,33 +116,24 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
                 if (mClockFormat != null) {
                     mClockFormat.setTimeZone(mCalendar.getTimeZone());
                 }
-            } else if (action.equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
-                final Locale newLocale = getResources().getConfiguration().locale;
-                if (! newLocale.equals(mLocale)) {
-                    mLocale = newLocale;
-                    mClockFormatString = ""; // force refresh
-                }
             }
             updateClock();
         }
     };
 
     final void updateClock() {
-        if (mDemoMode) return;
         mCalendar.setTimeInMillis(System.currentTimeMillis());
         setText(getSmallTime());
     }
 
     private final CharSequence getSmallTime() {
         Context context = getContext();
-        boolean is24 = DateFormat.is24HourFormat(context);
-        LocaleData d = LocaleData.get(context.getResources().getConfiguration().locale);
 
         final char MAGIC1 = '\uEF00';
         final char MAGIC2 = '\uEF01';
 
         SimpleDateFormat sdf;
-        String format = is24 ? d.timeFormat24 : d.timeFormat12;
+        String format = DateFormat.getTimeFormatString(context);
         if (!format.equals(mClockFormatString)) {
             /*
              * Search for an unquoted "a" in the format string, so we can
@@ -213,6 +165,7 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
                         + "a" + MAGIC2 + format.substring(b + 1);
                 }
             }
+
             mClockFormat = sdf = new SimpleDateFormat(format);
             mClockFormatString = format;
         } else {
@@ -243,88 +196,4 @@ public class Clock extends TextView implements DemoMode, OnClickListener, OnLong
         return result;
 
     }
-
-    private void collapseStartActivity(Intent what) {
-        // don't do anything if the activity can't be resolved (e.g. app disabled)
-        if (getContext().getPackageManager().resolveActivity(what, 0) == null) {
-            return;
-        }
-
-        // collapse status bar
-        StatusBarManager statusBarManager = (StatusBarManager) getContext().getSystemService(
-                Context.STATUS_BAR_SERVICE);
-        statusBarManager.collapsePanels();
-
-        // dismiss keyguard in case it was active and no passcode set
-        try {
-            ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
-        } catch (Exception ex) {
-            // no action needed here
-        }
-
-        // start activity
-        what.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mContext.startActivity(what);
-    }
-
-    @Override
-    public void onClick(View v) {
-        Intent intent = new Intent(AlarmClock.ACTION_SHOW_ALARMS);
-        collapseStartActivity(intent);
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        Intent intent = new Intent("android.settings.DATE_SETTINGS");
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        collapseStartActivity(intent);
-
-        // consume event
-        return true;
-    }
-
-    protected void updateSettings() {
-        ContentResolver resolver = mContext.getContentResolver();
-
-        mClockStyle = Settings.System.getInt(resolver,
-                Settings.System.STATUSBAR_CLOCK_STYLE, STYLE_CLOCK_RIGHT);
-    }
-
-    protected void updateView() {
-        updateClockVisibility();
-        updateClock();
-    }
-
-    protected void updateClockVisibility() {
-        if (mClockStyle == STYLE_CLOCK_RIGHT)
-            setVisibility(View.VISIBLE);
-        else
-            setVisibility(View.GONE);
-    }
-
-    private boolean mDemoMode;
-
-
-    @Override
-    public void dispatchDemoCommand(String command, Bundle args) {
-        if (!mDemoMode && command.equals(COMMAND_ENTER)) {
-            mDemoMode = true;
-        } else if (mDemoMode && command.equals(COMMAND_EXIT)) {
-            mDemoMode = false;
-            updateClock();
-        } else if (mDemoMode && command.equals(COMMAND_CLOCK)) {
-            String millis = args.getString("millis");
-            String hhmm = args.getString("hhmm");
-            if (millis != null) {
-                mCalendar.setTimeInMillis(Long.parseLong(millis));
-            } else if (hhmm != null && hhmm.length() == 4) {
-                int hh = Integer.parseInt(hhmm.substring(0, 2));
-                int mm = Integer.parseInt(hhmm.substring(2));
-                mCalendar.set(Calendar.HOUR, hh);
-                mCalendar.set(Calendar.MINUTE, mm);
-            }
-            setText(getSmallTime());
-        }
-    }
 }
-
