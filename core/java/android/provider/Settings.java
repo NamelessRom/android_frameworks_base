@@ -3001,16 +3001,14 @@ public final class Settings {
          */
         public static final String STATUS_BAR_BATTERY_SHOW_PERCENT =
                 "status_bar_battery_show_percent";
-
         /**
-         * Whether to show the clock in status bar
-         * of the stock battery icon
-         * 0: don't show the clock
-         * 1: show the clock
-         * default: 1
+         * Style of clock
+         * 0 - Hide Clock
+         * 1 - Right Clock
+         * 2 - Center Clock
          * @hide
          */
-        public static final String STATUS_BAR_CLOCK = "status_bar_clock";
+        public static final String STATUSBAR_CLOCK_STYLE = "statusbar_clock_style";
 
         /**
          * Whether to show the signal text or signal bars.
