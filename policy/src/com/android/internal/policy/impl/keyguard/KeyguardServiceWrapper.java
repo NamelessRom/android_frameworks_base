@@ -197,6 +197,18 @@ public class KeyguardServiceWrapper implements IKeyguardService {
         }
     }
 
+    public void showCustomIntent(Intent intent) {
+        try {
+            mService.showCustomIntent(intent);
+        } catch (RemoteException e) {
+            Slog.w(TAG , "Remote Exception", e);
+        }
+    }
+
+    public void setWallpaper(Bitmap bmp) {
+        // Not used by PhoneWindowManager
+    }
+
     public void showAssistant() {
         // Not used by PhoneWindowManager
     }

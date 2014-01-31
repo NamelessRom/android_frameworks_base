@@ -2958,6 +2958,12 @@ public final class Settings {
         public static final String LOCKSCREEN_TARGETS = "lockscreen_targets";
 
         /**
+         * Whether a custom lockscreen wallpaper is enabled
+         * @hide
+         */
+        public static final String LOCKSCREEN_WALLPAPER = "lockscreen_wallpaper";
+
+        /**
          * Screen-On Notification Light,
          * should default to 1 (yes, Notification Light is enabled when screen is on)
          * @hide
