@@ -991,16 +991,22 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             if (!ramBarEnabled)
                 return;
 
+            final boolean includeCached = false;//Settings.System.getBoolean(mContext.getContentResolver(),
+            //Settings.System.RAM_USAGE_BAR_CACHED, false);
+
             mAm.getMemoryInfo(mMemInfo);
             final long secServerMem = mMemInfo.secondaryServerThreshold;
             mMemInfoReader.readMemInfo();
-            final long availMem = mMemInfoReader.getFreeSize() + mMemInfoReader.getCachedSize() -
-                    secServerMem;
+            final long availMem = mMemInfoReader.getFreeSize()
+                    + (includeCached ? 0 : mMemInfoReader.getCachedSize())
+                    - secServerMem;
             final long totalMem = mMemInfoReader.getTotalSize();
 
             String sizeStr = Formatter.formatShortFileSize(mContext, totalMem-availMem);
             mForegroundProcessText.setText(getResources().getString(
-                    R.string.service_foreground_processes, sizeStr));
+                    (includeCached
+                            ? R.string.service_foreground_processes_cached
+                            : R.string.service_foreground_processes), sizeStr));
             sizeStr = Formatter.formatShortFileSize(mContext, availMem);
             mBackgroundProcessText.setText(getResources().getString(
                     R.string.service_background_processes, sizeStr));
