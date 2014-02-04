@@ -991,11 +991,15 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             if (!ramBarEnabled)
                 return;
 
+            final boolean includeCached = Settings.System.getBoolean(mContext.getContentResolver(),
+                    Settings.System.RAM_USAGE_BAR_CACHED, false);
+
             mAm.getMemoryInfo(mMemInfo);
             final long secServerMem = mMemInfo.secondaryServerThreshold;
             mMemInfoReader.readMemInfo();
-            final long availMem = mMemInfoReader.getFreeSize() + mMemInfoReader.getCachedSize() -
-                    secServerMem;
+            final long availMem = mMemInfoReader.getFreeSize()
+                    + (includeCached ? mMemInfoReader.getCachedSize() : 0)
+                    - secServerMem;
             final long totalMem = mMemInfoReader.getTotalSize();
 
             String sizeStr = Formatter.formatShortFileSize(mContext, totalMem-availMem);
