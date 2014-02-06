@@ -2810,6 +2810,16 @@ public final class Settings {
         public static final String LOCKSCREEN_SEE_THROUGH = "lockscreen_see_through";
 
         /**
+         * If the statusbar should be hidden on lockscreen
+         *     0 = show all
+         *     1 = hide statusbar
+         *     2 = hide navigation bar
+         *     3 = hide all
+         * @hide
+         */
+        public static final String LOCKSCREEN_HIDE_STATUSBAR = "lockscreen_hide_statusbar";
+
+        /**
          * Quick Settings Panel Tiles to Use
          *
          * @hide
