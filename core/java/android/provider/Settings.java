@@ -3699,6 +3699,12 @@ public final class Settings {
         };
 
         /**
+         * Whether to force enable navigation bars
+         * @hide
+         */
+        public static final String NAVBAR_FORCE_ENABLE = "navbar_force_enable";
+
+        /**
          * Volume key controls ringtone or media sound stream
          *
          * @hide
