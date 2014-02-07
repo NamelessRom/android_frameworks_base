@@ -2504,7 +2504,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             sbModeChanged = sbModeChanged && sbVisible;
             nbModeChanged = nbModeChanged && nbVisible;
 
-
             if (sbModeChanged || nbModeChanged) {
                 // update transient bar autohide
                 if (sbMode == MODE_SEMI_TRANSPARENT || nbMode == MODE_SEMI_TRANSPARENT) {
