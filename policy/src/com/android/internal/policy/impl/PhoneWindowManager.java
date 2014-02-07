@@ -674,6 +674,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_WIDTH), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVBAR_FORCE_ENABLE), false, this,
+                    UserHandle.USER_ALL);
+
             updateSettings();
         }
 
@@ -1430,7 +1434,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mHasNavigationBar = res.getBoolean(com.android.internal.R.bool.config_showNavigationBar);
         // Allow a system property to override this. Used by the emulator.
         // See also hasNavigationBar().
-        String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
+        final String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
         if ("1".equals(navBarOverride)) {
             mHasNavigationBar = false;
         } else if ("0".equals(navBarOverride)) {
@@ -1538,6 +1542,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     com.android.internal.R.bool.config_showNavigationBar);
 
             if (!mHasNavigationBar) {
+                mHasNavigationBar = Settings.System.getBoolean(resolver,
+                        Settings.System.NAVBAR_FORCE_ENABLE, false);
+            }
+
+            if (!mHasNavigationBar) {
                 // Set the navigation bar's dimensions to 0 in expanded desktop mode
                 mNavigationBarWidthForRotation[mPortraitRotation]
                         = mNavigationBarWidthForRotation[mUpsideDownRotation]
@@ -1549,20 +1558,24 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         = mNavigationBarHeightForRotation[mSeascapeRotation] = 0;
             } else {
                 // Height of the navigation bar when presented horizontally at bottom *******
-                mNavigationBarHeightForRotation[mPortraitRotation] =
-                mNavigationBarHeightForRotation[mUpsideDownRotation] =
+                final int defaultHeight =
                         Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.NAVIGATION_BAR_HEIGHT,
                         mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_height),
                         UserHandle.USER_CURRENT);
+                mNavigationBarHeightForRotation[mPortraitRotation] =
+                mNavigationBarHeightForRotation[mUpsideDownRotation] =
+                        (defaultHeight != 0 ? defaultHeight : 48);
 
                 // Width of the navigation bar when presented vertically along one side
+                final int defaultWidth =
+                        Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.NAVIGATION_BAR_WIDTH,
+                        mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_width),
+                        UserHandle.USER_CURRENT);
                 mNavigationBarWidthForRotation[mPortraitRotation] =
                 mNavigationBarWidthForRotation[mUpsideDownRotation] =
                 mNavigationBarWidthForRotation[mLandscapeRotation] =
                 mNavigationBarWidthForRotation[mSeascapeRotation] =
-                        Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.NAVIGATION_BAR_WIDTH,
-                        mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_width),
-                        UserHandle.USER_CURRENT);
+                        (defaultWidth != 0 ? defaultWidth : 42);
             }
 
             if (mSystemReady) {
