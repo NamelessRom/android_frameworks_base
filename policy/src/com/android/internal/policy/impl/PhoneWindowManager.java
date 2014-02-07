@@ -674,6 +674,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_WIDTH), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVBAR_FORCE_ENABLE), false, this,
+                    UserHandle.USER_ALL);
+
             updateSettings();
         }
 
@@ -1430,7 +1434,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mHasNavigationBar = res.getBoolean(com.android.internal.R.bool.config_showNavigationBar);
         // Allow a system property to override this. Used by the emulator.
         // See also hasNavigationBar().
-        String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
+        final String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
         if ("1".equals(navBarOverride)) {
             mHasNavigationBar = false;
         } else if ("0".equals(navBarOverride)) {
@@ -1536,6 +1540,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // Custom nav bar dimensions
             mHasNavigationBar = mContext.getResources().getBoolean(
                     com.android.internal.R.bool.config_showNavigationBar);
+
+            if (!mHasNavigationBar) {
+                mHasNavigationBar = Settings.System.getBoolean(resolver,
+                        Settings.System.NAVBAR_FORCE_ENABLE, false);
+            }
 
             if (!mHasNavigationBar) {
                 // Set the navigation bar's dimensions to 0 in expanded desktop mode
