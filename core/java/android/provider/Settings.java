@@ -3815,6 +3815,13 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_USE_WIDGET_CONTAINER_CAROUSEL = "lockscreen_use_widget_container_carousel";
 
+        /**
+         * Whether double-tap and hold on the lock glowpad starts the torch
+         *
+         * @hide
+         */
+        public static final String LOCKSCREEN_GLOWPAD_TORCH = "lockscreen_glowpad_torch";
+
          /**
           * Action to perform when the app switch key is long-pressed. (Default is 0)
           * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
