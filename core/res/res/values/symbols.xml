@@ -1872,6 +1872,9 @@
   <!-- LED flashlight -->
   <java-symbol type="bool" name="config_enableTorch" />
 
+  <!-- LED Flashlight Nameless Edition -->
+  <java-symbol type="bool" name="config_device_has_camera_flash" />
+
   <!-- Navigation Ring -->
   <java-symbol type="drawable" name="ic_navigation_ring_blank_normal" />
   <java-symbol type="drawable" name="ic_navigation_ring_blank_activated" />
