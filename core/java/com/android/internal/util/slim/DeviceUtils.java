@@ -17,11 +17,15 @@
 package com.android.internal.util.slim;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.DisplayInfo;
 import android.view.WindowManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DeviceUtils {
 
@@ -30,7 +34,18 @@ public class DeviceUtils {
     private static final int DEVICE_HYBRID = 1;
     private static final int DEVICE_TABLET = 2;
 
-    private DeviceUtils() {
+    public static boolean deviceSupportsTorch(Context context) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            List<ApplicationInfo> packages = pm.getInstalledApplications(0);
+                for (ApplicationInfo packageInfo : packages) {
+                    if (packageInfo.packageName.equals(TorchConstants.APP_PACKAGE_NAME)) {
+                        return true;
+                    }
+                }
+        } catch (Exception e) {
+        }
+        return false;
     }
 
     private static int getScreenType(Context con) {
