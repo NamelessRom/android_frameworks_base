@@ -17,6 +17,8 @@
 package com.android.internal.util.slim;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.util.DisplayMetrics;
 import android.view.DisplayInfo;
 import android.view.WindowManager;
@@ -31,6 +33,19 @@ public class DeviceUtils {
     private static final int DEVICE_TABLET = 2;
 
     private DeviceUtils() {
+
+    public static boolean deviceSupportsFlashlight(Context context) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            List<ApplicationInfo> packages = pm.getInstalledApplications(0);
+                for (ApplicationInfo packageInfo : packages) {
+                    if (packageInfo.packageName.equals(FlashlightConstants.APP_PACKAGE_NAME)) {
+                        return true;
+                    }
+                }
+        } catch (Exception e) {
+        }
+        return false;
     }
 
     private static int getScreenType(Context con) {
