@@ -1870,7 +1870,7 @@
   <java-symbol type="array" name="config_disabledComponents" />
 
   <!-- LED flashlight -->
-  <java-symbol type="bool" name="config_enableTorch" />
+  <java-symbol type="bool" name="config_device_has_camera_flash" />
 
   <!-- Navigation Ring -->
   <java-symbol type="drawable" name="ic_navigation_ring_blank_normal" />
