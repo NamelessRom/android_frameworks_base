@@ -20,7 +20,7 @@
     package="com.android.keyguard"
     android:sharedUserId="android.uid.systemui"
     coreApp="true">
-    <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="17"/>
+    <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="19"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
