@@ -42,6 +42,7 @@ import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -51,10 +52,14 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Slog;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 
 import com.android.internal.telephony.IccCardConstants.State;
 import com.android.internal.util.cm.LockscreenTargetUtils;
+import com.android.internal.util.nameless.DeviceUtils;
+import com.android.internal.util.nameless.FlashlighConstants;
+import com.android.internal.view.RotationPolicy;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.GlowPadView.OnTriggerListener;
@@ -66,6 +71,8 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     private static final String ASSIST_ICON_METADATA_NAME =
         "com.android.systemui.action_assist_icon";
 
+    private Handler mHandler = new Handler();
+
     private KeyguardSecurityCallback mCallback;
     private GlowPadView mGlowPadView;
     private ObjectAnimator mAnim;
@@ -73,10 +80,14 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     private boolean mIsBouncing;
     private boolean mCameraDisabled;
     private boolean mSearchDisabled;
+    private boolean mGlowTorch;
+    private boolean mGlowTorchRunning;
+    private boolean mUserRotation;
     private LockPatternUtils mLockPatternUtils;
     private SecurityMessageDisplay mSecurityMessageDisplay;
     private Drawable mBouncerFrame;
     private String[] mStoredTargets;
+    private int mTaps;
     private int mTargetOffset;
     private boolean mIsScreenLarge;
     private float mBatteryLevel;
@@ -136,15 +147,29 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             if (!mIsBouncing) {
                 doTransition(mFadeView, 1.0f);
             }
+            killGlowpadTorch();
         }
 
         public void onGrabbed(View v, int handle) {
             mCallback.userActivity(0);
             doTransition(mFadeView, 0.0f);
+            startGlowpadTorch();
         }
 
         public void onGrabbedStateChange(View v, int handle) {
 
+        }
+
+        public void onTargetChange(View v, int target) {
+            if (target != -1) {
+                killGlowpadTorch();
+            } else {
+                if (mGlowTorch && mGlowTorchRunning) {
+                    // Keep screen alive extremely tiny
+                    // unintentional movement is logged
+                    mCallback.userActivity(0);
+                }
+            }
         }
 
         public void onFinishFinalAnimation() {
@@ -214,6 +239,12 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         mSecurityMessageDisplay = new KeyguardMessageArea.Helper(this);
         View bouncerFrameView = findViewById(R.id.keyguard_selector_view_frame);
         mBouncerFrame = bouncerFrameView.getBackground();
+
+        mGlowTorchRunning = false;
+        mGlowTorch = Settings.System.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_GLOWPAD_TORCH, 0,
+                UserHandle.USER_CURRENT) == 1;
     }
 
     public void setCarrierArea(View carrierArea) {
@@ -410,6 +441,54 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     public void setLockPatternUtils(LockPatternUtils utils) {
         mLockPatternUtils = utils;
     }
+
+    private void startGlowpadTorch() {
+        if (mGlowTorch) {
+            mHandler.removeCallbacks(checkDouble);
+            mHandler.removeCallbacks(checkLongPress);
+            if (mTaps > 0) {
+                mHandler.postDelayed(checkLongPress,
+                        ViewConfiguration.getLongPressTimeout());
+                mTaps = 0;
+            } else {
+                mTaps += 1;
+                mHandler.postDelayed(checkDouble, 400);
+            }
+        }
+    }
+
+    private void killGlowpadTorch() {
+        if (mGlowTorch) {
+            mHandler.removeCallbacks(checkLongPress);
+            // Don't mess with torch if we didn't start it
+            if (mGlowTorchRunning) {
+                mGlowTorchRunning = false;
+                Intent intent = new Intent(FlashlightConstants.ACTION_OFF);
+                mContext.sendBroadcastAsUser(
+                        intent, new UserHandle(UserHandle.USER_CURRENT));
+                // Restore user rotation policy
+                RotationPolicy.setRotationLock(mContext, mUserRotation);
+            }
+        }
+    }
+
+    final Runnable checkLongPress = new Runnable () {
+        public void run() {
+            mGlowTorchRunning = true;
+            mUserRotation = RotationPolicy.isRotationLocked(mContext);
+            // Lock device so user doesn't accidentally rotate and lose torch
+            RotationPolicy.setRotationLock(mContext, true);
+            Intent intent = new Intent(FlashlightConstants.ACTION_ON);
+            mContext.sendBroadcastAsUser(
+                    intent, new UserHandle(UserHandle.USER_CURRENT));
+        }
+    };
+
+    final Runnable checkDouble = new Runnable () {
+        public void run() {
+            mTaps = 0;
+        }
+    };
 
     @Override
     public void reset() {

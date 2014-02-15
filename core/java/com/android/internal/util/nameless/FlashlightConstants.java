@@ -26,6 +26,21 @@ public class FlashlightConstants {
     public static final String APP_PACKAGE_NAME = "com.nameless.flashlight";
 
     /**
+     * Intent broadcast action for toggling the torch state
+     */
+    public static final String ACTION_TOGGLE_STATE = APP_PACKAGE_NAME + ".TOGGLE_FLASHLIGHT";
+
+    /**
+     * Intent broadcast action for turning the torch off
+     */
+    public static final String ACTION_OFF = APP_PACKAGE_NAME + ".FLASHLIGHT_OFF";
+
+    /**
+     * Intent broadcast action for turning the torch on
+     */
+    public static final String ACTION_ON = APP_PACKAGE_NAME + ".FLASHLIGHT_ON";
+
+    /**
      * Intent action for 'torch state changed' broadcast
      */
     public static final String ACTION_STATE_CHANGED = "TORCH_STATUS_CHANGED";
