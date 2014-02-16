@@ -1,31 +1,25 @@
 package com.android.systemui.quicksettings;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
-import android.os.UserHandle;
-import android.provider.Settings;
-import android.view.LayoutInflater;
 import android.view.View;
 
-import com.android.internal.util.cm.TorchConstants;
+import com.android.internal.util.nameless.NamelessUtils;
+import com.android.internal.util.nameless.constants.FlashLightConstants;
 import com.android.systemui.R;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class TorchTile extends QuickSettingsTile {
     private boolean mActive = false;
 
-    public TorchTile(Context context, 
-            QuickSettingsController qsc, Handler handler) {
+    public TorchTile(Context context, QuickSettingsController qsc, Handler handler) {
         super(context, qsc);
 
         mOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
+                Intent i = new Intent(FlashLightConstants.ACTION_TOGGLE_STATE);
                 mContext.sendBroadcast(i);
             }
         };
@@ -33,12 +27,14 @@ public class TorchTile extends QuickSettingsTile {
         mOnLongClick = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                startSettingsActivity(TorchConstants.INTENT_LAUNCH_APP);
+                startSettingsActivity(FlashLightConstants.INTENT_LAUNCH_APP);
                 return true;
             }
         };
 
-        qsc.registerAction(TorchConstants.ACTION_STATE_CHANGED, this);
+        mActive = NamelessUtils.isServiceRunning(context, FlashLightConstants.APP_SERVICE_NAME);
+
+        qsc.registerAction(FlashLightConstants.ACTION_STATE_CHANGED, this);
     }
 
     @Override
@@ -65,7 +61,7 @@ public class TorchTile extends QuickSettingsTile {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        mActive = intent.getIntExtra(TorchConstants.EXTRA_CURRENT_STATE, 0) != 0;
+        mActive = intent.getIntExtra(FlashLightConstants.EXTRA_CURRENT_STATE, 0) != 0;
         updateResources();
     }
 }
