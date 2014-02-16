@@ -19,6 +19,7 @@
 
 package com.android.internal.util.nameless;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -51,6 +52,26 @@ public class NamelessUtils {
         } catch (Exception e) {
             Log.e(TAG, "Error: " + e.getMessage());
         }
+        return false;
+    }
+
+    public static boolean isServiceRunning(Context context, String serviceName) {
+        ActivityManager activityManager = (ActivityManager) context
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> services = activityManager
+                .getRunningTasks(Integer.MAX_VALUE);
+
+        if (services != null) {
+            for (ActivityManager.RunningTaskInfo info : services) {
+                if (info.topActivity != null) {
+                    if (info.topActivity.getClassName() != null && info.topActivity.getClassName()
+                            .equalsIgnoreCase(serviceName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 }
