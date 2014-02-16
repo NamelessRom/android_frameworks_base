@@ -10,7 +10,7 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.android.internal.util.cm.TorchConstants;
+import com.android.internal.util.nameless.FlashlightConstants;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
@@ -25,7 +25,7 @@ public class TorchTile extends QuickSettingsTile {
         mOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
+                Intent i = new Intent(FlashlightConstants.ACTION_TOGGLE_STATE);
                 mContext.sendBroadcast(i);
             }
         };
@@ -33,12 +33,12 @@ public class TorchTile extends QuickSettingsTile {
         mOnLongClick = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                startSettingsActivity(TorchConstants.INTENT_LAUNCH_APP);
+                startSettingsActivity(FlashlightConstants.INTENT_LAUNCH_APP);
                 return true;
             }
         };
 
-        qsc.registerAction(TorchConstants.ACTION_STATE_CHANGED, this);
+        qsc.registerAction(FlashlightConstants.ACTION_STATE_CHANGED, this);
     }
 
     @Override
@@ -63,9 +63,4 @@ public class TorchTile extends QuickSettingsTile {
         }
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        mActive = intent.getIntExtra(TorchConstants.EXTRA_CURRENT_STATE, 0) != 0;
-        updateResources();
-    }
 }
