@@ -553,7 +553,8 @@ public class NavigationBarView extends LinearLayout {
                 Settings.System.getInt(mContext.getContentResolver(),
                         Settings.System.LOCKSCREEN_NOTIFICATIONS_PRIVACY_MODE, 0) == 0;
         setVisibleOrGone(getSearchLight(), showSearch);
-        setVisibleOrGone(getCameraButton(), showCamera && mModLockDisabled);
+        setVisibleOrGone(getNotifsButton(), showNotifs && mWasNotifsButtonVisible);
+        setVisibleOrGone(getCameraButton(), showCamera);
         setVisibleOrGone(getNotifsButton(), showNotifs && mWasNotifsButtonVisible);
 
         mBarTransitions.applyBackButtonQuiescentAlpha(mBarTransitions.getMode(), true /*animate*/);
