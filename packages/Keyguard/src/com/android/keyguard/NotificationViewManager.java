@@ -192,7 +192,7 @@ public class NotificationViewManager {
                     config.forceExpandedView);
             if (added && config.wakeOnNotification && screenOffAndNotCovered
                       && showNotification && mTimeCovered == 0 
-                      && !QuietHoursUtils.inQuietHours(mContext, Settings.System.QUIET_HOURS_DIM)) {   
+                      && !QuietHoursUtils.inQuietHours(mContext, Settings.System.QUIET_HOURS_DIM)) {
                 wakeDevice();
             }
         }
