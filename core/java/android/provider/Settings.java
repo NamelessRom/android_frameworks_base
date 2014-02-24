@@ -8568,11 +8568,11 @@ public final class Settings {
         public static final String MULTI_SIM_PRIORITY_SUBSCRIPTION = "multi_sim_priority";
 
         /**
-          * To know the status of tune away. The supported values
-          * are false = disable, true = enable.
-          * @hide
-          */
-        public static final String TUNE_AWAY_STATUS = "tune_away";
+        * ToastAnimations
+        * @hide
+        */
+        public static final String TOAST_ANIMATION = "toast_animation";
+
     }
 
     /**
