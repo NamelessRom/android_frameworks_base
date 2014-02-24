@@ -3516,6 +3516,18 @@ public final class Settings {
         public static final String HOME_WAKE_SCREEN = "home_wake_screen";
 
         /**
+         * Allows to show the background activity back the lockscreen
+         * @hide
+         */
+        public static final String LOCKSCREEN_SEE_THROUGH = "lockscreen_see_through";
+
+        /**
+         * Allows setting the radius for blur
+         * @hide
+         */
+        public static final String LOCKSCREEN_BLUR_RADIUS = "lockscreen_blur_radius";
+
+        /**
          * Whether to wake the screen with the volume keys, the value is boolean.
          * @hide
          */
