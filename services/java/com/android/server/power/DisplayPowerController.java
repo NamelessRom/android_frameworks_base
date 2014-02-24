@@ -16,6 +16,8 @@
 
 package com.android.server.power;
 
+import java.io.PrintWriter;
+
 import com.android.server.LightsService;
 import com.android.server.TwilightService;
 import com.android.server.TwilightService.TwilightState;
@@ -23,16 +25,21 @@ import com.android.server.display.DisplayManagerService;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.ContentObserver;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
@@ -41,11 +48,15 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.text.format.DateUtils;
 import android.util.FloatMath;
+import android.util.Log;
 import android.util.Slog;
 import android.util.Spline;
 import android.util.TimeUtils;
+import android.view.DisplayInfo;
+import android.view.SurfaceControl;
 
-import java.io.PrintWriter;
+import com.android.internal.policy.impl.keyguard.KeyguardServiceWrapper;
+import com.android.internal.policy.IKeyguardService;
 
 /**
  * Controls the power state of the display.
@@ -375,6 +386,24 @@ final class DisplayPowerController {
     private boolean mTwilightChanged;
     private boolean mAutoBrightnessSettingsChanged;
 
+    private KeyguardServiceWrapper mKeyguardService;
+    private final int MAX_BLUR_WIDTH = 900;
+    private final int MAX_BLUR_HEIGHT = 1600;
+
+    private final ServiceConnection mKeyguardConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mKeyguardService = new KeyguardServiceWrapper(
+                    IKeyguardService.Stub.asInterface(service));
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mKeyguardService = null;
+        }
+
+    };
+
     /**
      * Creates the display power controller.
      */
@@ -454,6 +483,15 @@ final class DisplayPowerController {
 
         if (mUseSoftwareAutoBrightnessConfig && USE_TWILIGHT_ADJUSTMENT) {
             mTwilight.registerListener(mTwilightListener, mHandler);
+        }
+
+        Intent intent = new Intent();
+        intent.setClassName("com.android.keyguard", "com.android.keyguard.KeyguardService");
+        if (!context.bindServiceAsUser(intent, mKeyguardConnection,
+                Context.BIND_AUTO_CREATE, UserHandle.OWNER)) {
+            Log.e(TAG, "*** Keyguard: can't bind to keyguard");
+        } else {
+            Log.e(TAG, "*** Keyguard started");
         }
     }
 
@@ -575,6 +613,7 @@ final class DisplayPowerController {
      */
     public boolean requestPowerState(DisplayPowerRequest request,
             boolean waitForNegativeProximity) {
+
         if (DEBUG) {
             Slog.d(TAG, "requestPowerState: "
                     + request + ", waitForNegativeProximity=" + waitForNegativeProximity);
@@ -602,6 +641,7 @@ final class DisplayPowerController {
             }
 
             if (changed && !mPendingRequestChangedLocked) {
+                initSeeThrough(request);
                 mPendingRequestChangedLocked = true;
                 sendUpdatePowerStateLocked();
             }
@@ -1520,4 +1560,30 @@ final class DisplayPowerController {
             updatePowerState();
         }
     };
+
+    private void initSeeThrough(DisplayPowerRequest request) {
+        boolean seeThrough = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_SEE_THROUGH, 0) == 1;
+
+        if ((mKeyguardService == null || !mKeyguardService.isShowing()) &&
+                request.screenState == DisplayPowerRequest.SCREEN_STATE_OFF &&
+                seeThrough) {
+            DisplayInfo di = mDisplayManager
+                    .getDisplayInfo(mDisplayManager.getDisplayIds() [0]);
+            /* Limit max screenshot capture layer to 22000.
+               Prevents status bar and navigation bar from being captured.*/
+            Bitmap bmp = SurfaceControl
+                    .screenshot(di.getNaturalWidth(),di.getNaturalHeight(), 0, 22000);
+            if (bmp != null) {
+                Bitmap tmpBmp = bmp;
+                // scale image if its too large
+                if (bmp.getWidth() > MAX_BLUR_WIDTH) {
+                    tmpBmp = Bitmap.createScaledBitmap(bmp, MAX_BLUR_WIDTH, MAX_BLUR_HEIGHT, true);
+                }
+                mKeyguardService.setBackgroundBitmap(tmpBmp);
+                bmp.recycle();
+                tmpBmp.recycle();
+            }
+        }
+    }
 }
