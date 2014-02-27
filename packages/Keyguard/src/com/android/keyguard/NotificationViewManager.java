@@ -286,6 +286,10 @@ public class NotificationViewManager {
         mIsScreenOn = true;
         mTimeCovered = 0;
         if (mHostView != null) mHostView.bringToFront();
+        // Only keep watching for pocketing if woken up by pocket mode.
+        if (!mWokenByPocketMode) {
+            unregisterListeners();
+        }
     }
 
     public void onDismiss() {
