@@ -3430,6 +3430,36 @@ public final class Settings {
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
         /**
+         * MediaScanner behavior on boot.
+         * 0 = enabled
+         * 1 = ask (notification)
+         * 2 = disabled
+         * @hide
+         */
+        public static final String MEDIA_SCANNER_ON_BOOT = "media_scanner_on_boot";
+
+        /**
+         * Reminder alert on / off
+         * @hide
+         */
+        public static final String REMINDER_ALERT_ENABLED = "reminder_alert_enabled";
+
+        /**
+         * Reminder alert extras
+         *  0 = no alert
+         *  1 = alert rings once
+         *  2 = alert rings until dismissed
+         * @hide
+         */
+        public static final String REMINDER_ALERT_NOTIFY = "reminder_alert_notify";
+
+        /**
+         * Reminder alert ringer
+         * @hide
+         */
+        public static final String REMINDER_ALERT_RINGER = "reminder_alert_ringer";
+
+        /**
          * Battery warning preferences
          *
          * 0 = show dialog + play sound (default)
