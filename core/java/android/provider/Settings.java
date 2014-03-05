@@ -3460,6 +3460,12 @@ public final class Settings {
         public static final String REMINDER_ALERT_RINGER = "reminder_alert_ringer";
 
         /**
+         * Reminder alert flip interval
+         * @hide
+         */
+        public static final String REMINDER_ALERT_INTERVAL = "reminder_alert_interval";
+
+        /**
          * Battery warning preferences
          *
          * 0 = show dialog + play sound (default)
