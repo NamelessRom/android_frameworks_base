@@ -46,17 +46,14 @@ import android.widget.TextView.OnEditorActionListener;
  */
 public class KeyguardSimPinView extends KeyguardAbsKeyInputView
         implements KeyguardSecurityView, OnEditorActionListener, TextWatcher {
-    private static final String LOG_TAG = "KeyguardSimPinView";
+    public static final String LOG_TAG = "KeyguardSimPinView";
     private static final boolean DEBUG = KeyguardViewMediator.DEBUG;
     public static final String TAG = "KeyguardSimPinView";
 
     protected ProgressDialog mSimUnlockProgressDialog = null;
     private CheckSimPin mCheckSimPinThread;
 
-    private AlertDialog mRemainingAttemptsDialog;
-    
-    protected volatile boolean mSimCheckInProgress;
-
+    protected AlertDialog mRemainingAttemptsDialog;
     public KeyguardSimPinView(Context context) {
         this(context, null);
     }
@@ -78,24 +75,11 @@ public class KeyguardSimPinView extends KeyguardAbsKeyInputView
     }
 
     public void resetState() {
-        String  displayMessage = "";
-        try {
-            int attemptsRemaining = ITelephony.Stub.asInterface(ServiceManager
-                    .checkService("phone")).getIccPin1RetryCount();
-            if (attemptsRemaining >= 0) {
-                displayMessage = getContext().getString(R.string.keyguard_password_wrong_pin_code)
-                        + getContext().getString(R.string.pinpuk_attempts)
-                        + attemptsRemaining + ". ";
-            }
-        } catch (RemoteException ex) {
-            displayMessage = getContext().getString(R.string.keyguard_password_pin_failed);
-        }
-        displayMessage = displayMessage + getContext().getString(R.string.kg_sim_pin_instructions) ;
-        mSecurityMessageDisplay.setMessage(displayMessage, true);
+        mSecurityMessageDisplay.setMessage(R.string.kg_sim_pin_instructions, true);
         mPasswordEntry.setEnabled(true);
     }
 
-    private String getPinPasswordErrorMessage(int attemptsRemaining) {
+    protected String getPinPasswordErrorMessage(int attemptsRemaining) {
         String displayMessage;
 
         if (attemptsRemaining == 0) {
@@ -167,7 +151,6 @@ public class KeyguardSimPinView extends KeyguardAbsKeyInputView
                 | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
 
         mPasswordEntry.requestFocus();
-
         mSecurityMessageDisplay.setTimeout(0); // don't show ownerinfo/charging status by default
     }
 
@@ -232,8 +215,7 @@ public class KeyguardSimPinView extends KeyguardAbsKeyInputView
         }
         return mSimUnlockProgressDialog;
     }
-
-    private Dialog getSimRemainingAttemptsDialog(int remaining) {
+    protected Dialog getSimRemainingAttemptsDialog(int remaining) {
         String msg = getPinPasswordErrorMessage(remaining);
         if (mRemainingAttemptsDialog == null) {
             Builder builder = new AlertDialog.Builder(mContext);
