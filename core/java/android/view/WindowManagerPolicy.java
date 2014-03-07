@@ -1214,9 +1214,4 @@ public interface WindowManagerPolicy {
      * @return True if navbar can be hidden by immersive mode
      */
     public boolean isImmersiveMode(int vis);
-
-    /**
-     * @hide
-     */
-    public void updateStatusBarNavBarHeight();
 }
