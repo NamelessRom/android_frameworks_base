@@ -88,11 +88,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_SYSTEM = "system";
     private static final String TABLE_SECURE = "secure";
     private static final String TABLE_GLOBAL = "global";
+    private static final String TABLE_NAMELESS = "nameless";
 
     static {
         mValidTables.add(TABLE_SYSTEM);
         mValidTables.add(TABLE_SECURE);
         mValidTables.add(TABLE_GLOBAL);
+        mValidTables.add(TABLE_NAMELESS);
         mValidTables.add("bluetooth_devices");
         mValidTables.add("bookmarks");
 
@@ -143,6 +145,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX globalIndex1 ON global (name);");
     }
 
+    private void createNamelessTable(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS nameless (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT UNIQUE ON CONFLICT REPLACE," +
+                "value TEXT" +
+                ");");
+        db.execSQL("CREATE INDEX IF NOT EXISTS namelessIndex1 ON nameless (name);");
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE system (" +
@@ -153,6 +164,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX systemIndex1 ON system (name);");
 
         createSecureTable(db);
+
+        createNamelessTable(db);
 
         // Only create the global table for the singleton 'owner' user
         if (mUserHandle == UserHandle.USER_OWNER) {
@@ -1606,6 +1619,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     if (stmt != null) stmt.close();
                 }
             }
+            //add Nameless table
+            db.beginTransaction();
+            try {
+                createNamelessTable(db);
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
             upgradeVersion = 98;
         }
 
@@ -1633,6 +1654,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP INDEX IF EXISTS bookmarksIndex1");
         db.execSQL("DROP INDEX IF EXISTS bookmarksIndex2");
         db.execSQL("DROP TABLE IF EXISTS favorites");
+        db.execSQL("DROP TABLE IF EXISTS nameless");
+        db.execSQL("DROP INDEX IF EXISTS namelessIndex1");
         onCreate(db);
 
         // Added for diagnosing settings.db wipes after the fact
@@ -2021,6 +2044,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (mUserHandle == UserHandle.USER_OWNER) {
             loadGlobalSettings(db);
         }
+        loadNamelessSettings(db);
     }
 
     private void loadSystemSettings(SQLiteDatabase db) {
@@ -2210,6 +2234,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         loadStringSetting(stmt, Settings.Secure.BACKUP_TRANSPORT,
                 R.string.def_backup_transport);
+    }
+
+     private void loadNamelessSettings(SQLiteDatabase db) {
+        SQLiteStatement stmt = null;
+        try {
+            stmt = db.compileStatement("INSERT OR IGNORE INTO nameless(name,value)"
+                    + " VALUES(?,?);");
+            loadBooleanSetting(stmt, Settings.Nameless.ENABLE_ACRA,
+                    true);
+        } finally {
+            if (stmt != null) stmt.close();
+        }
     }
 
     private void loadGlobalSettings(SQLiteDatabase db) {
