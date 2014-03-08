@@ -341,7 +341,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mDeskDockEnablesAccelerometer;
     int mLidKeyboardAccessibility;
     int mLidNavigationAccessibility;
-    boolean mLidControlsSleep = false;
+    boolean mLidControlsSleep;
     int mLongPressOnPowerBehavior = -1;
     boolean mScreenOnEarly = false;
     boolean mScreenOnFully = false;
@@ -4540,7 +4540,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         if (lidOpen) {
             if (Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.LOCKSCREEN_LID_WAKE, 0, UserHandle.USER_CURRENT) == 1) {
+                    Settings.System.LOCKSCREEN_LID_WAKE, 1, UserHandle.USER_CURRENT) == 1) {
                 mPowerManager.wakeUp(SystemClock.uptimeMillis());
             } else if (!mLidControlsSleep) {
                 mPowerManager.userActivity(SystemClock.uptimeMillis(), false);
@@ -6049,8 +6049,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
         }
 
-        if (mLidState == LID_CLOSED && Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.LOCKSCREEN_LID_WAKE, 0, UserHandle.USER_CURRENT) == 1) {
+        if (mLidState == LID_CLOSED && mLidControlsSleep
+            && Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.LOCKSCREEN_LID_WAKE, 1, UserHandle.USER_CURRENT) == 1) {
             mPowerManager.goToSleep(SystemClock.uptimeMillis());
         }
     }
