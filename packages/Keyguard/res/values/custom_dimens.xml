@@ -27,4 +27,7 @@
 
     <!-- Height of a large notification in the status bar plus glow, padding, etc -->
     <dimen name="notification_row_max_height">260dp</dimen>
+
+    <drawable name="reminder_bg_pressed">#FF191919</drawable>
+
 </resources>
