@@ -161,7 +161,7 @@ public final class ActivityThread {
     private static final int LOG_ON_PAUSE_CALLED = 30021;
     private static final int LOG_ON_RESUME_CALLED = 30022;
 
-    static ContextImpl mSystemContext = null;
+    private ContextImpl mSystemContext;
 
     static IPackageManager sPackageManager;
 
