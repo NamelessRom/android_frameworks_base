@@ -247,6 +247,11 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                 Settings.Secure.LOCKSCREEN_DOTS_COLOR, -2,
                 UserHandle.USER_CURRENT);
 
+        int ringColor = Settings.Secure.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.Secure.LOCKSCREEN_MISC_COLOR, -2,
+                UserHandle.USER_CURRENT);
+
         String lockIcon = Settings.Secure.getStringForUser(
                 mContext.getContentResolver(),
                 Settings.Secure.LOCKSCREEN_LOCK_ICON,
@@ -273,7 +278,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             }
         }
 
-        mGlowPadView.setColoredIcons(lockColor, dotColor, lock);
+        mGlowPadView.setColoredIcons(lockColor, dotColor, ringColor, lock);
 
         updateTargets();
 
@@ -397,6 +402,35 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             storedDrawables.add(new TargetDrawable(res,
                     res.getDrawable(R.drawable.ic_lockscreen_unlock)));
 
+            int frontColor = Settings.Secure.getIntForUser(
+                    mContext.getContentResolver(),
+                    Settings.Secure.LOCKSCREEN_TARGETS_COLOR, -2,
+                    UserHandle.USER_CURRENT);
+
+            int backColor = Settings.Secure.getIntForUser(
+                    mContext.getContentResolver(),
+                    Settings.Secure.LOCKSCREEN_MISC_COLOR, -2,
+                    UserHandle.USER_CURRENT);
+
+            Drawable unlockFront = res.getDrawable(R.drawable.ic_lockscreen_unlock_normal);
+            Drawable unlockBack = res.getDrawable(R.drawable.ic_lockscreen_unlock_activated);;
+
+            if (frontColor != -2) {
+                unlockFront = new BitmapDrawable(
+                        res, ImageHelper.getColoredBitmap(unlockFront, frontColor));
+            }
+
+            if (backColor != -2) {
+                unlockBack = new BitmapDrawable(
+                        res, ImageHelper.getColoredBitmap(unlockBack, backColor));
+            }
+
+            int insetType = LockscreenTargetUtils.getInsetForIconType(
+                    mContext, GlowPadView.ICON_RESOURCE);
+            Drawable unlock = LockscreenTargetUtils.getLayeredDrawable(mContext,
+                    unlockBack, unlockFront, insetType, true);
+            TargetDrawable unlockTarget = new TargetDrawable(res, unlock);
+
             for (int i = 0; i < 8 - mTargetOffset - 1; i++) {
                 if (i >= mStoredTargets.length) {
                     storedDrawables.add(new TargetDrawable(res, 0));
@@ -444,6 +478,22 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                     }
 
                     int inset = LockscreenTargetUtils.getInsetForIconType(mContext, type);
+
+                    if (frontColor != -2) {
+                        front = new BitmapDrawable(
+                                res, ImageHelper.getColoredBitmap(front, frontColor));
+                    }
+
+                    if (backColor != -2) {
+                        if ((back instanceof InsetDrawable)) {
+                            back = new BitmapDrawable(res, ImageHelper.getColoredBitmap(
+                                    blankActiveDrawable, backColor));
+                        } else {
+                            back = new BitmapDrawable(res, ImageHelper.getColoredBitmap(
+                                    back, backColor));
+                        }
+                    }
+
                     Drawable drawable = LockscreenTargetUtils.getLayeredDrawable(mContext,
                             back,front, inset, frontBlank);
                     TargetDrawable targetDrawable = new TargetDrawable(res, drawable);
