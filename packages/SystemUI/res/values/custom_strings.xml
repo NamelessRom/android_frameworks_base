@@ -75,4 +75,7 @@
     <string name="onthego_service_toggle">Automatically restart service</string>
     <string name="quick_settings_onthego_back">Rear Camera</string>
     <string name="quick_settings_onthego_front">Front Camera</string>
+
+    <!-- Kill app toast -->
+    <string name="app_killed_message">App Killed</string>
 </resources>
