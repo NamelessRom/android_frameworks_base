@@ -35,6 +35,8 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 
+import com.android.internal.util.slim.DeviceUtils;
+
 import com.android.systemui.R;
 import com.android.systemui.RecentsComponent;
 import com.android.systemui.SystemUI;
@@ -138,6 +140,12 @@ public class Recents extends SystemUI implements RecentsComponent {
                                 R.dimen.status_bar_recents_thumbnail_width);
                     }
                 } else { // if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    boolean navigationBarCanMove = DeviceUtils.isPhone(mContext) ?
+                            Settings.System.getIntForUser(mContext.getContentResolver(),
+                                Settings.System.NAVIGATION_BAR_CAN_MOVE, 1,
+                                UserHandle.USER_CURRENT) == 1
+                            : false;
+
                     float thumbTopMargin = res.getDimensionPixelSize(
                             R.dimen.status_bar_recents_thumbnail_top_margin);
                     float thumbBgPadding = res.getDimensionPixelSize(
