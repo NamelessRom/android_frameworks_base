@@ -411,25 +411,52 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             if (Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.POWER_MENU_SCREENRECORD_ENABLED, 0) != 0) {
                 mItems.add(
-                    new SinglePressAction(com.android.internal.R.drawable.ic_lock_screen_record,
-                            R.string.global_action_screenrecord) {
+                        new SinglePressAction(com.android.internal.R.drawable.ic_lock_screen_record,
+                                R.string.global_action_screenrecord) {
 
-                        public void onPress() {
-                            takeScreenrecord();
-                        }
+                            public void onPress() {
+                                takeScreenrecord();
+                            }
 
-                        public boolean onLongPress() {
-                            return false;
-                        }
+                            public boolean onLongPress() {
+                                return false;
+                            }
 
-                        public boolean showDuringKeyguard() {
-                            return true;
-                        }
+                            public boolean showDuringKeyguard() {
+                                return true;
+                            }
 
-                        public boolean showBeforeProvisioning() {
-                            return true;
-                        }
-                    });
+                            public boolean showBeforeProvisioning() {
+                                return true;
+                            }
+                        });
+            }
+        }
+
+        // next: On-The-Go, if enabled
+        // TODO: toggle
+        if (true) {
+            if (true) {
+                mItems.add(
+                        new SinglePressAction(com.android.internal.R.drawable.ic_lock_power_off,
+                                R.string.global_action_screenrecord) {
+
+                            public void onPress() {
+                                startOnTheGo();
+                            }
+
+                            public boolean onLongPress() {
+                                return false;
+                            }
+
+                            public boolean showDuringKeyguard() {
+                                return true;
+                            }
+
+                            public boolean showBeforeProvisioning() {
+                                return true;
+                            }
+                        });
             }
         }
 
@@ -766,6 +793,15 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 mHandler.postDelayed(mScreenrecordTimeout, 31 * 60 * 1000);
             }
         }
+    }
+
+    private void startOnTheGo() {
+        final ComponentName cn = new ComponentName("com.android.systemui",
+                "com.android.systemui.nameless.onthego.OnTheGoService");
+        final Intent startIntent = new Intent();
+        startIntent.setComponent(cn);
+        startIntent.setAction("start");
+        mContext.startService(startIntent);
     }
 
     private void prepareDialog() {
