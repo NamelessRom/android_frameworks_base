@@ -3280,13 +3280,6 @@ public final class Settings {
         public static final String NAV_BUTTONS = "nav_buttons";
 
         /**
-         * Whether navigation bar is placed on the left side in landscape mode
-         *
-         * @hide
-         */
-        public static final String NAVBAR_LEFT_IN_LANDSCAPE = "navigation_bar_left";
-
-        /**
         * Notification Power Widget - Custom Brightness Mode
         * @hide
         */
@@ -3428,6 +3421,80 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
+
+        /**
+         * Navigation bar button color
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_BUTTON_TINT = "navigation_bar_button_tint";
+
+        /**
+         * Option To Colorize Navigation bar buttons in different modes
+         * 0 = all, 1 = system icons, 2 = system icons + custom user icons
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_BUTTON_TINT_MODE = "navigation_bar_button_tint_mode";
+
+        /**
+         * Navigation bar glow color
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_GLOW_TINT = "navigation_bar_glow_tint";
+
+        /**
+         * Wether navigation bar is enabled or not
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_SHOW = "navigation_bar_show";
+
+        /**
+         * Wether navigation bar is on landscape on the bottom or on the right
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_CAN_MOVE = "navigation_bar_can_move";
+
+        /**
+         * Navigation bar height when it is on protrait
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_HEIGHT = "navigation_bar_height";
+
+        /**
+         * Navigation bar height when it is on landscape at the bottom
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_HEIGHT_LANDSCAPE = "navigation_bar_height_landscape";
+
+        /**
+         * Navigation bar height when it is on landscape at the right
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_WIDTH = "navigation_bar_width";
+
+        /**
+         * Custom navigation bar intent and action configuration
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_CONFIG = "navigation_bar_config";
+
+        /**
+         * Custom navring intent and action configuration
+         *
+         * @hide
+         */
+        public static final String NAVRING_CONFIG = "navring_config";
+
+        /**
+         * Wether the navbar menu button is on the left/right/both
+         * @hide
+         */
+        public static final String MENU_LOCATION = "menu_location";
+
+        /**
+         * Wether the navbar menu button should show or not
+         * @hide
+         */
+        public static final String MENU_VISIBILITY = "menu_visibility";
 
         /**
          * Battery warning preferences
@@ -4097,41 +4164,12 @@ public final class Settings {
         public static final String NOTIFICATION_CONVERT_SOUND_TO_VIBRATION = "convert_sound_to_vibration";
 
         /**
-         * Navigation bar height when it is on protrait
-         * @hide
-         */
-        public static final String NAVIGATION_BAR_HEIGHT = "navigation_bar_height";
-
-        /**
-         * Navigation bar height when it is on landscape at the right
-         * @hide
-         */
-        public static final String NAVIGATION_BAR_WIDTH = "navigation_bar_width";
-
-        /**
          * Whether to allow notification vibration while notification alerts are disabled
          * (e.g. during phone calls). The vibration pattern to be used will be a subtle one;
          * custom vibration is disabled at that point.
          * @hide
          */
         public static final String NOTIFICATION_VIBRATE_DURING_ALERTS_DISABLED = "vibrate_while_no_alerts";
-
-        /**
-         * Custom navring actions
-         *
-         * @hide
-         */
-        public static final String[] NAVIGATION_RING_TARGETS = new String[] {
-            "navigation_ring_targets_0",
-            "navigation_ring_targets_1",
-            "navigation_ring_targets_2",
-        };
-
-        /**
-         * Whether to force enable navigation bars
-         * @hide
-         */
-        public static final String NAVBAR_FORCE_ENABLE = "navbar_force_enable";
 
         /**
          * Enable touches in screen recording
@@ -4320,6 +4358,32 @@ public final class Settings {
          * @hide
          */
         public static final String FLIP_ACTION_KEY = "flip_action";
+
+
+        /**
+         * Hide carrier information on notification drawer
+         * @hide
+         */
+        public static final String NOTIFICATION_HIDE_CARRIER = "notification_hide_carrier";
+
+
+        /**
+          * Stores values for notification shortcut targets
+          * @hide
+          */
+        public static final String NOTIFICATION_SHORTCUTS_CONFIG = "notification_shortcuts_config";
+
+        /**
+         * Stores the value for notification shortcuts icon color
+         * @hide
+         */
+        public static final String NOTIFICATION_SHORTCUTS_COLOR = "notification_shortcuts_color";
+
+        /**
+         * Whether to colorize the default application icons
+         * @hide
+         */
+        public static final String NOTIFICATION_SHORTCUTS_COLOR_MODE = "notification_shortcuts_color_mode";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

@@ -508,5 +508,11 @@ public class IWindowManagerImpl implements IWindowManager {
     @Override
     public int getSystemUIVisibility() {
         return 0;
+
+
+    /* @hide */
+    @Override
+    public void showCustomIntentOnKeyguard(Intent intent) {
+
     }
 }
