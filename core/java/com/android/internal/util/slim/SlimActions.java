@@ -19,7 +19,6 @@ package com.android.internal.util.slim;
 import android.app.Activity;
 import android.app.ActivityManagerNative;
 import android.app.SearchManager;
-import android.app.IUiModeManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -78,8 +77,7 @@ public class SlimActions {
             }
 
             if (!action.equals(ButtonsConstants.ACTION_QS)
-                    && !action.equals(ButtonsConstants.ACTION_NOTIFICATIONS)
-                    && !action.equals(ButtonsConstants.ACTION_TORCH)) {
+                    && !action.equals(ButtonsConstants.ACTION_NOTIFICATIONS)) {
                 try {
                     barService.collapsePanels();
                 } catch (RemoteException ex) {
@@ -87,7 +85,35 @@ public class SlimActions {
             }
 
             // process the actions
-            if (action.equals(ButtonsConstants.ACTION_THEME_SWITCH)) {
+            if (action.equals(ButtonsConstants.ACTION_HOME)) {
+                injectKeyDelayed(KeyEvent.KEYCODE_HOME, isLongpress, false);
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_BACK)) {
+                injectKeyDelayed(KeyEvent.KEYCODE_BACK, isLongpress, false);
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_SEARCH)) {
+                injectKeyDelayed(KeyEvent.KEYCODE_SEARCH, isLongpress, false);
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_MENU)) {
+                injectKeyDelayed(KeyEvent.KEYCODE_MENU, isLongpress, false);
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_POWER_MENU)) {
+                injectKeyDelayed(KeyEvent.KEYCODE_POWER, isLongpress, true);
+            } else if (action.equals(ButtonsConstants.ACTION_POWER)) {
+                PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+                pm.goToSleep(SystemClock.uptimeMillis());
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_TORCH)) {
+                Intent i = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
+                context.sendBroadcast(i);
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_IME)) {
+                if (isKeyguardShowing) {
+                    return;
+                }
+                context.sendBroadcast(new Intent("android.settings.SHOW_INPUT_METHOD_PICKER"));
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_THEME_SWITCH)) {
                 boolean enabled = Settings.Secure.getIntForUser(
                         context.getContentResolver(),
                         Settings.Secure.UI_THEME_AUTO_MODE, 0,
@@ -104,17 +130,165 @@ public class SlimActions {
                 // we currently switch between holodark and hololight till either
                 // theme engine is ready or lightheme is ready. Currently due of
                 // missing light themeing hololight = system base theme
-                final IUiModeManager uiModeManagerService = IUiModeManager.Stub.asInterface(
-                        ServiceManager.getService(Context.UI_MODE_SERVICE));
-                try {
-                    uiModeManagerService.setUiThemeMode(state
+                Settings.Secure.putIntForUser(context.getContentResolver(),
+                        Settings.Secure.UI_THEME_MODE, state
                             ? Configuration.UI_THEME_MODE_HOLO_LIGHT
-                            : Configuration.UI_THEME_MODE_HOLO_DARK);
+                            : Configuration.UI_THEME_MODE_HOLO_DARK,
+                        UserHandle.USER_CURRENT);
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_KILL)) {
+                if (isKeyguardShowing) {
+                    return;
+                }
+                try {
+                    barService.toggleKillApp();
                 } catch (RemoteException e) {
                 }
                 return;
+            } else if (action.equals(ButtonsConstants.ACTION_LAST_APP)) {
+                if (isKeyguardShowing) {
+                    return;
+                }
+                try {
+                    barService.toggleLastApp();
+                } catch (RemoteException e) {
+                }
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_RECENTS)) {
+                if (isKeyguardShowing) {
+                    return;
+                }
+                try {
+                    barService.toggleRecentApps();
+                } catch (RemoteException e) {
+                }
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_SCREENSHOT)) {
+                try {
+                    barService.toggleScreenshot();
+                } catch (RemoteException e) {
+                }
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_NOTIFICATIONS)) {
+                if (isKeyguardShowing && isKeyguardSecure) {
+                    return;
+                }
+                try {
+                    barService.toggleNotificationShade();
+                } catch (RemoteException e) {
+                }
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_QS)) {
+                if (isKeyguardShowing && isKeyguardSecure) {
+                    return;
+                }
+                try {
+                    barService.toggleQSShade();
+                } catch (RemoteException e) {
+                }
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_ASSIST)) {
+                Intent intent = ((SearchManager) context.getSystemService(Context.SEARCH_SERVICE))
+                  .getAssistIntent(context, true, UserHandle.USER_CURRENT);
+                if (intent == null) {
+                    intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+                }
+                startActivity(context, windowManagerService, isKeyguardShowing, intent);
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_VIB)) {
+                AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                if(am != null){
+                    if(am.getRingerMode() != AudioManager.RINGER_MODE_VIBRATE) {
+                        am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                        Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                        if(vib != null){
+                            vib.vibrate(50);
+                        }
+                    }else{
+                        am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                        ToneGenerator tg = new ToneGenerator(
+                                AudioManager.STREAM_NOTIFICATION,
+                                (int)(ToneGenerator.MAX_VOLUME * 0.85));
+                        if(tg != null){
+                            tg.startTone(ToneGenerator.TONE_PROP_BEEP);
+                        }
+                    }
+                }
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_SILENT)) {
+                AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                if(am != null){
+                    if(am.getRingerMode() != AudioManager.RINGER_MODE_SILENT) {
+                        am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    }else{
+                        am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                        ToneGenerator tg = new ToneGenerator(
+                                AudioManager.STREAM_NOTIFICATION,
+                                (int)(ToneGenerator.MAX_VOLUME * 0.85));
+                        if(tg != null){
+                            tg.startTone(ToneGenerator.TONE_PROP_BEEP);
+                        }
+                    }
+                }
+                return;
+            } else if (action.equals(ButtonsConstants.ACTION_VIB_SILENT)) {
+                AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                if(am != null){
+                    if(am.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+                        am.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                        Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                        if(vib != null){
+                            vib.vibrate(50);
+                        }
+                    } else if(am.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
+                        am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                    } else {
+                        am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                        ToneGenerator tg = new ToneGenerator(
+                                AudioManager.STREAM_NOTIFICATION,
+                                (int)(ToneGenerator.MAX_VOLUME * 0.85));
+                        if(tg != null){
+                            tg.startTone(ToneGenerator.TONE_PROP_BEEP);
+                        }
+                    }
+                }
+            } else {
+                // we must have a custom uri
+                Intent intent = null;
+                try {
+                    intent = Intent.parseUri(action, 0);
+                } catch (URISyntaxException e) {
+                    Log.e("SlimActions:", "URISyntaxException: [" + action + "]");
+                    return;
+                }
+                startActivity(context, windowManagerService, isKeyguardShowing, intent);
+                return;
             }
 
+    }
+
+    private static void startActivity(Context context, IWindowManager windowManagerService,
+                boolean isKeyguardShowing, Intent intent) {
+        if (intent == null) {
+            return;
+        }
+        if (isKeyguardShowing) {
+            // Have keyguard show the bouncer and launch the activity if the user succeeds.
+            try {
+                windowManagerService.showCustomIntentOnKeyguard(intent);
+            } catch (RemoteException e) {
+            }
+        } else {
+            // otherwise let us do it here
+            try {
+                ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
+            } catch (RemoteException e) {
+                // too bad, so sad...
+            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivityAsUser(intent,
+                    new UserHandle(UserHandle.USER_CURRENT));
+        }
     }
 
     public static boolean isActionKeyEvent(String action) {
@@ -122,7 +296,6 @@ public class SlimActions {
                 || action.equals(ButtonsConstants.ACTION_BACK)
                 || action.equals(ButtonsConstants.ACTION_SEARCH)
                 || action.equals(ButtonsConstants.ACTION_MENU)
-                || action.equals(ButtonsConstants.ACTION_MENU_BIG)
                 || action.equals(ButtonsConstants.ACTION_POWER_MENU)
                 || action.equals(ButtonsConstants.ACTION_NULL)) {
             return true;
