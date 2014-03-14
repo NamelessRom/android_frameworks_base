@@ -52,7 +52,7 @@ public class QuickSettingsTileView extends FrameLayout {
         return mColSpan;
     }
 
-    public void setContent(int layoutId, LayoutInflater inflater) {
+    void setContent(int layoutId, LayoutInflater inflater) {
         mContentLayoutId = layoutId;
         inflater.inflate(layoutId, this);
     }

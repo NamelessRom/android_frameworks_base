@@ -69,4 +69,21 @@
     <string name="onthego_notif_options">Options</string>
     <string name="onthego_notif_error">Unable to start On-The-Go</string>
     <string name="onthego_transparency">Transparency</string>
+
+    <!-- Flippable Tiles -->
+    <!-- Quick Settings Wi-Fi Back Tile Tethering label -->
+    <string name="quick_settings_wifi_tethering_label">Tethering</string>
+
+    <!-- Quick Settings Bluetooth Not Discoverable label -->
+    <string name="quick_settings_bluetooth_not_discoverable_label">Not discoverable</string>
+
+    <!-- Quick Settings Bluetooth Discoverable label -->
+    <string name="quick_settings_bluetooth_discoverable_label">Discoverable</string>
+
+    <!-- Quick Settings Bluetooth Not Connected -->
+    <string name="quick_settings_bluetooth_disabled">Disabled</string>
+
+    <!-- Quick Settings Bluetooth Number of Paired Devices -->
+    <string name="quick_settings_bluetooth_number_paired"><xliff:g id="number">%d</xliff:g> Devices paired</string>
+
 </resources>
