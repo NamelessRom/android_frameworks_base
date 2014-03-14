@@ -50,6 +50,7 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Profile;
 import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.security.KeyChain;
 import android.util.Log;
 import android.util.Pair;
@@ -356,6 +357,33 @@ class QuickSettings {
                 showBrightnessDialog();
             }
         });
+        if (LONG_PRESS_TOGGLES) {
+            brightnessTile.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    boolean automaticAvailable = mContext.getResources().getBoolean(
+                        com.android.internal.R.bool.config_automatic_brightness_available);
+
+                    // If we have automatic brightness available, toggle it
+                    if (automaticAvailable) {
+                        int automatic;
+                        try {
+                            automatic = Settings.System.getIntForUser(mContext.getContentResolver(),
+                                    Settings.System.SCREEN_BRIGHTNESS_MODE,
+                                    UserHandle.USER_CURRENT);
+                        } catch (SettingNotFoundException snfe) {
+                            automatic = 0;
+                        }
+
+                        Settings.System.putIntForUser(mContext.getContentResolver(),
+                            Settings.System.SCREEN_BRIGHTNESS_MODE, automatic != 0 ? 0 : 1,
+                            UserHandle.USER_CURRENT);
+                    }
+
+                    return true;
+                }
+            });
+        }
         mModel.addBrightnessTile(brightnessTile,
                 new QuickSettingsModel.BasicRefreshCallback(brightnessTile));
         parent.addView(brightnessTile);
@@ -407,11 +435,14 @@ class QuickSettings {
                             return null;
                         }
                     }.execute();
+                    wifiTile.setLoading(true);
                     wifiTile.setPressed(false);
                     return true;
                 }} );
         }
         mModel.addWifiTile(wifiTile, new NetworkActivityCallback() {
+            private String mPreviousLabel = "";
+
             @Override
             public void refreshView(QuickSettingsTileView view, State state) {
                 WifiState wifiState = (WifiState) state;
@@ -424,6 +455,11 @@ class QuickSettings {
                         R.string.accessibility_quick_settings_wifi,
                         wifiState.signalContentDescription,
                         (wifiState.connected) ? wifiState.label : ""));
+
+                if (wifiState.label != null && !mPreviousLabel.equals(wifiState.label)) {
+                    wifiTile.setLoading(false);
+                    mPreviousLabel = wifiState.label;
+                }
             }
         });
         parent.addView(wifiTile);
@@ -575,10 +611,13 @@ class QuickSettings {
                             mBluetoothAdapter.enable();
                         }
                         bluetoothTile.setPressed(false);
+                        bluetoothTile.setLoading(true);
                         return true;
                     }});
             }
             mModel.addBluetoothTile(bluetoothTile, new QuickSettingsModel.RefreshCallback() {
+                private boolean mPreviousState = false;
+
                 @Override
                 public void refreshView(QuickSettingsTileView unused, State state) {
                     BluetoothState bluetoothState = (BluetoothState) state;
@@ -602,6 +641,10 @@ class QuickSettings {
                             R.string.accessibility_quick_settings_bluetooth,
                             bluetoothState.stateContentDescription));
                     bluetoothTile.setText(state.label);
+                    if (mPreviousState != state.enabled) {
+                        bluetoothTile.setLoading(false);
+                        mPreviousState = state.enabled;
+                    }
                 }
             });
             parent.addView(bluetoothTile);
