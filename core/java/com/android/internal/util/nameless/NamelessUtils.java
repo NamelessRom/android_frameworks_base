@@ -81,4 +81,15 @@ public class NamelessUtils {
 
         return false;
     }
+
+    /**
+     * Check if system has a front camera.
+     *
+     * @param context
+     * @return
+     */
+    public static boolean hasFrontCamera(final Context context) {
+        final PackageManager pm = context.getPackageManager();
+        return pm != null && pm.hasSystemFeature("android.hardware.camera.front");
+    }
 }
