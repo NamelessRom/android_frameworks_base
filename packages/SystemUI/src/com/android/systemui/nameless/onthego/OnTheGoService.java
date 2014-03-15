@@ -89,7 +89,7 @@ public class OnTheGoService extends Service implements ShakeDetector.Listener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceivers();
+        unregisterReceivers(false);
         resetViews();
     }
 
@@ -99,18 +99,29 @@ public class OnTheGoService extends Service implements ShakeDetector.Listener {
         final IntentFilter cameraFilter = new IntentFilter(ACTION_TOGGLE_CAMERA);
         registerReceiver(mCameraReceiver, cameraFilter);
 
+        final IntentFilter screenFilter = new IntentFilter();
+        screenFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        screenFilter.addAction(Intent.ACTION_SCREEN_ON);
+        registerReceiver(mScreenReceiver, screenFilter);
+
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mShakeDetector = new ShakeDetector(this);
         mShakeDetector.start(mSensorManager);
     }
 
-    private void unregisterReceivers() {
+    private void unregisterReceivers(boolean isScreenOff) {
         try {
             unregisterReceiver(mAlphaReceiver);
         } catch (Exception ignored) { }
         try {
             unregisterReceiver(mCameraReceiver);
         } catch (Exception ignored) { }
+
+        if (!isScreenOff) {
+            try {
+                unregisterReceiver(mScreenReceiver);
+            } catch (Exception ignored) { }
+        }
 
         if (mShakeDetector != null) {
             mShakeDetector.stop();
@@ -139,6 +150,29 @@ public class OnTheGoService extends Service implements ShakeDetector.Listener {
                     restartOnTheGo();
                 } else {
                     stopOnTheGo(true);
+                }
+            }
+        }
+    };
+
+    private final BroadcastReceiver mScreenReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) {
+                return;
+            }
+
+            synchronized (mRestartObject) {
+                final String action = intent.getAction();
+                if (action != null && !action.isEmpty()) {
+                    logDebug("mScreenReceiver: " + action);
+                    if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                        setupViews(true);
+                        registerReceivers();
+                    } else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                        unregisterReceivers(true);
+                        resetViews();
+                    }
                 }
             }
         }
@@ -187,7 +221,7 @@ public class OnTheGoService extends Service implements ShakeDetector.Listener {
     }
 
     private void stopOnTheGo(boolean shouldRestart) {
-        unregisterReceivers();
+        unregisterReceivers(false);
         resetViews();
 
         // Cancel notification
