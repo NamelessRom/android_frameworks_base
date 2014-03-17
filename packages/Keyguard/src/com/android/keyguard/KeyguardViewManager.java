@@ -31,8 +31,11 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.graphics.Canvas;
@@ -41,6 +44,8 @@ import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -69,6 +74,8 @@ import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+
+imort java.io.File;
 
 /**
  * Manages creating, showing, hiding and resetting the keyguard.  Calls back
@@ -102,6 +109,7 @@ public class KeyguardViewManager {
 
     private boolean mScreenOn = false;
     private LockPatternUtils mLockPatternUtils;
+    private AudioManager mAudioManager;
 
     private Bitmap mBlurredImage = null;
     private int mBlurRadius = 12;
@@ -182,6 +190,7 @@ public class KeyguardViewManager {
         mViewManager = viewManager;
         mViewMediatorCallback = callback;
         mLockPatternUtils = lockPatternUtils;
+        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
 
         SettingsObserver observer = new SettingsObserver(new Handler());
         observer.observe();
@@ -313,6 +322,41 @@ public class KeyguardViewManager {
         }
 
         public void setCustomBackground(Drawable d) {
+            if (!mAudioManager.isMusicActive()) {
+                int mBackgroundStyle = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.LOCKSCREEN_BACKGROUND_STYLE, 2);
+                int mBackgroundColor = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.LOCKSCREEN_BACKGROUND_COLOR, 0x00000000);
+                float mWallpaperAlpha = Settings.System.getFloat(mContext.getContentResolver(),
+                        Settings.System.LOCKSCREEN_WALLPAPER_ALPHA, 1.0f);
+
+                switch (mBackgroundStyle) {
+                    case 0:
+                        d = new ColorDrawable(mBackgroundColor);
+                        d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
+                        mCustomBackground = d;
+                        break;
+                    case 1:
+                        try {
+                            Context settingsCtx = mContext.createPackageContext(
+                                    "com.android.settings", 0);
+                            String wallpaper = settingsCtx.getFilesDir() + "/lockwallpaper";
+                            Bitmap bitmap = BitmapFactory.decodeFile(wallpaper);
+                            d = new BitmapDrawable(mContext.getResources(), bitmap);
+                            d.setColorFilter(BACKGROUND_COLOR, PorterDuff.Mode.SRC_OVER);
+                            d.setAlpha((int) (mWallpaperAlpha *255));
+                            mCustomBackground = d;
+                        } catch (NameNotFoundException e) {
+                        }
+                        break;
+                    case 2:
+                    default:
+                        mCustomBackground = d;
+                        break;
+                }
+                computeCustomBackgroundBounds(mCustomBackground);
+                setBackground(mBackgroundDrawable);
+            }
             if (!ActivityManager.isHighEndGfx()) {
                 mCustomBackground = d;
                 if (d != null) {
