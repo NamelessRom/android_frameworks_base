@@ -4109,6 +4109,19 @@ public final class Settings {
         public static final String KEY_SMS_BREATH = "sms_breath";
 
         /**
+         * Whether lockscreen rotation is enabled
+         * 0 = off, 1 = on, 2 = portrait, 3 = landscape
+         * @hide
+         */
+        public static final String LOCKSCREEN_ROTATION_ENABLED = "lockscreen_rotation_enabled";
+
+        /**
+          * Always show the battery status on the lockscreen
+          * @hide
+          */
+        public static final String LOCKSCREEN_ALWAYS_SHOW_BATTERY = "lockscreen_always_show_battery";
+
+        /**
          * Give Missed call notifications a breathing effect
          * @hide
          */

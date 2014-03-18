@@ -114,18 +114,20 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             } else if (target == mTargetOffset) {
                 mCallback.dismiss(false);
             } else {
-                int realTarget = target - mTargetOffset - 1;
-                String targetUri = realTarget < mStoredTargets.length
-                        ? mStoredTargets[realTarget] : null;
-
-                if (LockscreenTargetUtils.EMPTY_TARGET.equals(targetUri)) {
+                if (target == 0) {
+                    mCallback.userActivity(0);
                     mCallback.dismiss(false);
                 } else {
-                    try {
-                        Intent intent = Intent.parseUri(targetUri, 0);
-                        mActivityLauncher.launchActivity(intent, false, true, null, null);
-                    } catch (URISyntaxException e) {
-                        Log.w(TAG, "Invalid lockscreen target " + targetUri);
+                    int realTarget = target - 1;
+                    String targetUri = realTarget < mStoredTargets.length
+                            ? mStoredTargets[realTarget] : null;
+
+                    if (GlowPadView.EMPTY_TARGET.equals(targetUri)) {
+                        mCallback.userActivity(0);
+                        mCallback.dismiss(false);
+                    } else {
+                        SlimActions.processAction(mContext, targetUri, false);
+                        mCallback.userActivity(0);
                     }
                 }
             }
