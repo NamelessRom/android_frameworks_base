@@ -43,8 +43,8 @@ import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -121,7 +121,7 @@ public class KeyguardViewManager {
 
     private NotificationHostView mNotificationView;
     private NotificationViewManager mNotificationViewManager;
-    private boolean mLockscreenNotifications = true;
+    private boolean mLockscreenNotifications = false;
 
     private static final String WALLPAPER_IMAGE_PATH =
             "/data/data/com.android.settings/files/lockscreen_wallpaper";
@@ -131,10 +131,10 @@ public class KeyguardViewManager {
     private KeyguardUpdateMonitorCallback mBackgroundChanger = new KeyguardUpdateMonitorCallback() {
         @Override
         public void onSetBackground(Bitmap bmp) {
-            if (bmp != null) mBlurredImage = null;
-            mIsCoverflow = true;
-            setCustomBackground (bmp);
-        }
+            mKeyguardHost.setCustomBackground(bmp != null ?
+                    new BitmapDrawable(mContext.getResources(), bmp) : null);
+             updateShowWallpaper(bmp == null);
+         }
     };
 
     public interface ShowListener {
@@ -159,9 +159,10 @@ public class KeyguardViewManager {
         @Override
         public void onChange(boolean selfChange) {
             updateSettings();
-            if (mKeyguardHost == null) {
-                maybeCreateKeyguardLocked(shouldEnableScreenRotation(), false, null);
-                hide();
+            try {
+                mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
+            } catch(IllegalArgumentException e) {
+                // Do nothing...
             }
             mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
         }
@@ -188,6 +189,7 @@ public class KeyguardViewManager {
      * @param viewManager Keyguard will be attached to this.
      * @param callback Used to notify of changes.
      * @param lockPatternUtils
+     * @param SettingsObserver used to observe lockscreen notifications changes
      */
     public KeyguardViewManager(Context context, ViewManager viewManager,
             KeyguardViewMediator.ViewMediatorCallback callback,
@@ -200,7 +202,6 @@ public class KeyguardViewManager {
 
         SettingsObserver observer = new SettingsObserver(new Handler());
         observer.observe();
-
         updateSettings();
     }
 
@@ -707,7 +708,6 @@ public class KeyguardViewManager {
         if (v != null) {
             mKeyguardHost.removeView(v);
         }
-
         final LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.keyguard_host_view, mKeyguardHost, true);
         mKeyguardView = (KeyguardHostView) view.findViewById(R.id.keyguard_host_view);
@@ -784,6 +784,7 @@ public class KeyguardViewManager {
         } else {
             mWindowLayoutParams.flags &= ~WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
         }
+
         mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
     }
 
@@ -873,7 +874,6 @@ public class KeyguardViewManager {
                 Slog.w(TAG, "Exception calling onShown():", e);
             }
         }
-
         if (mLockscreenNotifications) {
             mNotificationViewManager.onScreenTurnedOn();
         }
