@@ -430,9 +430,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         mExpandChallengeView = (View) findViewById(R.id.expand_challenge_handle);
         if (mExpandChallengeView != null) {
             mExpandChallengeView.setOnLongClickListener(mFastUnlockClickListener);
-            mExpandChallengeView.bringToFront();
         }
-
     }
 
     private final OnLongClickListener mFastUnlockClickListener = new OnLongClickListener() {
@@ -780,24 +778,15 @@ public class KeyguardHostView extends KeyguardViewBase {
      * @param turningOff true if the device is being turned off
      */
     void showPrimarySecurityScreen(boolean turningOff) {
-        final boolean lockBeforeUnlock = Settings.Secure.getIntForUser(
-                mContext.getContentResolver(),
-                Settings.Secure.LOCK_BEFORE_UNLOCK, 0,
-                UserHandle.USER_CURRENT) == 1;
-
-        if (lockBeforeUnlock && !isSimOrAccount(mCurrentSecuritySelection, true)) {
-            showSecurityScreen(SecurityMode.None);
-        } else {
-            SecurityMode securityMode = mSecurityModel.getSecurityMode();
-            if (DEBUG) Log.v(TAG, "showPrimarySecurityScreen(turningOff=" + turningOff + ")");
-            if (!turningOff &&
-                    KeyguardUpdateMonitor.getInstance(mContext).isAlternateUnlockEnabled()) {
-                // If we're not turning off, then allow biometric alternate.
-                // We'll reload it when the device comes back on.
-                securityMode = mSecurityModel.getAlternateFor(securityMode);
-            }
-            showSecurityScreen(securityMode);
-          }
+        SecurityMode securityMode = mSecurityModel.getSecurityMode();
+        if (DEBUG) Log.v(TAG, "showPrimarySecurityScreen(turningOff=" + turningOff + ")");
+        if (!turningOff &&
+                KeyguardUpdateMonitor.getInstance(mContext).isAlternateUnlockEnabled()) {
+            // If we're not turning off, then allow biometric alternate.
+            // We'll reload it when the device comes back on.
+            securityMode = mSecurityModel.getAlternateFor(securityMode);
+        }
+        showSecurityScreen(securityMode);
     }
 
     /**
@@ -1041,11 +1030,14 @@ public class KeyguardHostView extends KeyguardViewBase {
 
         // Enter full screen mode if we're in SIM or Account screen
         boolean fullScreenEnabled = getResources().getBoolean(R.bool.kg_sim_puk_account_full_screen);
+        boolean isSimOrAccount = securityMode == SecurityMode.SimPin
+                || securityMode == SecurityMode.SimPuk
+                || securityMode == SecurityMode.Account;
         mAppWidgetContainer.setVisibility(
-                isSimOrAccount(securityMode, false) && fullScreenEnabled ? View.GONE : View.VISIBLE);
+                isSimOrAccount && fullScreenEnabled ? View.GONE : View.VISIBLE);
 
         // Don't show camera or search in navbar when SIM or Account screen is showing
-        setSystemUiVisibility(isSimOrAccount(securityMode, false) ?
+        setSystemUiVisibility(isSimOrAccount ?
                 (getSystemUiVisibility() | View.STATUS_BAR_DISABLE_SEARCH)
                 : (getSystemUiVisibility() & ~View.STATUS_BAR_DISABLE_SEARCH));
 
@@ -1162,8 +1154,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     }
 
     private void minimizeChallengeIfDesired() {
-        if (mSlidingChallengeLayout == null
-                || isSimOrAccount(mCurrentSecuritySelection, true)) {
+        if (mSlidingChallengeLayout == null) {
             return;
         }
         int setting = Settings.System.getIntForUser(getContext().getContentResolver(),
@@ -1171,15 +1162,6 @@ public class KeyguardHostView extends KeyguardViewBase {
         if (setting == 1) {
             mSlidingChallengeLayout.showChallenge(false);
         }
-    }
-
-    private boolean isSimOrAccount(SecurityMode securityMode, boolean isInvalidCheck) {
-        final boolean isSimOrAccount = securityMode == SecurityMode.SimPin
-                || securityMode == SecurityMode.SimPuk
-                || securityMode == SecurityMode.Account;
-        return isInvalidCheck
-                ? isSimOrAccount || securityMode == SecurityMode.Invalid
-                : isSimOrAccount;
     }
 
     private int getSecurityViewIdForMode(SecurityMode securityMode) {
