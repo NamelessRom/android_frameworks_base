@@ -211,11 +211,6 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         }
 
         @Override
-        protected void dismissKeyguardOnNextActivity() {
-            getCallback().dismiss(false);
-        }
-
-        @Override
         Context getContext() {
             return mContext;
         }
@@ -247,6 +242,22 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                 mContext.getContentResolver(), Settings.System.LOCKSCREEN_GLOWPAD_TORCH, 0,
                 UserHandle.USER_CURRENT) == 1)
                 && NamelessUtils.isPackageInstalled(mContext, FlashLightConstants.APP_PACKAGE_NAME);
+
+	final boolean lockBeforeUnlock = Settings.Secure.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.Secure.LOCK_BEFORE_UNLOCK, 0,
+                UserHandle.USER_CURRENT) == 1;
+
+        // bring emergency button on slider lockscreen
+        // to front when lockBeforeUnlock is enabled
+        // to make it clickable
+        if (mLockPatternUtils != null && mLockPatternUtils.isSecure() && lockBeforeUnlock) {
+            LinearLayout ecaContainer =
+                (LinearLayout) findViewById(R.id.keyguard_selector_fade_container);
+            if (ecaContainer != null) {
+                ecaContainer.bringToFront();
+            }
+        }
     }
 
     public void setCarrierArea(View carrierArea) {
