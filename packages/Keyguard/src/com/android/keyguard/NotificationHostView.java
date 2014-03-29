@@ -50,6 +50,7 @@ import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 import android.widget.ScrollView;
 
+import com.android.internal.statusbar.IStatusBarService;
 import com.android.keyguard.KeyguardViewMediator.ViewMediatorCallback;
 
 import java.util.ArrayDeque;
@@ -323,6 +324,7 @@ public class NotificationHostView extends FrameLayout {
                     if ((dismissedSbn = mDismissedNotifications.get(describeNotification(sbn))) == null || dismissedSbn.getPostTime() != sbn.getPostTime())
                         addNotification(sbn);
                 }
+                setButtonDrawable();
                 bringToFront();
             } catch (RemoteException e) {
                 Log.e(TAG, "Failed to get active notifications!");
@@ -358,7 +360,7 @@ public class NotificationHostView extends FrameLayout {
             View v = g.getChildAt(i);
             if (v instanceof ViewGroup) {
                 setBackgroundRecursive((ViewGroup)v);
-                ((ViewGroup)v).setBackgroundColor(0x33555555);
+                v.setBackground(null);
             }
         }
     }
@@ -387,19 +389,16 @@ public class NotificationHostView extends FrameLayout {
         final NotificationView oldView = mNotifications.get(describeNotification(sbn));
         final boolean reposted = oldView != null;
         if (reposted && oldView.bigContentView) forceBigContentView = true;
-        boolean bigContentView = (reposted && oldView.bigContentView) ||
-                (sbn.getNotification().bigContentView != null &&
+        boolean bigContentView = sbn.getNotification().bigContentView != null && ((reposted && oldView.bigContentView) ||
                 (NotificationViewManager.config.expandedView || sbn.getNotification().contentView == null));
         nv.bigContentView = bigContentView && forceBigContentView;
         RemoteViews rv = nv.bigContentView ? sbn.getNotification().bigContentView : sbn.getNotification().contentView;
         final View remoteView = rv.apply(mContext, null);
-        remoteView.setBackgroundColor(0x33ffffff);
         remoteView.setLayoutParams(new LayoutParams(mDynamicWidth ? LayoutParams.WRAP_CONTENT : LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         remoteView.setX(mDisplayWidth - mNotificationMinHeight);
-        if (bigContentView && forceBigContentView) {
-            setBackgroundRecursive((ViewGroup)remoteView);
-        }
+        setBackgroundRecursive((ViewGroup)remoteView);
+        remoteView.setBackgroundColor(NotificationViewManager.config.notificationColor);
         remoteView.setAlpha(1f);
         if (bigContentView && sbn.getNotification().contentView != null) {
             final boolean bc = !forceBigContentView;
@@ -453,6 +452,7 @@ public class NotificationHostView extends FrameLayout {
                 showNotification(nv);
             }
         }
+        setButtonDrawable();
     }
 
     public void removeNotification(final StatusBarNotification sbn) {
@@ -494,6 +494,7 @@ public class NotificationHostView extends FrameLayout {
                 }
             };
             animateTranslation(v, v.shown ? -mDisplayWidth : mDisplayWidth, 0, duration);
+            setButtonDrawable();
         }
     }
 
@@ -544,6 +545,7 @@ public class NotificationHostView extends FrameLayout {
                 mShownNotifications++;
             }
         }
+        setButtonDrawable();
         bringToFront();
     }
 
@@ -555,6 +557,7 @@ public class NotificationHostView extends FrameLayout {
         if (mShownNotifications == 0) animateBackgroundColor(0);
         animateTranslation(nv, targetX, 0, duration);
         nv.shown = false;
+        setButtonDrawable();
     }
 
     public void showAllNotifications() {
@@ -568,6 +571,31 @@ public class NotificationHostView extends FrameLayout {
         for (NotificationView nv : mNotifications.values()) {
             if (nv.shown)
                 hideNotification (nv);
+        }
+    }
+
+    private void setButtonDrawable() {
+        IStatusBarService statusBar = null;
+        try {
+            statusBar = IStatusBarService.Stub.asInterface(
+                ServiceManager.getService(Context.STATUS_BAR_SERVICE));
+        } catch (Exception ex) {
+            Log.w(TAG, "Failed to get statusbar service!");
+            return;
+        }
+
+        if (statusBar != null) {
+            try {
+                if (mNotifications.size() == 0) {
+                    statusBar.setButtonDrawable(0, 0);
+                } else if (mShownNotifications == mNotifications.size()) {
+                    statusBar.setButtonDrawable(0, 2);
+                } else {
+                    statusBar.setButtonDrawable(0, 1);
+                }
+            } catch (Exception ex) {
+                Log.e(TAG, "Failed to set button drawable!");
+            }
         }
     }
 
