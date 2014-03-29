@@ -131,7 +131,7 @@ public class KeyguardViewMediator {
     private static final int DISPATCH_EVENT = 15;
     private static final int LAUNCH_CAMERA = 16;
     private static final int DISMISS = 17;
-
+    
     /**
      * The default amount of time we stay awake (used for all key input)
      */
@@ -674,8 +674,7 @@ public class KeyguardViewMediator {
                 }
             } else if (mShowing) {
                 notifyScreenOffLocked();
-                // It doesn't make sense to me to reset the lockscreen when screen is turned off on lockscreen
-                // resetStateLocked(null);
+                resetStateLocked(null);
             } else if (why == WindowManagerPolicy.OFF_BECAUSE_OF_TIMEOUT
                    || (why == WindowManagerPolicy.OFF_BECAUSE_OF_USER && !lockImmediately)) {
                 doKeyguardLaterLocked();
