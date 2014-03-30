@@ -36,7 +36,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -131,7 +130,6 @@ public class KeyguardViewMediator {
     private static final int DISPATCH_EVENT = 15;
     private static final int LAUNCH_CAMERA = 16;
     private static final int DISMISS = 17;
-    private static final int DISPATCH_BUTTON_CLICK_EVENT = 18;
 
     /**
      * The default amount of time we stay awake (used for all key input)
@@ -489,25 +487,6 @@ public class KeyguardViewMediator {
         }
     };
 
-    private class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver cr = mContext.getContentResolver();
-            cr.registerContentObserver(Settings.Global.getUriFor(
-                    Settings.Global.LOCK_SOUND), false, this);
-            cr.registerContentObserver(Settings.Global.getUriFor(
-                    Settings.Global.UNLOCK_SOUND), false, this);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            reloadSounds();
-        }
-    }
-
     private void userActivity() {
         userActivity(AWAKE_INTERVAL_DEFAULT_MS);
     }
@@ -557,27 +536,6 @@ public class KeyguardViewMediator {
         mScreenOn = mPM.isScreenOn();
 
         mLockSounds = new SoundPool(1, AudioManager.STREAM_SYSTEM, 0);
-        reloadSounds();
-        int lockSoundDefaultAttenuation = context.getResources().getInteger(
-                com.android.internal.R.integer.config_lockSoundVolumeDb);
-        mLockSoundVolume = (float)Math.pow(10, (float)lockSoundDefaultAttenuation/20);
-
-        SettingsObserver observer = new SettingsObserver(new Handler());
-        observer.observe();
-    }
-
-    public void reloadSounds() {
-        final ContentResolver cr = mContext.getContentResolver();
-
-        if (mLockSoundId > 0) {
-            mLockSounds.unload(mLockSoundId);
-            mLockSoundId = 0;
-        }
-        if (mUnlockSoundId > 0) {
-            mLockSounds.unload(mUnlockSoundId);
-            mUnlockSoundId = 0;
-        }
-
         String soundPath = Settings.Global.getString(cr, Settings.Global.LOCK_SOUND);
         if (soundPath != null) {
             mLockSoundId = mLockSounds.load(soundPath, 1);
@@ -592,10 +550,9 @@ public class KeyguardViewMediator {
         if (soundPath == null || mUnlockSoundId == 0) {
             Log.w(TAG, "failed to load unlock sound from " + soundPath);
         }
-    }
-
-    public void setBackgroundBitmap(Bitmap bmp) {
-        mKeyguardViewManager.setBackgroundBitmap(bmp);
+        int lockSoundDefaultAttenuation = context.getResources().getInteger(
+                com.android.internal.R.integer.config_lockSoundVolumeDb);
+        mLockSoundVolume = (float)Math.pow(10, (float)lockSoundDefaultAttenuation/20);
     }
 
     /**
@@ -1199,9 +1156,6 @@ public class KeyguardViewMediator {
                 case DISPATCH_EVENT:
                     handleDispatchEvent((MotionEvent) msg.obj);
                     break;
-                case DISPATCH_BUTTON_CLICK_EVENT:
-                    handleDispatchButtonClickEvent(msg.arg1);
-                    break;
                 case LAUNCH_CAMERA:
                     handleLaunchCamera();
                     break;
@@ -1250,10 +1204,6 @@ public class KeyguardViewMediator {
 
     protected void handleDispatchEvent(MotionEvent event) {
         mKeyguardViewManager.dispatch(event);
-    }
-
-    protected void handleDispatchButtonClickEvent(int buttonId) {
-        mKeyguardViewManager.dispatchButtonClick(buttonId);
     }
 
     private void sendUserPresentBroadcast() {
@@ -1494,12 +1444,6 @@ public class KeyguardViewMediator {
 
     public void dispatch(MotionEvent event) {
         Message msg = mHandler.obtainMessage(DISPATCH_EVENT, event);
-        mHandler.sendMessage(msg);
-    }
-
-    public void dispatchButtonClick(int buttonId) {
-        Message msg = mHandler.obtainMessage(DISPATCH_BUTTON_CLICK_EVENT);
-        msg.arg1 = buttonId;
         mHandler.sendMessage(msg);
     }
 

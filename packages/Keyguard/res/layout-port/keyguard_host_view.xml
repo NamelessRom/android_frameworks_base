@@ -28,27 +28,6 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <com.android.keyguard.NotificationHostView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/notification_host_view" >
-
-        <view class="com.android.keyguard.NotificationHostView$TouchModalScrollView"
-            android:fillViewport="false"
-            android:layout_width="match_parent"
-            android:layout_height="210dp"
-            android:id="@+id/scrollview" >
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:animateLayoutChanges="true"
-                android:id="@+id/linearlayout" />
-        </view>
-
-    </com.android.keyguard.NotificationHostView>
-
     <com.android.keyguard.SlidingChallengeLayout
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
@@ -72,11 +51,6 @@
             androidprv:layout_childType="widgets">
             <include layout="@layout/keyguard_widget_pager"
                 android:id="@+id/app_widget_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"/>
-            <include layout="@layout/keyguard_widget_pager_carousel"
-                android:id="@+id/app_widget_container_carousel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"/>
