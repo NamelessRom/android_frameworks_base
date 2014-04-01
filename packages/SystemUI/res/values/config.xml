@@ -111,5 +111,8 @@
 
     <!-- milliseconds before the heads up notification accepts touches. -->
     <integer name="heads_up_sensitivity_delay">700</integer>
+
+    <!-- TODO: make this configurable via java -->
+    <bool name="config_enableTaskManager">true</bool>
 </resources>
 

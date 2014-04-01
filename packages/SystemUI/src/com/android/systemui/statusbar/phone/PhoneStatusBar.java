@@ -92,6 +92,11 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
+import android.widget.ExpandableListView.OnGroupExpandListener;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -342,6 +347,15 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     int mLinger;
     int mInitialTouchX;
     int mInitialTouchY;
+
+    //TaskManager
+    private ExpandableListView mTaskListView;
+    private TaskExpandableListAdapter mTaskListViewAdapter;
+    private ImageView mtasklistSwitch;
+    private boolean mIsShowTasklist=false;
+
+    //originLayout
+    private LinearLayout mOriginLayout;
 
     // for disabling the status bar
     int mDisabled = 0;
@@ -857,6 +871,32 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // set the inital view visibility
         setAreThereNotifications();
+
+        // add task list view and manager
+        mTaskListView = (ExpandableListView) mStatusBarWindow.findViewById(R.id.taskList);
+        mTaskListViewAdapter = new TaskExpandableListAdapter(mContext);
+        final TaskListManager taskListManager = new TaskListManager();
+        mTaskListViewAdapter.setOnTaskActionListener(taskListManager);
+        mTaskListView.setAdapter(mTaskListViewAdapter);
+        mTaskListView.setChildDivider(mContext.getResources()
+                .getDrawable(R.drawable.list_divider_holo_light));
+        mTaskListView.setOnGroupClickListener(mOnGroupClickListener);
+        mTaskListViewAdapter.expandGroup(null,0);
+        mTaskListViewAdapter.onGroupExpanded(0);
+        mTaskListView.expandGroup(0);
+        mTaskListView.setGroupIndicator(null);
+        mTaskListView.setVisibility(View.GONE);
+        //origin layout
+        mOriginLayout = (LinearLayout) mStatusBarWindow.findViewById(R.id.originLayout);
+        mOriginLayout.setVisibility(View.VISIBLE);
+
+        mtasklistSwitch = (ImageView) mStatusBarWindow.findViewById(R.id.tasklistSwitch);
+        if (mContext.getResources().getBoolean(R.bool.config_enableTaskManager)) {
+            mtasklistSwitch.setVisibility(View.VISIBLE);
+            mtasklistSwitch.setOnClickListener(mTaskSwitchButtonListener);
+        } else {
+            mtasklistSwitch.setVisibility(View.GONE);
+        }
 
         // Other icons
         mBatteryView = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
@@ -2110,6 +2150,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         mNotificationPanel.expand();
         if (mHasFlipSettings && mScrollView.getVisibility() != View.VISIBLE) {
+            if (mIsShowTasklist) {
+                mOriginLayout.setVisibility(View.VISIBLE);
+                mTaskListView.setVisibility(View.GONE);
+                mIsShowTasklist = false;
+            }
             flipToNotifications();
         }
 
@@ -2205,6 +2250,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (mHasFlipSettings) {
             mNotificationPanel.expand();
             if (mFlipSettingsView.getVisibility() != View.VISIBLE) {
+                if (mIsShowTasklist) {
+                    mOriginLayout.setVisibility(View.VISIBLE);
+                    mTaskListView.setVisibility(View.GONE);
+                    mIsShowTasklist = false;
+                }
                 flipToSettings();
             }
         } else if (mSettingsPanel != null) {
@@ -3753,6 +3803,58 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         public void setBounds(Rect bounds) {
         }
     }
+
+    // add Taskmanager
+    private final OnChildClickListener mOnChildClickListener = new OnChildClickListener() {
+
+        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
+                int childPosition, long id) {
+            Log.d("StatusBarService","onChildClick");
+            if("kill".equals(v.getTag())){
+                mTaskListViewAdapter.killChild(childPosition);
+            }
+        return true;
+        }
+    };
+
+    private final OnGroupClickListener mOnGroupClickListener = new OnGroupClickListener() {
+        public boolean onGroupClick(ExpandableListView parent, View v,
+                int groupPosition, long id) {
+
+            if(true)return true;
+
+            if(mTaskListView.isGroupExpanded(groupPosition)){
+                mTaskListViewAdapter.collapseGroup(v, groupPosition);
+                mTaskListView.collapseGroup(groupPosition);
+            }else{
+                mTaskListViewAdapter.expandGroup(v, groupPosition);
+                mTaskListView.expandGroup(groupPosition);
+            }
+            return true;
+        }
+    };
+
+    private class TaskListManager implements TaskExpandableListAdapter.OnTaskActionListener {
+        public void onTaskKilled() {
+        }
+        public void onTaskBroughtToFront() {
+            animateCollapsePanels();
+        }
+    }
+
+    private View.OnClickListener mTaskSwitchButtonListener = new View.OnClickListener() {
+
+        public void onClick(View v) {
+            if(!mIsShowTasklist){
+                mOriginLayout.setVisibility(View.GONE);
+                mTaskListView.setVisibility(View.VISIBLE);
+            }else{
+                mOriginLayout.setVisibility(View.VISIBLE);
+                mTaskListView.setVisibility(View.GONE);
+            }
+            mIsShowTasklist = !mIsShowTasklist;
+        }
+    };
 
     @Override
     public void destroy() {
