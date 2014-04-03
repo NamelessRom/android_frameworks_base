@@ -44,6 +44,9 @@ import com.android.internal.R;
 import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.TargetDrawable;
 
+import com.android.internal.util.nameless.NamelessUtils;
+import com.android.internal.util.nameless.constants.FlashLightConstants;
+
 import java.io.File;
 
 public final class LockscreenTargetUtils {
@@ -298,5 +301,9 @@ public final class LockscreenTargetUtils {
         canvas.setBitmap(null);
 
         return bitmap;
+    }
+
+    public boolean isTorchAvailable(Context context) {
+        return NamelessUtils.isPackageInstalled(context, FlashLightConstants.APP_PACKAGE_NAME);
     }
 }
