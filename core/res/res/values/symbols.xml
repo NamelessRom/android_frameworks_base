@@ -1910,6 +1910,9 @@
   <!-- LED flashlight -->
   <java-symbol type="bool" name="config_enableTorch" />
 
+  <!-- LED flashlight old -->
+  <java-symbol type="bool" name="has_led_flash" />
+
   <!-- Navigation Ring -->
   <java-symbol type="drawable" name="ic_navigation_ring_blank_normal" />
   <java-symbol type="drawable" name="ic_navigation_ring_blank_activated" />
