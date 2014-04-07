@@ -1984,7 +1984,10 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         public DecorView(Context context, int featureId) {
             super(context);
             mFeatureId = featureId;
-            mSettingsObserver = new SettingsObserver(new Handler());
+            if (context.getResources().getBoolean(
+                    com.android.internal.R.bool.config_stylusGestures)) {
+                mSettingsObserver = new SettingsObserver(new Handler());
+            }
         }
 
         @Override
@@ -2191,10 +2194,6 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                     break;
                 default:
                     return;
-            }
-
-            if (setting == null) {
-                return;
             }
 
             try {
@@ -2914,15 +2913,17 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
             hackTurnOffWindowResizeAnim(bg == null || bg.getOpacity()
                     != PixelFormat.OPAQUE);
         }
-        
+
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
-            
-            mSettingsObserver.observe();
+
+            if (mSettingsObserver != null) {
+                mSettingsObserver.observe();
+            }
 
             updateWindowResizeState();
-            
+
             final Callback cb = getCallback();
             if (cb != null && !isDestroyed() && mFeatureId < 0) {
                 cb.onAttachedToWindow();
@@ -2943,8 +2944,11 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         @Override
         protected void onDetachedFromWindow() {
             super.onDetachedFromWindow();
-            
-            mSettingsObserver.unobserve();
+
+            if (context.getResources().getBoolean(
+                    com.android.internal.R.bool.config_stylusGestures)) {
+                mSettingsObserver = new SettingsObserver(new Handler());
+            }
 
             final Callback cb = getCallback();
             if (cb != null && mFeatureId < 0) {
