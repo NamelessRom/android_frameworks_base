@@ -444,7 +444,7 @@ public class KeyguardViewMediator {
                     break;
                 case READY:
                     synchronized (this) {
-                        if (isShowing() && !isSecure()) {
+                        if (isShowing()) {
                             resetStateLocked(null);
                         }
                     }
@@ -646,26 +646,15 @@ public class KeyguardViewMediator {
     public void onScreenTurnedOff(int why) {
         synchronized (this) {
             mScreenOn = false;
-            mSlideLockDelay = why;
             if (DEBUG) Log.d(TAG, "onScreenTurnedOff(" + why + ")");
 
             mKeyguardDonePending = false;
 
-            // Prepare for handling Lock/Slide lock delay and timeout
-            boolean lockImmediately = false;
-            final ContentResolver cr = mContext.getContentResolver();
-            boolean separateSlideLockTimeoutEnabled = Settings.System.getInt(cr,
-                    Settings.System.SCREEN_LOCK_SLIDE_DELAY_TOGGLE, 0) == 1;
-            if (mLockPatternUtils.isSecure()) {
-                // Lock immediately based on setting if secure (user has a pin/pattern/password)
-                // This is retained as-is to ensue AOSP security integrity is maintained
-                lockImmediately = mLockPatternUtils.getPowerButtonInstantlyLocks();
-            } else {
-                // Unless a separate slide lock timeout is enabled, this "locks" the device when
-                // not secure to provide easy access to the camera while preventing unwanted input
-                lockImmediately = separateSlideLockTimeoutEnabled ? false
-                        : mLockPatternUtils.getPowerButtonInstantlyLocks();
-            }
+            // Lock immediately based on setting if secure (user has a pin/pattern/password).
+            // This also "locks" the device when not secure to provide easy access to the
+            // camera while preventing unwanted input.
+            final boolean lockImmediately =
+                mLockPatternUtils.getPowerButtonInstantlyLocks() || !mLockPatternUtils.isSecure();
 
             if (mExitSecureCallback != null) {
                 if (DEBUG) Log.d(TAG, "pending exit secure callback cancelled");
@@ -1136,6 +1125,8 @@ public class KeyguardViewMediator {
                         + sequence + ", mDelayedShowingSequence = " + mDelayedShowingSequence);
                 synchronized (KeyguardViewMediator.this) {
                     if (mDelayedShowingSequence == sequence) {
+                        // Don't play lockscreen SFX if the screen went off due to timeout.
+                        mSuppressNextLockSound = true;
                         doKeyguardLocked(null);
                     }
                 }

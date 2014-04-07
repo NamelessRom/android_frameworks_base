@@ -126,13 +126,15 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                     break;
                 }
             } else if (target == mTargetOffset) {
+                mCallback.userActivity(0);
                 mCallback.dismiss(false);
             } else {
                 int realTarget = target - mTargetOffset - 1;
                 String targetUri = realTarget < mStoredTargets.length
                         ? mStoredTargets[realTarget] : null;
 
-                if (LockscreenTargetUtils.EMPTY_TARGET.equals(targetUri)) {
+                if (target == 0) {
+                    mCallback.userActivity(0);
                     mCallback.dismiss(false);
                 } else {
                     try {
@@ -395,11 +397,8 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                             frontBlank = true;
                         }
                     }
-                    if (front == null) {
+                    if (front == null || back == null) {
                         front = LockscreenTargetUtils.getDrawableFromIntent(mContext, intent);
-                    }
-                    if (back == null) {
-                        back = activeBack;
                     }
 
                     int inset = LockscreenTargetUtils.getInsetForIconType(mContext, type);
