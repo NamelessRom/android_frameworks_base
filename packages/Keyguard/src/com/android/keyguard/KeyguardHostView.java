@@ -494,10 +494,11 @@ public class KeyguardHostView extends KeyguardViewBase {
     }
 
     private boolean widgetsDisabled() {
+        boolean disabledByLowRamDevice = ActivityManager.isLowRamDeviceStatic();
         boolean disabledByDpm =
                 (mDisabledFeatures & DevicePolicyManager.KEYGUARD_DISABLE_WIDGETS_ALL) != 0;
         boolean disabledByUser = !mLockPatternUtils.getWidgetsEnabled();
-        return disabledByDpm || disabledByUser;
+        return disabledByLowRamDevice || disabledByDpm || disabledByUser;
     }
 
     private boolean cameraDisabledByDpm() {
@@ -1051,6 +1052,11 @@ public class KeyguardHostView extends KeyguardViewBase {
 
         if (mSlidingChallengeLayout != null) {
             mSlidingChallengeLayout.setChallengeInteractive(!fullScreenEnabled);
+            // Don't let the user drag the challenge down if widgets are disabled
+            // or it is a simpin, simpuk or accountswitcher lockscreen
+            mSlidingChallengeLayout.setEnableChallengeDragging(
+                    !isSimOrAccount(securityMode, false)
+                    && (!widgetsDisabled() || mDefaultAppWidgetAttached));
         }
 
         // Emulate Activity life cycle
@@ -1845,7 +1851,10 @@ public class KeyguardHostView extends KeyguardViewBase {
     public void showAssistant() {
         final Intent intent = ((SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE))
           .getAssistIntent(mContext, true, UserHandle.USER_CURRENT);
+        startActivity(intent);
+    }
 
+    private void startActivity(Intent intent) {
         if (intent == null) return;
 
         final ActivityOptions opts = ActivityOptions.makeCustomAnimation(mContext,
