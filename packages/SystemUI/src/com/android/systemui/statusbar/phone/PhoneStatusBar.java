@@ -200,7 +200,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     DockBatteryController mDockBatteryController;
     LocationController mLocationController;
     NetworkController mNetworkController;
-    RotationLockController mRotationLockController;
     MSimNetworkController mMSimNetworkController;
 
     int mNaturalBarHeight = -1;
@@ -849,12 +848,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         setAreThereNotifications();
 
         // Other icons
-        if (mLocationController == null) mLocationController = new LocationController(mContext);
-        if (mBatteryController == null) mBatteryController = new BatteryController(mContext);
-        if (mDockBatteryController == null) mDockBatteryController = new DockBatteryController(mContext);
-        if (mBluetoothController == null) mBluetoothController = new BluetoothController(mContext);
-        if (mRotationLockController == null) mRotationLockController = new RotationLockController(mContext);
-
         mBatteryView = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
         mDockBatteryView = (DockBatteryMeterView) mStatusBarView.findViewById(R.id.dock_battery);
 
