@@ -17,9 +17,13 @@
 package com.android.systemui.statusbar.policy;
 
 import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.provider.Settings;
+import android.service.notification.StatusBarNotification;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,6 +33,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.android.systemui.ExpandHelper;
 import com.android.systemui.R;
@@ -223,11 +228,7 @@ public class HeadsUpNotificationView extends FrameLayout implements SwipeHelper.
         return true;
     }
 
-    @Override
-    public void onChildDismissed(View v) {
-        Log.v(TAG, "User swiped heads up to dismiss");
-        mBar.onHeadsUpDismissed();
-    }
+    public void onChildDismissed(View v) {}
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
@@ -261,5 +262,13 @@ public class HeadsUpNotificationView extends FrameLayout implements SwipeHelper.
     @Override
     public View getChildContentView(View v) {
         return mContentSlider;
+    }
+
+    @Override
+    public void onChildDismissed(View v, int direction) {
+        if (Settings.System.getInt(mContext.getContentResolver(), Settings.System.HEADS_UP_FLOAT, 0) == 1
+                && direction == SwipeHelper.LEFT)
+                mBar.launchFloating();
+        mBar.onHeadsUpDismissed();
     }
 }

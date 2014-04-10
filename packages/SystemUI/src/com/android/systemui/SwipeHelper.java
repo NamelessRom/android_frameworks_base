@@ -75,6 +75,12 @@ public class SwipeHelper implements Gefingerpoken {
     private Runnable mWatchLongPress;
     private long mLongPressTimeout;
 
+    private int mTriggerDirection;
+    public static final int LEFT = 0;
+    public static final int RIGHT = 1;
+    public static final int UP = 2;
+    public static final int DOWN = 3;
+
     public SwipeHelper(int swipeDirection, Callback callback, float densityScale,
             float pagingTouchSlop) {
         mCallback = callback;
@@ -297,6 +303,7 @@ public class SwipeHelper implements Gefingerpoken {
         anim.addListener(new AnimatorListenerAdapter() {
             public void onAnimationEnd(Animator animation) {
                 mCallback.onChildDismissed(view);
+                mCallback.onChildDismissed(view, mTriggerDirection);
                 animView.setLayerType(View.LAYER_TYPE_NONE, null);
             }
         });
@@ -343,9 +350,16 @@ public class SwipeHelper implements Gefingerpoken {
         final int action = ev.getAction();
         switch (action) {
             case MotionEvent.ACTION_OUTSIDE:
+                // don't do anything if we tap outside, ignore
+                break;
             case MotionEvent.ACTION_MOVE:
                 if (mCurrView != null) {
                     float delta = getPos(ev) - mInitialTouchPos;
+
+                    mTriggerDirection = delta < 0 ?
+                        (mSwipeDirection == X ? LEFT : UP) :
+                        (mSwipeDirection == X ? RIGHT : DOWN);
+
                     // don't let items that can't be dismissed be dragged more than
                     // maxScrollDistance
                     if (CONSTRAIN_SWIPE && !mCallback.canChildBeDismissed(mCurrView)) {
@@ -405,6 +419,8 @@ public class SwipeHelper implements Gefingerpoken {
         void onBeginDrag(View v);
 
         void onChildDismissed(View v);
+
+        void onChildDismissed(View v, int direction);
 
         void onDragCancelled(View v);
     }

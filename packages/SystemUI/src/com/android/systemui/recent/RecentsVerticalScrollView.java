@@ -398,4 +398,6 @@ public class RecentsVerticalScrollView extends ScrollView
     public void setCallback(RecentsCallback callback) {
         mCallback = callback;
     }
+
+    public void onChildDismissed(View v, int direction) {}
 }
