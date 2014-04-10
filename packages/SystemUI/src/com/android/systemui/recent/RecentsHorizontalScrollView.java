@@ -405,4 +405,6 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
 
         return res;
     }
+
+    public void onChildDismissed(View v, int direction) {}
 }
