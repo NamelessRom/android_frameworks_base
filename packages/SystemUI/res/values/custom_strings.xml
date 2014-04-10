@@ -65,4 +65,8 @@
     <string name="onthego_service_toggle">Automatically restart service</string>
     <string name="quick_settings_onthego_back">Rear Camera</string>
     <string name="quick_settings_onthego_front">Front Camera</string>
+
+    <!-- Floating mode -->
+    <string name="status_bar_floating_item_title">Floating mode</string>
+    <string name="status_bar_floating_no_interface">App provides no interface</string>
 </resources>

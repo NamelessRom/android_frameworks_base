@@ -70,6 +70,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.StatusBarIcon;
@@ -490,8 +491,11 @@ public abstract class BaseStatusBar extends SystemUI implements
                 final NotificationData.Entry entry = (Entry) v.getTag();
                 final StatusBarNotification sbNotification = entry.notification;
                 final String packageNameF = sbNotification.getPackageName();
+                final PendingIntent contentIntent = sbNotification.getNotification().contentIntent;
+
                 if (packageNameF == null) return false;
                 if (v.getWindowToken() == null) return false;
+
                 mNotificationBlamePopup = new PopupMenu(mContext, v);
                 mNotificationBlamePopup.getMenuInflater().inflate(
                         R.menu.notification_popup_menu,
@@ -537,6 +541,15 @@ public abstract class BaseStatusBar extends SystemUI implements
                         if (item.getItemId() == R.id.notification_inspect_item) {
                             startApplicationDetailsActivity(packageNameF);
                             animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_NONE);
+                        } else if (item.getItemId() == R.id.notification_floating_item) {
+                            animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_NONE);
+                            if (contentIntent == null) {
+                                String text = mContext.getResources().getString(R.string.status_bar_floating_no_interface);
+                                int duration = Toast.LENGTH_SHORT;
+                                Toast.makeText(mContext, text, duration).show();
+                            } else {
+                                launchFloating(contentIntent);
+                            }
                         } else if (item.getItemId() == R.id.notification_inspect_item_force_stop) {
                             ActivityManager am = (ActivityManager) mContext
                                     .getSystemService(
@@ -565,6 +578,14 @@ public abstract class BaseStatusBar extends SystemUI implements
                         return true;
                     }
                 });
+
+                mNotificationBlamePopup.setOnDismissListener(new PopupMenu.OnDismissListener() {
+                    @Override
+                    public void onDismiss(PopupMenu popupMenu) {
+                        mNotificationBlamePopup = null;
+                    }
+                });
+
                 mNotificationBlamePopup.show();
 
                 return true;
@@ -895,6 +916,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
 
         public void onClick(View v) {
+            if (mNotificationBlamePopup != null) return;
             try {
                 // The intent we are sending is for the application, which
                 // won't have permission to immediately start an activity after
@@ -1383,5 +1405,33 @@ public abstract class BaseStatusBar extends SystemUI implements
         final boolean hide = mContext.getSharedPreferences("hidden_statusbar_icon_packages", 0)
                 .getBoolean(iconPackage, false);
         return hide;
+    }
+
+    public void launchFloating() {
+        StatusBarNotification sbn = mInterruptingNotificationEntry.notification;
+        final PendingIntent contentIntent = sbn.getNotification().contentIntent;
+        if (contentIntent == null) {
+            String text = mContext.getResources().getString(R.string.status_bar_floating_no_interface);
+            int duration = Toast.LENGTH_SHORT;
+            Toast.makeText(mContext, text, duration).show();
+        } else {
+            launchFloating(contentIntent);
+        }
+    }
+
+    private void launchFloating(PendingIntent pIntent) {
+        Intent overlay = new Intent();
+        overlay.addFlags(Intent.FLAG_FLOATING_WINDOW | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        try {
+            ActivityManagerNative.getDefault().resumeAppSwitches();
+            ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
+        } catch (RemoteException e) {
+        }
+        try {
+            pIntent.send(mContext, 0, overlay);
+        } catch (PendingIntent.CanceledException e) {
+            // the stack trace isn't very helpful here.  Just log the exception message.
+            Slog.w(TAG, "Sending contentIntent failed: " + e);
+        }
     }
 }
