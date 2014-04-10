@@ -3276,6 +3276,12 @@ public final class Settings {
         public static final String HEADS_UP_BLACKLIST_VALUES = "heads_up_blacklist_values";
 
         /**
+         * Whether applications should be launched in float view on left swipe
+         * @hide
+         */
+        public static final String HEADS_UP_FLOAT = "heads_up_float";
+
+        /**
          * Quick Settings Panel Dynamic Tiles
          *
          * @hide
@@ -4534,6 +4540,12 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_NETWORK_STATS_HIDE = "status_bar_network_stats_hide";
+
+        /**
+         * Floating window scale
+         * @hide
+         */
+        public static final String FLOATING_WINDOW_SCALE = "floating_window_scale";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

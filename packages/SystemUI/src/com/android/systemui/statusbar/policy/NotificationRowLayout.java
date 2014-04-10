@@ -295,4 +295,6 @@ public class NotificationRowLayout
             mOnSizeChangedListener.onSizeChanged(this, w, h, oldw, oldh);
         }
     }
+
+    public void onChildDismissed(View v, int direction) {}
 }
