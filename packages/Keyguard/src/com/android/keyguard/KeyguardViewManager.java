@@ -72,6 +72,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.android.internal.util.cm.LockscreenBackgroundUtil;
+import com.android.internal.util.nameless.NamelessUtils;
 import com.android.internal.util.nameless.constants.FlashLightConstants;
 
 /**
@@ -265,6 +266,7 @@ public class KeyguardViewManager {
 
         public void drawToCanvas(Canvas canvas, Drawable drawable) {
             if (drawable != null) {
+                drawable = NamelessUtils.blurBitmap(mContext, drawable, 12);
                 final Rect bounds = drawable.getBounds();
                 final int vWidth = getWidth();
                 final int vHeight = getHeight();
