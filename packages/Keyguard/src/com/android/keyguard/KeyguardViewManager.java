@@ -72,6 +72,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.android.internal.util.cm.LockscreenBackgroundUtil;
+import com.android.internal.util.nameless.NamelessUtils;
 import com.android.internal.util.nameless.constants.FlashLightConstants;
 
 /**
@@ -315,6 +316,7 @@ public class KeyguardViewManager {
                 Bitmap b = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
                 Canvas c = new Canvas(b);
                 drawToCanvas(c, d);
+                b = NamelessUtils.blurBitmap(mContext, b, 12);
 
                 Drawable dd = new BitmapDrawable(mContext.getResources(), b);
 
