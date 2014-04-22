@@ -69,12 +69,6 @@ public class ThemesContract {
         public static final String LOCKSCREEN_URI = "lockscreen_uri";
 
         /**
-         * URI to an image that shows the style (aka skin) with theme applied
-         * <P>Type: TEXT</P>
-         */
-        public static final String STYLE_URI = "style_uri";
-
-        /**
          * TODO: Figure structure for actual animation instead of static
          * URI to an image of the boot_anim.
          * <P>Type: TEXT</P>
