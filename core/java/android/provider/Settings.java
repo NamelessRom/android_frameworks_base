@@ -6406,6 +6406,1130 @@ public final class Settings {
         }
 
         /**
+         * Convenience function for updating a single settings value as an
+         * integer. This will either create a new entry in the table if the
+         * given name does not exist, or modify the value of the existing row
+         * with that name.  Note that internally setting values are always
+         * stored as strings, so this function converts the given value to a
+         * string before storing it.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to modify.
+         * @param value The new value for the setting.
+         * @return true if the value was set, false on database errors
+         */
+        public static boolean putInt(ContentResolver cr, String name, int value) {
+            return putIntForUser(cr, name, value, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static boolean putIntForUser(ContentResolver cr, String name, int value,
+                int userHandle) {
+            return putStringForUser(cr, name, Integer.toString(value), userHandle);
+        }
+
+        /**
+         * Convenience function for retrieving a single system settings value
+         * as a {@code long}.  Note that internally setting values are always
+         * stored as strings; this function converts the string to a {@code long}
+         * for you.  The default value will be returned if the setting is
+         * not defined or not a {@code long}.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to retrieve.
+         * @param def Value to return if the setting is not defined.
+         *
+         * @return The setting's current value, or 'def' if it is not defined
+         * or not a valid {@code long}.
+         */
+        public static long getLong(ContentResolver cr, String name, long def) {
+            return getLongForUser(cr, name, def, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static long getLongForUser(ContentResolver cr, String name, long def,
+                int userHandle) {
+            String valString = getStringForUser(cr, name, userHandle);
+            long value;
+            try {
+                value = valString != null ? Long.parseLong(valString) : def;
+            } catch (NumberFormatException e) {
+                value = def;
+            }
+            return value;
+        }
+
+        /**
+         * Convenience function for retrieving a single system settings value
+         * as a {@code long}.  Note that internally setting values are always
+         * stored as strings; this function converts the string to a {@code long}
+         * for you.
+         * <p>
+         * This version does not take a default value.  If the setting has not
+         * been set, or the string value is not a number,
+         * it throws {@link SettingNotFoundException}.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to retrieve.
+         *
+         * @return The setting's current value.
+         * @throws SettingNotFoundException Thrown if a setting by the given
+         * name can't be found or the setting value is not an integer.
+         */
+        public static long getLong(ContentResolver cr, String name)
+                throws SettingNotFoundException {
+            return getLongForUser(cr, name, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static long getLongForUser(ContentResolver cr, String name, int userHandle)
+                throws SettingNotFoundException {
+            String valString = getStringForUser(cr, name, userHandle);
+            try {
+                return Long.parseLong(valString);
+            } catch (NumberFormatException e) {
+                throw new SettingNotFoundException(name);
+            }
+        }
+
+        /**
+         * Convenience function for updating a single settings value as a long
+         * integer. This will either create a new entry in the table if the
+         * given name does not exist, or modify the value of the existing row
+         * with that name.  Note that internally setting values are always
+         * stored as strings, so this function converts the given value to a
+         * string before storing it.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to modify.
+         * @param value The new value for the setting.
+         * @return true if the value was set, false on database errors
+         */
+        public static boolean putLong(ContentResolver cr, String name, long value) {
+            return putLongForUser(cr, name, value, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static boolean putLongForUser(ContentResolver cr, String name, long value,
+                int userHandle) {
+            return putStringForUser(cr, name, Long.toString(value), userHandle);
+        }
+
+        /**
+         * Convenience function for retrieving a single system settings value
+         * as a floating point number.  Note that internally setting values are
+         * always stored as strings; this function converts the string to an
+         * float for you. The default value will be returned if the setting
+         * is not defined or not a valid float.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to retrieve.
+         * @param def Value to return if the setting is not defined.
+         *
+         * @return The setting's current value, or 'def' if it is not defined
+         * or not a valid float.
+         */
+        public static float getFloat(ContentResolver cr, String name, float def) {
+            return getFloatForUser(cr, name, def, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static float getFloatForUser(ContentResolver cr, String name, float def,
+                int userHandle) {
+            String v = getStringForUser(cr, name, userHandle);
+            try {
+                return v != null ? Float.parseFloat(v) : def;
+            } catch (NumberFormatException e) {
+                return def;
+            }
+        }
+
+        /**
+         * Convenience function for retrieving a single system settings value
+         * as a float.  Note that internally setting values are always
+         * stored as strings; this function converts the string to a float
+         * for you.
+         * <p>
+         * This version does not take a default value.  If the setting has not
+         * been set, or the string value is not a number,
+         * it throws {@link SettingNotFoundException}.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to retrieve.
+         *
+         * @throws SettingNotFoundException Thrown if a setting by the given
+         * name can't be found or the setting value is not a float.
+         *
+         * @return The setting's current value.
+         */
+        public static float getFloat(ContentResolver cr, String name)
+                throws SettingNotFoundException {
+            return getFloatForUser(cr, name, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static float getFloatForUser(ContentResolver cr, String name, int userHandle)
+                throws SettingNotFoundException {
+            String v = getStringForUser(cr, name, userHandle);
+            if (v == null) {
+                throw new SettingNotFoundException(name);
+            }
+            try {
+                return Float.parseFloat(v);
+            } catch (NumberFormatException e) {
+                throw new SettingNotFoundException(name);
+            }
+        }
+
+        /**
+         * Convenience function for updating a single settings value as a
+         * floating point number. This will either create a new entry in the
+         * table if the given name does not exist, or modify the value of the
+         * existing row with that name.  Note that internally setting values
+         * are always stored as strings, so this function converts the given
+         * value to a string before storing it.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to modify.
+         * @param value The new value for the setting.
+         * @return true if the value was set, false on database errors
+         */
+        public static boolean putFloat(ContentResolver cr, String name, float value) {
+            return putFloatForUser(cr, name, value, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static boolean putFloatForUser(ContentResolver cr, String name, float value,
+                int userHandle) {
+            return putStringForUser(cr, name, Float.toString(value), userHandle);
+        }
+
+        /**
+         * @hide
+         * Convenience function for retrieving a single system settings value
+         * as a boolean. Note that internally setting values are always
+         * stored as strings; this function converts the string to a boolean
+         * for you. It will only return true if the stored value is "1"
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to retrieve.
+         * @param def Value to return if the setting is not defined.
+         *
+         * @return The setting's current value, or 'def' if it is not defined
+         * or not a valid integer.
+         */
+        public static boolean getBoolean(ContentResolver cr, String name, boolean def) {
+            return getBooleanForUser(cr, name, def, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static boolean getBooleanForUser(ContentResolver cr, String name, boolean def, int userHandle) {
+            String v = getStringForUser(cr, name, userHandle);
+            try {
+                if(v != null)
+                    return "1".equals(v);
+                else
+                    return def;
+            } catch (NumberFormatException e) {
+                return def;
+            }
+        }
+
+        /**
+         * @hide
+         * Convenience function for updating a single settings value as a
+         * boolean. This will either create a new entry in the table if the
+         * given name does not exist, or modify the value of the existing row
+         * with that name. Note that internally setting values are always
+         * stored as strings, so this function converts the given value to a
+         * string (1 or 0) before storing it.
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to modify.
+         * @param value The new value for the setting.
+         * @return true if the value was set, false on database errors
+         */
+        public static boolean putBoolean(ContentResolver cr, String name, boolean value) {
+            return putBooleanForUser(cr, name, value, UserHandle.myUserId());
+        }
+
+        /** @hide */
+        public static boolean putBooleanForUser(ContentResolver cr, String name, boolean value, int userHandle) {
+            return putStringForUser(cr, name, value ? "1" : "0", userHandle);
+        }
+
+        /**
+         * @hide
+         * Methods to handle storing and retrieving arraylists
+         *
+         * @param cr The ContentResolver to access.
+         * @param name The name of the setting to modify.
+         * @param value The new value for the setting.
+         * @return true if the value was set, false on database errors
+         */
+        public static boolean putArrayList(ContentResolver cr, String name, ArrayList<String> list) {
+            return putArrayListForUser(cr, name, list, UserHandle.myUserId());
+        }
+
+        public static boolean putArrayListForUser(ContentResolver cr, String name, ArrayList<String> list, int userHandle) {
+            if (list != null && list.size() > 0) {
+                String joined = TextUtils.join("|",list);
+                return putStringForUser(cr, name, joined, userHandle);
+            } else {
+                return putStringForUser(cr, name, "", userHandle);
+            }
+        }
+
+        public static ArrayList<String> getArrayList(ContentResolver cr, String name) {
+            return getArrayListForUser(cr, name,  UserHandle.myUserId());
+        }
+
+        public static ArrayList<String> getArrayListForUser(ContentResolver cr, String name, int userHandle) {
+            String v = getStringForUser(cr, name, userHandle);
+            ArrayList<String> list = new ArrayList<String>();
+            if (v != null) {
+                if (!v.isEmpty()){
+                    String[] split = v.split("\\|");
+                    for (String i : split) {
+                        list.add(i);
+                    }
+                }
+            }
+            return list;
+        }
+
+        /**
+         * @hide
+         */
+        public static final String[] APP_WINDOW = new String[] {
+            "window_color",
+            "window_animation",
+            "window_animation_duration",
+            "window_size",
+            "window_space",
+        };
+
+        /**
+         * @hide
+         */
+        public static final String[] AOKP_LEFT_RIBBON = new String[] {
+            "left_enabled",
+            "left_ribbon_items",
+            "left_ribbon_size",
+            "left_handle_weight",
+            "left_handle_height",
+            "left_handle_opacity",
+            "left_handle_vibrate",
+            "left_handle_location",
+            "left_handle_long_swipe",
+            "left_handle_long_press",
+            "left_ribbon_auto_hide",
+            "left_ribbon_color",
+            "left_ribbon_animation_type",
+            "left_ribbon_animation_duration",
+            "left_ribbon_margin",
+            "left_ribbon_icon_gravity",
+        };
+
+        /**
+         * @hide
+         */
+        public static final String[] AOKP_RIGHT_RIBBON = new String[] {
+            "right_enabled",
+            "right_ribbon_items",
+            "right_ribbon_size",
+            "right_handle_weight",
+            "right_handle_height",
+            "right_handle_opacity",
+            "right_handle_vibrate",
+            "right_handle_location",
+            "right_handle_long_swipe",
+            "right_handle_long_press",
+            "right_ribbon_auto_hide",
+            "right_ribbon_color",
+            "right_ribbon_animation_type",
+            "right_ribbon_animation_duration",
+            "right_ribbon_margin",
+            "right_ribbon_icon_gravity",
+        };
+
+        /**
+         * @hide
+         */
+        public static final String[] AOKP_LOCKSCREEN_RIBBON = new String[] {
+            "lockscreen_ribbon_items",
+            "lockscreen_ribbon_size",
+            "lockscreen_ribbon_margin",
+        };
+
+        /**
+         * Whether to enable quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_ENABLED = "quiet_hours_enabled";
+
+        /**
+         * Sets when quiet hours starts. This is stored in minutes from the start of the day.
+         * @hide
+         */
+        public static final String QUIET_HOURS_START = "quiet_hours_start";
+
+        /**
+         * Sets when quiet hours end. This is stored in minutes from the start of the day.
+         * @hide
+         */
+        public static final String QUIET_HOURS_END = "quiet_hours_end";
+
+        /**
+         * Whether to remove the sound from outgoing notifications during quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_NOTIFICATIONS = "quiet_hours_notifications";
+
+        /**
+         * Whether to mute phone ringtones during quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_RINGER = "quiet_hours_ringer";
+
+        /**
+         * Whether to disable vibrations during quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_STILL = "quiet_hours_still";
+
+        /**
+         * Whether to attempt to dim the LED color during quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_DIM = "quiet_hours_dim";
+
+        /**
+         * Immersive Mode
+         * @hide
+         */
+        public static final String IMMERSIVE_MODE = "immersive_mode";
+
+        /**
+         * Whether to enable custom rebindings of the actions performed on
+         * certain key press events.
+         * @hide
+         */
+        public static final String HARDWARE_KEY_REBINDING = "hardware_key_rebinding";
+
+         /**
+          * Action to perform when the home key is long-pressed. (Default is 2)
+          * 0 - Nothing
+          * 1 - Menu
+          * 2 - App-switch
+          * 3 - Search
+          * 4 - Voice search
+          * 5 - In-app search
+          * 6 - Kill app
+          * @hide
+          */
+         public static final String KEY_HOME_LONG_PRESS_ACTION = "key_home_long_press_action";
+
+         /**
+          * Action to perform when the home key is double-tapped. (Default is 0)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_HOME_DOUBLE_TAP_ACTION = "key_home_double_tap_action";
+
+         /**
+          * Action to perform when the back key is long-pressed. (Default is 0)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_BACK_LONG_PRESS_ACTION = "key_back_long_press_action";
+
+         /**
+          * Action to perform when the menu key is pressed. (Default is 1)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_MENU_ACTION = "key_menu_action";
+
+         /**
+          * Action to perform when the menu key is long-pressed.
+          * (Default is 0 on devices with a search key, 3 on devices without)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_MENU_LONG_PRESS_ACTION = "key_menu_long_press_action";
+
+         /**
+          * Action to perform when the assistant (search) key is pressed. (Default is 3)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_ASSIST_ACTION = "key_assist_action";
+
+         /**
+          * Action to perform when the assistant (search) key is long-pressed. (Default is 4)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_ASSIST_LONG_PRESS_ACTION = "key_assist_long_press_action";
+
+         /**
+          * Action to perform when the app switch key is pressed. (Default is 2)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_APP_SWITCH_ACTION = "key_app_switch_action";
+
+         /**
+          * Action to perform when the app switch key is long-pressed. (Default is 0)
+          * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
+          * @hide
+          */
+         public static final String KEY_APP_SWITCH_LONG_PRESS_ACTION = "key_app_switch_long_press_action";
+
+        /**
+         * Control the display of the action overflow button within app UI.
+         * 0 = use system default
+         * 1 = force on
+         * @hide
+         */
+        public static final String UI_FORCE_OVERFLOW_BUTTON = "ui_force_overflow_button";
+
+       /**
+         * Whether to enable swiping your finger across the statusbar to change the brightness.
+         * Boolean value. Defaults to true.
+         */
+        public static final String STATUSBAR_ENABLE_BRIGHTNESS_SLIDER = "statusbar_enable_brightness_slider";
+
+        /**
+         * wake up when plugged or unplugged
+         *
+         * @hide
+         */
+        public static final String WAKEUP_WHEN_PLUGGED_UNPLUGGED = "wakeup_when_plugged_unplugged";
+
+        /**
+         * Show battery percentage indicator front of battery icon
+         *
+         * @hide
+         */
+        public static final String BATTERY_PERCENTAGE_INDICATOR = "battery_percentage_indicator";
+
+        /**
+         * Change battery percentage indicator color during charging
+         *
+         * @hide
+         */
+        public static final String BATTERY_PERCENTAGE_INDICATOR_PLUGGED = "battery_percentage_indicator_plugged";
+
+        /**
+         * Whether double tapping the volume keys toggles the rotation lock or not.
+         * Boolean. Default true.
+         * @hide
+         */
+        public static final String DOUBLE_TAP_VOLUME_KEYS = "volume_keys_double_tap_action";
+
+        /**
+         * IME Switcher
+         *
+         * @hide
+         */
+        public static final String SHOW_STATUSBAR_IME_SWITCHER = "show_statusbar_ime_switcher";
+
+        /**
+         * Hide Singal Bars
+         *
+         * @hide
+         */
+        public static final String STATUSBAR_HIDE_SIGNAL_BARS = "statusbar_hide_signal_bars";
+
+        /**
+         * Whether to display the ADB notification.
+         * @hide
+         */
+        public static final String ADB_NOTIFY = "adb_notify";
+
+        /**
+         * AM/PM Style for clock options
+         * 0 - Normal AM/PM
+         * 1 - Small AM/PM
+         * 2 - No AM/PM
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_AM_PM_STYLE = "statusbar_clock_am_pm_style";
+
+        /**
+         * Style of clock
+         * 0 - Hide Clock
+         * 1 - Right Clock
+         * 2 - Center Clock
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_STYLE = "statusbar_clock_style";
+
+        /**
+         * Setting for clock color
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_COLOR = "statusbar_clock_color";
+
+        /**
+         * Shows weekday before clock time
+         * 0 - No Day
+         * 1 - Small Day
+         * 2 - Normal Day
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_WEEKDAY = "statusbar_clock_weekday";
+
+        /**
+         * Shows date before clock time
+         * 0 - No Date
+         * 1 - Small Date
+         * 2 - Normal Date
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_DATE = "statusbar_clock_date";
+
+        /**
+         * Setting for animation controls
+         *
+         * @hide
+         */
+        public static final String[] ACTIVITY_ANIMATION_CONTROLS = new String[] {
+                "activity_open",
+                "activity_close",
+                "task_open",
+                "task_close",
+                "task_to_front",
+                "task_to_back",
+                "wallpaper_open",
+                "wallpaper_close",
+                "wallpaper_intra_open",
+                "wallpaper_intra_close",
+        };
+
+        public static final String ANIMATION_CONTROLS_DURATION = "animation_controls_duration";
+
+        public static final String ANIMATION_CONTROLS_NO_OVERRIDE = "animation_controls_no_override";
+
+        public static final String ANIMATION_CONTROLS_EXIT_ONLY = "animation_controls_exit_only";
+
+        public static final String ANIMATION_CONTROLS_REVERSE_EXIT = "animation_controls_reverse_exit";
+
+       /**
+        *
+        * @hide
+        */
+        public static final String SYSTEMUI_NAVRING_AMOUNT = "systemui_navring_amount";
+
+        /**
+         * Custom navring actions
+         *
+         * @hide
+         */
+        public static final String[] SYSTEMUI_NAVRING = new String[] {
+                "navring_0",
+                "navring_1",
+                "navring_2",
+                "navring_3",
+                "navring_4",
+        };
+
+        /**
+         * Custom navring long press actions
+         *
+         * @hide
+         */
+        public static final String[] SYSTEMUI_NAVRING_LONG = new String[] {
+                "navring_long_0",
+                "navring_long_1",
+                "navring_long_2",
+                "navring_long_3",
+                "navring_long_4",
+        };
+
+        /**
+         * Custom navring icons
+         *
+         * @hide
+         */
+        public static final String[] SYSTEMUI_NAVRING_ICON = new String[] {
+                "navring_icon_0",
+                "navring_icon_1",
+                "navring_icon_2",
+                "navring_icon_3",
+                "navring_icon_4",
+        };
+
+        /**
+         * Statusbar toggles style
+         * @hide
+         */
+        public static final String TOGGLES_STYLE = "statusbar_toggles_style";
+
+        /**
+         * @hide
+         */
+        public static final String QUICK_TOGGLES_PER_ROW = "statusbar_toggles_number_per_row";
+
+        /**
+         * @hide
+         */
+        public static final String QUICK_TOGGLES = "statusbar_toggles_order";
+
+        /**
+         * @hide
+         */
+        public static final String QUICK_TOGGLE_FAV_CONTACT = "statusbar_toggles_favorite_contact";
+
+        /**
+         * @hide
+         */
+        public static final String SHADE_COLLAPSE_ALL = "status_bar_toggles_shade_collapse_all";
+
+        /**
+         * @hide
+         */
+        public static final String QUICK_TOGGLE_VIBRATE = "statusbar_toggles_vibrate_on_click";
+
+        /**
+         * @hide
+         */
+        public static final String HIDE_BATTERY_ICON = "hide_battery_icon";
+
+        /**
+         * Whether to use the custom quick unlock screen control
+         * @hide
+         */
+        public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL = "lockscreen_quick_unlock_control";
+
+        /**
+         * Vibrate when expanding notifications
+         * @hide
+         */
+        public static final String VIBRATE_NOTIF_EXPAND = "vibrate_notif_expand";
+
+        /**
+         * Whether to show statusbar signal text
+         *
+         * @hide
+         */
+        public static final String STATUSBAR_SIGNAL_TEXT = "statusbar_signal_text";
+
+        /**
+         * statusbar signal text color
+         *
+         * @hide
+         */
+        public static final String STATUSBAR_SIGNAL_TEXT_COLOR = "statusbar_signal_text_color";
+
+        /**
+         * Show the pending notification counts as overlays on the statusbar
+         * @hide
+         */
+        public static final String STATUSBAR_NOTIF_COUNT = "status_bar_notif_count";
+
+        /**
+         * The hostname for this device
+         * @hide
+         */
+        public static final String DEVICE_HOSTNAME = "device_hostname";
+
+        /**
+         * enable and disable fast toggle in settings
+         *
+         * @hide
+         */
+        public static final String FAST_TOGGLE = "fast_toggle";
+
+        /**
+         * enable and disable fast toggle in settings
+         *
+         * @hide
+         */
+        public static final String CHOOSE_FASTTOGGLE_SIDE = "choose_fasttoggle_side";
+
+        /**
+         * Swipe to switch from notifications to tiles
+         *
+         * @hide
+         */
+        public static final String SWIPE_TO_SWITCH = "swipe_to_switch";
+
+        /**
+         * Should the non-intrsive incall ui be used
+         * @hide
+         */
+        public static final String NON_INTRUSIVE_INCALL = "non_intrusive_incall";
+
+        /**
+         * Whether the volume keys wake the screen.
+         * @hide
+         */
+        public static final String VOLUME_WAKE_SCREEN = "volume_wake_screen";
+
+        /**
+         * Location mode toggle
+         * 1 - LOCATION_MODE_OFF / LOCATION_MODE_SENSORS_ONLY / LOCATION_MODE_BATTERY_SAVING / LOCATION_MODE_HIGH_ACCURACY
+         * 2 - LOCATION_MODE_HIGH_ACCURACY / LOCATION_MODE_BATTERY_SAVING / LOCATION_MODE_SENSORS_ONLY
+         * 3 - LOCATION_MODE_HIGH_ACCURACY / LOCATION_MODE_BATTERY_SAVING
+         * 4 - LOCATION_MODE_HIGH_ACCURACY / LOCATION_MODE_SENSORS_ONLY
+         * 5 - LOCATION_MODE_HIGH_ACCURACY / LOCATION_MODE_OFF
+         * 6 - LOCATION_MODE_BATTERY_SAVING / LOCATION_MODE_SENSORS_ONLY / LOCATION_MODE_OFF
+         * 7 - LOCATION_MODE_BATTERY_SAVING / LOCATION_MODE_SENSORS_ONLY
+         * 8 - LOCATION_MODE_BATTERY_SAVING / LOCATION_MODE_OFF
+         * 9 - LOCATION_MODE_SENSORS_ONLY / LOCATION_MODE_OFF
+         * @hide
+         */
+        public static final String LOCATION_MODES_TOGGLE = "location_modes_toggle";
+
+        /**
+         * Whether to enable the navbar for hw key devices
+         * @hide
+         */
+        public static final String ENABLE_NAVIGATION_BAR = "enable_navigation_bar";
+
+        /**
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_BUTTONS = "navigation_bar_buttons";
+
+        /**
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_HEIGHT = "navigation_bar_height";
+
+        /**
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_HEIGHT_LANDSCAPE = "navigation_bar_height_landscape";
+
+        /**
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_WIDTH = "navigation_bar_width";
+
+        /**
+         * Whether volume up/down can be long pressed to skip tracks
+         * @hide
+         */
+        public static final String VOLUME_MUSIC_CONTROLS = "volume_music_controls";
+
+        /**
+         * Allows to show the background activity back the lockscreen
+         * @hide
+         */
+        public static final String LOCKSCREEN_SEE_THROUGH = "lockscreen_see_through";
+
+        /**
+         * Weather to minimize lockscreen challenge on screen turned on
+         * @hide
+         */
+        public static final String LOCKSCREEN_MINIMIZE_LOCKSCREEN_CHALLENGE = "lockscreen_minimize_lockscreen_challenge";
+
+        /**
+         * Key to store Torch state.
+         * @hide
+         */
+        public static final String TORCH_STATE = "torch_state";
+
+        /**
+         * Whether to show the network status in the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS = "status_bar_network_stats";
+
+        /**
+         * Frequency at which stats are updated, in milliseconds
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS_UPDATE_INTERVAL = "status_bar_network_stats_update_frequency";
+
+        /**
+         * statusbar network stats text color
+         *
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS_TEXT_COLOR = "status_bar_network_stats_text_color";
+
+        /**
+         * whether to hide the Ram Usage Bar on recent switcher
+         *
+         *@hide
+         */
+        public static final String RAM_USAGE_BAR = "ram_usage_bar";
+
+        /**
+         *  Enable statusbar double tap gesture on to put device to sleep
+         * @hide
+         */
+        public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
+
+        /**
+         * Whether to enable the built-in safe media volume for headsets
+         * @hide
+         */
+        public static final String MANUAL_SAFE_MEDIA_VOLUME = "manual_safe_media_volume";
+
+        /**
+         * Screenshot toggle delay
+         * @hide
+         */
+        public static final String SCREENSHOT_TOGGLE_DELAY = "screenshot_toggle_delay";
+
+        /**
+         * The following Settings.AOKP fields are for use with power menu
+         * 0 : not shown in power menu
+         * 1 : Always shown including keyguard (secure/insecure)
+         * 2 : Always shown except for insecure lockscreen
+         *
+         */
+        /** Airplane Mode Menu Option */
+        public static final String AIRPLANE_MODE_OPTIONS = "airplane_mode_options";
+        /** Immersive Mode Menu Option */
+        public static final String IMMERSIVE_MODE_OPTIONS = "immersive_mode_options";
+        /** Reboot Menu Options */
+        public static final String REBOOT_MODE_OPTIONS = "reboot_mode_options";
+        /** Screenshot Menu Options */
+        public static final String SCREENSHOT_MODE_OPTIONS = "screenshot_mode_options";
+        /** Screenrecord Menu Options */
+        public static final String SCREENRECORD_MODE_OPTIONS = "screenrecord_mode_options";
+
+        /**
+         * Volume Adjust Sounds Enable, This is the noise made when using volume hard buttons
+         * Defaults to 1 - sounds enabled
+         * @hide
+         */
+        public static final String VOLUME_ADJUST_SOUNDS_ENABLED = "volume_adjust_sounds_enabled";
+
+        /**
+         * Whether or not to show circle battery around the lockscreen handle
+         * @hide
+         */
+        public static final String BATTERY_ARC_LOCKSCREEN_HANDLE = "battery_arc_lockscreen_handle";
+
+        /**
+         * Enable battery charging LED
+         * @hide
+         */
+        public static final String BATTERY_CHARGING_LED_ENABLED = "battery_charging_led_enabled";
+
+        /**
+         * Enable / disable navring
+         * @hide
+         */
+        public static final String ENABLE_NAVRING = "enable_navring";
+
+        /**
+         * Setting to show the battery percentage text
+         * @hide
+         */
+        public static final String STATUS_BAR_BATTERY_STYLE = "status_bar_battery_style";
+
+        /**
+         * How long to keep the notification LED on (in milliseconds)
+         *
+         * @hide
+         */
+        public static final String NOTIFICATION_LIGHT_ON = "notification_light_on";
+
+        /**
+         * How long to keep the notification LED off (in milliseconds)
+         *
+         * @hide
+         */
+        public static final String NOTIFICATION_LIGHT_OFF = "notification_light_off";
+
+        /**
+         * What color to use for the notificaion LED
+         *
+         * @hide
+         */
+        public static final String NOTIFICATION_LIGHT_COLOR = "notification_light_color";
+
+        /**
+         * Whether to blink the LED when screen is on
+         *
+         * @hide
+         */
+        public static final String LED_SCREEN_ON = "led_screen_on";
+
+        /**
+         * Custom string for package;color|pacakge;color
+         * so we can change custom colors per app
+         * @hide
+         */
+        public static final String LED_CUSTOM_VALUES = "led_custom_values";
+
+        /**
+         * Enable looking up of phone numbers of nearby places
+         *
+         * @hide
+         */
+        public static final String ENABLE_FORWARD_LOOKUP = "enable_forward_lookup";
+
+        /**
+         * Enable looking up of phone numbers of people
+         *
+         * @hide
+         */
+        public static final String ENABLE_PEOPLE_LOOKUP = "enable_people_lookup";
+
+        /**
+         * Enable looking up of information of phone numbers not in the contacts
+         *
+         * @hide
+         */
+        public static final String ENABLE_REVERSE_LOOKUP = "enable_reverse_lookup";
+
+        /**
+         * The forward lookup provider
+         *
+         * @hide
+         */
+        public static final String FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider";
+
+        /**
+         * The people lookup provider
+         *
+         * @hide
+         */
+        public static final String PEOPLE_LOOKUP_PROVIDER = "people_lookup_provider";
+
+        /**
+         * The reverse lookup provider
+         *
+         * @hide
+         */
+        public static final String REVERSE_LOOKUP_PROVIDER = "reverse_lookup_provider";
+
+        /**
+         * Volume keys control cursor in text fields (default is 0)
+         * 0 - Disabled
+         * 1 - Volume up/down moves cursor left/right
+         * 2 - Volume up/down moves cursor right/left
+         * @hide
+         */
+        public static final String VOLUME_KEY_CURSOR_CONTROL = "volume_key_cursor_control";
+
+        /**
+        * ToastAnimations
+        * @hide
+        */
+        public static final String TOAST_ANIMATION = "toast_animation";
+
+    }
+
+    /**
+     * User-defined bookmarks and shortcuts.  The target of each bookmark is an
+     * Intent URL, allowing it to be either a web page or a particular
+     * application activity.
+     *
+     * @hide
+     */
+    public static final class Bookmarks implements BaseColumns
+    {
+        private static final String TAG = "Bookmarks";
+
+        /**
+         * The content:// style URL for this table
+         */
+        public static final Uri CONTENT_URI =
+            Uri.parse("content://" + AUTHORITY + "/bookmarks");
+
+        /**
+         * The row ID.
+         * <p>Type: INTEGER</p>
+         */
+        public static final String ID = "_id";
+
+        /**
+         * Descriptive name of the bookmark that can be displayed to the user.
+         * If this is empty, the title should be resolved at display time (use
+         * {@link #getTitle(Context, Cursor)} any time you want to display the
+         * title of a bookmark.)
+         * <P>
+         * Type: TEXT
+         * </P>
+         */
+        public static final String TITLE = "title";
+
+        /**
+         * Arbitrary string (displayed to the user) that allows bookmarks to be
+         * organized into categories.  There are some special names for
+         * standard folders, which all start with '@'.  The label displayed for
+         * the folder changes with the locale (via {@link #getLabelForFolder}) but
+         * the folder name does not change so you can consistently query for
+         * the folder regardless of the current locale.
+         *
+         * <P>Type: TEXT</P>
+         *
+         */
+        public static final String FOLDER = "folder";
+
+        /**
+         * The Intent URL of the bookmark, describing what it points to.  This
+         * value is given to {@link android.content.Intent#getIntent} to create
+         * an Intent that can be launched.
+         * <P>Type: TEXT</P>
+         */
+        public static final String INTENT = "intent";
+
+        /**
+         * Optional shortcut character associated with this bookmark.
+         * <P>Type: INTEGER</P>
+         */
+        public static final String SHORTCUT = "shortcut";
+
+        /**
+         * The order in which the bookmark should be displayed
+         * <P>Type: INTEGER</P>
+         */
+        public static final String ORDERING = "ordering";
+
+        private static final String[] sIntentProjection = { INTENT };
+        private static final String[] sShortcutProjection = { ID, SHORTCUT };
+        private static final String sShortcutSelection = SHORTCUT + "=?";
+
+        /**
+         * Convenience function to retrieve the bookmarked Intent for a
+         * particular shortcut key.
+         *
+         * @param cr The ContentResolver to query.
+         * @param shortcut The shortcut key.
+         *
+         * @return Intent The bookmarked URL, or null if there is no bookmark
+         *         matching the given shortcut.
+         */
+        public static Intent getIntentForShortcut(ContentResolver cr, char shortcut)
+        {
+            Intent intent = null;
+
+            Cursor c = cr.query(CONTENT_URI,
+                    sIntentProjection, sShortcutSelection,
+                    new String[] { String.valueOf((int) shortcut) }, ORDERING);
+            // Keep trying until we find a valid shortcut
+            try {
+                while (intent == null && c.moveToNext()) {
+                    try {
+                        String intentURI = c.getString(c.getColumnIndexOrThrow(INTENT));
+                        intent = Intent.parseUri(intentURI, 0);
+                    } catch (java.net.URISyntaxException e) {
+                        // The stored URL is bad...  ignore it.
+                    } catch (IllegalArgumentException e) {
+                        // Column not found
+                        Log.w(TAG, "Intent column not found", e);
+                    }
+                }
+            } finally {
+                if (c != null) c.close();
+            }
+
+            return intent;
+        }
+
+        /**
          * Add a new bookmark to the system.
          *
          * @param cr The ContentResolver to query.
