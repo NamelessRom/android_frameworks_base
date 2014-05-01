@@ -157,6 +157,9 @@ public final class PowerManagerService extends IPowerManager.Stub
     // minimum screen off timeout should be longer than this.
     private static final int SCREEN_DIM_DURATION = 7 * 1000;
     private static final int DEFAULT_BUTTON_ON_DURATION = 5 * 1000;
+    private static final int DISABLED_BUTTON_ON_DURATION = 0 * 1000;
+
+    private static final int DISABLED_BUTTON_BRIGHTNESS_SETTING = 0;
 
     // The maximum screen dim time expressed as a ratio relative to the screen
     // off timeout.  If the screen off timeout is very short then we want the
@@ -575,6 +578,9 @@ public final class PowerManagerService extends IPowerManager.Stub
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.WAKELOCK_BLOCKING_LIST),
                     false, mSettingsObserver, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HARDWARE_KEYS_DISABLE),
+                    false, mSettingsObserver, UserHandle.USER_ALL);
 
             // Go.
             readConfigurationLocked();
@@ -669,13 +675,21 @@ public final class PowerManagerService extends IPowerManager.Stub
         mAutoBrightnessResponsitivityFactor =
                 Math.min(Math.max(newAutoBrightnessResponsitivityFactor, 0.2f), 3.0f);
 
-        mButtonTimeout = Settings.System.getIntForUser(resolver,
-                Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
-                DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
+        boolean mHardwareKeysDisable = Settings.System.getInt(resolver,
+                Settings.System.HARDWARE_KEYS_DISABLE, 0) == 1;
 
-        mButtonBrightness = Settings.System.getIntForUser(resolver,
-                Settings.System.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
-                UserHandle.USER_CURRENT);
+        if (!mHardwareKeysDisable) {
+            mButtonTimeout = Settings.System.getIntForUser(resolver,
+                    Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
+                    DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
+            mButtonBrightness = Settings.System.getIntForUser(resolver,
+                    Settings.System.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
+                    UserHandle.USER_CURRENT);
+        } else {
+            mButtonTimeout = DISABLED_BUTTON_ON_DURATION;
+            mButtonBrightness = DISABLED_BUTTON_BRIGHTNESS_SETTING;
+        }
+
         mKeyboardBrightness = Settings.System.getIntForUser(resolver,
                 Settings.System.KEYBOARD_BRIGHTNESS, mKeyboardBrightnessSettingDefault,
                 UserHandle.USER_CURRENT);

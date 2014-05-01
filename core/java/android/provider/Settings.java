@@ -3896,6 +3896,12 @@ public final class Settings {
         public static final String LOCKSCREEN_NOTIFICATIONS_DYNAMIC_WIDTH = "lockscreen_notifications_dynamic_width";
 
         /**
+         * Wether to disable hardware keys
+         * @hide
+         */
+        public static final String HARDWARE_KEYS_DISABLE = "hardware_keys_disable";
+
+        /**
          * Changes the offset of the notifications to the top of the screen
          * @hide
          */
