@@ -432,7 +432,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                                 R.string.global_action_screenrecord) {
 
                             public void onPress() {
-                                takeScreenrecord();
+                                NamelessActions.processAction(mContext,
+                                        NamelessActions.ACTION_SCREEN_RECORD);
                             }
 
                             public boolean onLongPress() {
@@ -782,7 +783,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 return;
             }
             ComponentName cn = new ComponentName("com.android.systemui",
-                    "com.android.systemui.omni.screenrecord.TakeScreenrecordService");
+                    "com.android.systemui.nameless.screenrecord.ScreenRecordService");
             Intent intent = new Intent();
             intent.setComponent(cn);
             ServiceConnection conn = new ServiceConnection() {
