@@ -1134,6 +1134,7 @@ public class LockWallpaperPickerActivity extends WallpaperCropActivity {
             mWallpaperStrip.setAlpha(1f);
             mWallpaperStrip.setVisibility(View.VISIBLE);
         }
+        mCropView.destroy();
     }
 
     @Override
