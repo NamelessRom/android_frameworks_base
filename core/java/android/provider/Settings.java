@@ -6607,6 +6607,11 @@ public final class Settings {
         public static final String DEFAULT_THEME_COMPONENTS = "default_theme_components";
 
         /**
+         * Protected Components
+         */
+        public static final String PROTECTED_COMPONENTS = "protected_components";
+
+        /**
          * This are the settings to be backed up.
          *
          * NOTE: Settings are backed up and restored in the order they appear
