@@ -1260,6 +1260,13 @@ public final class Settings {
          * @hide
          */
         public static final String FORCE_MULTI_PANE = "force_multi_pane";
+
+        /**
+         * The delay when killing the app on long press takes place
+         *
+         * @hide
+         */
+        public static final String LONG_PRESS_KILL_DELAY = "long_press_kill_delay";
     }
 
     /**
