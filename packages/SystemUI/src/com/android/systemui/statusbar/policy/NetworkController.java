@@ -1184,6 +1184,20 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
     // ===== Update the views =======================================================
 
     void refreshViews() {
+
+        // Only update the quicksetting signal icons if we're interacting with the panel bar
+        if (NotificationPanelView.isAnimating()) return;
+        if (PanelView.isTouchInteracting()) {
+            for (NetworkSignalChangedCallback cb : mSignalsChangedCallbacks) {
+                notifySignalsChangedCallbacks(cb);
+            }
+
+            for (SignalStrengthChangedCallback cb : mSignalStrengthChangedCallbacks) {
+                notifySignalStrengthChangedCallbacks(cb);
+            }
+            return;
+        }
+
         int combinedSignalIconId = 0;
         int combinedActivityIconId = 0;
         String combinedLabel = "";
