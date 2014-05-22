@@ -2589,6 +2589,7 @@ ResourceTable::validateLocalizations(void)
          nameIter++) {
         const set<String8>& configSet = nameIter->second;   // naming convenience
 
+#ifdef SHOW_DEFAULT_TRANSLATION_WARNINGS
         // Look for strings with no default localization
         if (configSet.count(defaultLocale) == 0) {
             fprintf(stdout, "aapt: warning: string '%s' has no default translation in %s; found:",
@@ -2640,6 +2641,7 @@ ResourceTable::validateLocalizations(void)
                 }
            } while (comma != NULL);
         }
+#endif
     }
 
     return err;
