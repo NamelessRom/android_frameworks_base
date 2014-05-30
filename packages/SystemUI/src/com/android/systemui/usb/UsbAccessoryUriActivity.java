@@ -29,7 +29,6 @@ import android.util.Log;
 
 import com.android.internal.app.AlertActivity;
 import com.android.internal.app.AlertController;
-import com.android.systemui.R;
 
 /**
  * If the attached USB accessory has a URL associated with it, and that URL is valid,

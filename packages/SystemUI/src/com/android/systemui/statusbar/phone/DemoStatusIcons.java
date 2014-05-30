@@ -25,7 +25,6 @@ import android.widget.LinearLayout;
 
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.systemui.DemoMode;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.StatusBarIconView;
 import com.android.systemui.statusbar.policy.LocationController;
 

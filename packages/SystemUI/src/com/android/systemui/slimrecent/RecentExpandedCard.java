@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.cards.internal.CardExpand;
-import com.android.systemui.R;
 
 import java.lang.ref.WeakReference;
 

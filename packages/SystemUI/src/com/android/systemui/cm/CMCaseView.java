@@ -17,7 +17,6 @@
 package com.android.systemui.cm;
 
 import com.android.systemui.DessertCaseView;
-import com.android.systemui.R;
 
 import android.content.Context;
 import android.util.AttributeSet;

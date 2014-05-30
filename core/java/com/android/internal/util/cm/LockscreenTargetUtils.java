@@ -40,8 +40,6 @@ import android.graphics.drawable.StateListDrawable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.internal.R;
-import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.TargetDrawable;
 
 import java.io.File;

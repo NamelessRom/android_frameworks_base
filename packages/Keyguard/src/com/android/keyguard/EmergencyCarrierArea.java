@@ -22,8 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.android.keyguard.R;
-
 public class EmergencyCarrierArea extends LinearLayout {
 
     private CarrierText mCarrierText;

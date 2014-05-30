@@ -36,7 +36,6 @@ import android.widget.CheckBox;
 
 import com.android.internal.app.AlertActivity;
 import com.android.internal.app.AlertController;
-import com.android.systemui.R;
 
 public class UsbDebuggingActivity extends AlertActivity
                                   implements DialogInterface.OnClickListener {
@@ -111,7 +110,9 @@ public class UsbDebuggingActivity extends AlertActivity
     @Override
     protected void onStop() {
         if (mDisconnectedReceiver != null) {
-            unregisterReceiver(mDisconnectedReceiver);
+            try {
+                unregisterReceiver(mDisconnectedReceiver);
+            } catch (Exception ignored) { }
         }
         super.onStop();
     }

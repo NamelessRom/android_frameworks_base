@@ -71,7 +71,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.internal.util.MemInfoReader;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
 import com.android.systemui.statusbar.StatusBarPanel;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;

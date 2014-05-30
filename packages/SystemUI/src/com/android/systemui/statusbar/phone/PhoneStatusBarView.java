@@ -30,9 +30,6 @@ import android.view.GestureDetector;
 import android.os.PowerManager;
 import android.provider.Settings;
 
-import com.android.systemui.EventLogTags;
-import com.android.systemui.R;
-
 public class PhoneStatusBarView extends PanelBar {
     private static final String TAG = "PhoneStatusBarView";
     private static final boolean DEBUG = PhoneStatusBar.DEBUG;

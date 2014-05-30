@@ -24,14 +24,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.ContentObserver;
 import android.location.LocationManager;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.Settings;
-
-import com.android.systemui.R;
 
 import java.util.ArrayList;
 import java.util.List;

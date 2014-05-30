@@ -1,17 +1,12 @@
 package com.android.systemui.quicksettings;
 
 import android.content.Context;
-import android.content.Intent;
-import android.hardware.display.DisplayManager;
 import android.media.MediaRouter;
 import android.media.MediaRouter.RouteInfo;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsTileView;
 
 public class RemoteDisplayTile extends QuickSettingsTile{

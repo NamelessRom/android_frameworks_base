@@ -35,8 +35,6 @@ import android.os.ServiceManager;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.android.systemui.R;
-
 /**
  * Notify user that a {@link NetworkTemplate} is over its
  * {@link NetworkPolicy#limitBytes}, giving them the choice of acknowledging or

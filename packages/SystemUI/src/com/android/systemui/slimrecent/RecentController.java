@@ -27,7 +27,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -50,7 +49,6 @@ import android.widget.RelativeLayout;
 
 import com.android.cards.view.CardListView;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
 
 /**

@@ -3,11 +3,8 @@ package com.android.systemui.quicksettings;
 import android.content.Context;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
-import android.view.LayoutInflater;
 import android.view.View;
 
-import com.android.systemui.R;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 

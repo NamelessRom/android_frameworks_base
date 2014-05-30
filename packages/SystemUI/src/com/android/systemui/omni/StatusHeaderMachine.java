@@ -26,8 +26,6 @@ import android.util.SparseArray;
 
 import java.util.Calendar;
 
-import com.android.systemui.R;
-
 /**
  * This class manages the header images you can have on the expanded status bar
  * (ie. when you open the notification drawer)

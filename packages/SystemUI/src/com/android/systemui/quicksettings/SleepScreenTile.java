@@ -3,14 +3,11 @@ package com.android.systemui.quicksettings;
 import android.content.Context;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 
 public class SleepScreenTile extends QuickSettingsTile {
 

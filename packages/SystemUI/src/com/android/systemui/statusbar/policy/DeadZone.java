@@ -26,8 +26,6 @@ import android.util.Slog;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.android.systemui.R;
-
 public class DeadZone extends View {
     public static final String TAG = "DeadZone";
 

@@ -29,7 +29,6 @@ import android.view.View.OnLongClickListener;
 
 import com.android.internal.util.nameless.NamelessActions;
 import com.android.internal.util.nameless.NamelessUtils;
-import com.android.systemui.R;
 import com.android.systemui.nameless.onthego.OnTheGoDialog;
 import com.android.systemui.nameless.onthego.OnTheGoService;
 import com.android.systemui.statusbar.phone.QuickSettingsController;

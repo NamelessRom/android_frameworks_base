@@ -20,7 +20,6 @@ package com.android.systemui.statusbar;
 
 import android.content.Context;
 import android.telephony.MSimTelephonyManager;
-import android.telephony.TelephonyManager;
 import android.util.AttributeSet;
 import android.util.Slog;
 import android.view.accessibility.AccessibilityEvent;
@@ -31,10 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.internal.telephony.MSimConstants;
-import com.android.systemui.statusbar.policy.NetworkController;
 import com.android.systemui.statusbar.policy.MSimNetworkController;
-
-import com.android.systemui.R;
 
 // Intimately tied to the design of res/layout/msim_signal_cluster_view.xml
 public class MSimSignalClusterView

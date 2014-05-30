@@ -22,8 +22,6 @@ import android.util.EventLog;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
-import com.android.systemui.EventLogTags;
-
 public class PanelHolder extends FrameLayout {
     public static final boolean DEBUG_GESTURES = true;
 

@@ -56,7 +56,6 @@ import android.view.WindowManager;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
 
-import com.android.systemui.R;
 import com.android.systemui.screenshot.DeleteScreenshot;
 
 import java.io.File;

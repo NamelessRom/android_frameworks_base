@@ -33,7 +33,6 @@ import android.util.Log;
 import android.widget.CheckBox;
 
 import com.android.internal.app.ResolverActivity;
-import com.android.systemui.R;
 
 import java.util.ArrayList;
 
@@ -87,7 +86,9 @@ public class UsbResolverActivity extends ResolverActivity {
     @Override
     protected void onDestroy() {
         if (mDisconnectedReceiver != null) {
-            unregisterReceiver(mDisconnectedReceiver);
+            try {
+                unregisterReceiver(mDisconnectedReceiver);
+            } catch (Exception ignored) { }
         }
         super.onDestroy();
     }

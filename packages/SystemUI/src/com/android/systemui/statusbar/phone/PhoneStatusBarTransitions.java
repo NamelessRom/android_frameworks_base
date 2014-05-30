@@ -23,8 +23,6 @@ import android.content.res.Resources;
 import android.telephony.MSimTelephonyManager;
 import android.view.View;
 
-import com.android.systemui.R;
-
 public final class PhoneStatusBarTransitions extends BarTransitions {
     private static final float ICON_ALPHA_WHEN_NOT_OPAQUE = 1;
     private static final float ICON_ALPHA_WHEN_LIGHTS_OUT_BATTERY_CLOCK = 0.5f;

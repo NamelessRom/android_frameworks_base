@@ -48,7 +48,6 @@ import android.widget.FrameLayout;
 import com.android.internal.util.nameless.NamelessUtils;
 import com.android.internal.util.nameless.constants.FlashLightConstants;
 import com.android.internal.util.nameless.listeners.ShakeDetector;
-import com.android.systemui.R;
 
 import java.io.IOException;
 

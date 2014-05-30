@@ -29,9 +29,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.StatusBarPanel;
 
+import java.lang.Exception;
 import java.util.List;
 
 public class RecentsActivity extends Activity {
@@ -160,13 +160,11 @@ public class RecentsActivity extends Activity {
 
     public void dismissAndGoBack() {
         if (mRecentsPanel != null) {
-            final ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-
             final List<ActivityManager.RecentTaskInfo> recentTasks =
-                    am.getRecentTasks(2,
+                    ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE)).getRecentTasks(2,
                             ActivityManager.RECENT_WITH_EXCLUDED |
                             ActivityManager.RECENT_IGNORE_UNAVAILABLE);
-            if (recentTasks.size() > 1 &&
+            if (recentTasks != null && recentTasks.size() > 1 &&
                     mRecentsPanel.simulateClick(recentTasks.get(1).persistentId)) {
                 // recents panel will take care of calling show(false) through simulateClick
                 return;
@@ -214,7 +212,9 @@ public class RecentsActivity extends Activity {
     @Override
     protected void onDestroy() {
         RecentTasksLoader.getInstance(this).setRecentsPanel(null, mRecentsPanel);
-        unregisterReceiver(mIntentReceiver);
+        try {
+            unregisterReceiver(mIntentReceiver);
+        } catch (Exception ignored) { }
         super.onDestroy();
     }
 

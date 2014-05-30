@@ -27,8 +27,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.android.systemui.R;
-
 public class ToggleSlider extends RelativeLayout
         implements CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
     private static final String TAG = "StatusBar.ToggleSlider";

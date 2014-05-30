@@ -6,15 +6,11 @@ import android.net.NetworkUtils;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.RemoteException;
-import android.os.ServiceManager;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 import java.net.InetAddress;

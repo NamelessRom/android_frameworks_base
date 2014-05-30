@@ -35,8 +35,6 @@ import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 
-import com.android.systemui.EventLogTags;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.GestureRecorder;
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.BluetoothController;

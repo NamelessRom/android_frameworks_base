@@ -27,8 +27,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.android.systemui.R;
-
 /** A dialog that provides controls for adjusting the screen brightness. */
 public class BrightnessDialog extends Dialog implements
         BrightnessController.BrightnessStateChangeCallback {

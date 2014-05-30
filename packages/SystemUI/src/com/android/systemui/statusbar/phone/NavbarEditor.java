@@ -27,7 +27,6 @@ import android.util.DisplayMetrics;
 import android.view.DisplayInfo;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -38,7 +37,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.internal.util.ArrayUtils;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.policy.KeyButtonView;
 
 import java.util.ArrayList;
