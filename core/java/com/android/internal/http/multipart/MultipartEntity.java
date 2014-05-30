@@ -44,7 +44,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EncodingUtils;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements a request entity suitable for an HTTP multipart POST method.
@@ -194,10 +193,10 @@ public class MultipartEntity extends AbstractHttpEntity {
      */
     @Override
     public Header getContentType() {
-      StringBuffer buffer = new StringBuffer(MULTIPART_FORM_CONTENT_TYPE);
-      buffer.append("; boundary=");
-      buffer.append(EncodingUtils.getAsciiString(getMultipartBoundary()));
-      return new BasicHeader(HTTP.CONTENT_TYPE, buffer.toString());
+      StringBuilder builder = new StringBuilder(MULTIPART_FORM_CONTENT_TYPE);
+      builder.append("; boundary=");
+      builder.append(EncodingUtils.getAsciiString(getMultipartBoundary()));
+      return new BasicHeader(HTTP.CONTENT_TYPE, builder.toString());
 
     }
 
