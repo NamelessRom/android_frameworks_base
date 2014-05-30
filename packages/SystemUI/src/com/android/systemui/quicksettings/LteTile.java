@@ -6,15 +6,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 import com.android.internal.telephony.Phone;
-import com.android.internal.telephony.PhoneConstants;
-import com.android.internal.telephony.RILConstants;
-import com.android.systemui.R;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class LteTile extends QuickSettingsTile {

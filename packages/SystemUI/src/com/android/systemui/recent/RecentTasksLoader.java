@@ -35,7 +35,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
 
 import java.util.ArrayList;

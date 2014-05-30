@@ -28,8 +28,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 
-import com.android.systemui.R;
-
 public class FadedEdgeDrawHelper {
     public static final boolean OPTIMIZE_SW_RENDERED_RECENTS = true;
     public static final boolean USE_DARK_FADE_IN_HW_ACCELERATED_MODE = true;

@@ -37,7 +37,6 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 
 import com.android.internal.statusbar.StatusBarIcon;
-import com.android.systemui.R;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;

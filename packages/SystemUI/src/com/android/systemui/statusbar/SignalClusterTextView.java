@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.policy.NetworkController;
 
 public class SignalClusterTextView extends LinearLayout implements

@@ -49,7 +49,6 @@ import com.android.internal.statusbar.IStatusBarService;
 import static com.android.internal.util.cm.NavigationRingConstants.*;
 
 import com.android.internal.util.nameless.constants.FlashLightConstants;
-import com.android.systemui.R;
 import com.android.systemui.screenshot.TakeScreenshotService;
 
 import java.net.URISyntaxException;

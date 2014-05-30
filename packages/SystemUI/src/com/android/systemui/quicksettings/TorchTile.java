@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.view.View;
 
 import com.android.internal.util.nameless.constants.FlashLightConstants;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class TorchTile extends QuickSettingsTile {

@@ -35,8 +35,6 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.android.systemui.R;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

@@ -16,8 +16,6 @@
 
 package com.android.systemui.statusbar.policy;
 
-import com.android.systemui.R;
-
 class TelephonyIcons {
     //***** Signal strength icons
 

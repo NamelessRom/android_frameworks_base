@@ -21,8 +21,6 @@ import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.android.systemui.R;
-
 public class DelegateViewHelper {
     private View mDelegateView;
     private View mSourceView;

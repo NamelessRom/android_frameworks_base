@@ -25,7 +25,6 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.view.View;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class PerformanceProfileTile extends QuickSettingsTile {

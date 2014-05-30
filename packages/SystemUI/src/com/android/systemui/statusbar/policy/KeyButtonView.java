@@ -41,7 +41,6 @@ import android.view.ViewDebug;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.NavbarEditor;
 import com.android.systemui.statusbar.phone.NavbarEditor.ButtonInfo;
 

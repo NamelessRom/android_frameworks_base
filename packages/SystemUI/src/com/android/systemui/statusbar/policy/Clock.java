@@ -42,8 +42,6 @@ import android.widget.TextView;
 
 import com.android.systemui.DemoMode;
 
-import com.android.internal.R;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;

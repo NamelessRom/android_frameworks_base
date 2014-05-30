@@ -2,8 +2,6 @@
 
 package com.android.systemui.statusbar.policy;
 
-import com.android.systemui.R;
-
 /**
  * Content descriptions for accessibility support.
  */

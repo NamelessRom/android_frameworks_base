@@ -15,7 +15,6 @@ import android.provider.Settings;
 import android.view.View;
 
 import com.android.internal.util.cm.QuietHoursUtils;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class QuietHoursTile extends QuickSettingsTile {

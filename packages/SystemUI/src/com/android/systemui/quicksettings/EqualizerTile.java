@@ -27,13 +27,8 @@ import android.media.RemoteController;
 import android.media.audiofx.AudioEffect;
 import android.view.View;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 import com.android.systemui.statusbar.phone.QuickSettingsTileView;
-import com.pheelicks.visualizer.AudioData;
-import com.pheelicks.visualizer.FFTData;
-import com.pheelicks.visualizer.renderer.BarGraphRenderer;
-import com.pheelicks.visualizer.renderer.Renderer;
 
 public class EqualizerTile extends QuickSettingsTile {
     private boolean mLinked;

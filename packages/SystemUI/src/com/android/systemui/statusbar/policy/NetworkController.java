@@ -51,7 +51,6 @@ import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.cdma.EriInfo;
 import com.android.internal.util.AsyncChannel;
 import com.android.systemui.DemoMode;
-import com.android.systemui.R;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;

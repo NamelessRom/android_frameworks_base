@@ -33,7 +33,6 @@ import com.android.internal.telephony.IccCardConstants;
 import com.android.internal.telephony.MSimConstants;
 import com.android.internal.telephony.TelephonyIntents;
 import com.android.internal.telephony.cdma.TtyIntent;
-import com.android.systemui.R;
 
 /**
  * This class contains all of the policy about which icons are installed in the status

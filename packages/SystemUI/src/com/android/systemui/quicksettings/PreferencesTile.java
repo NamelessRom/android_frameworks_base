@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.view.View;
 
 import com.android.internal.util.nameless.NamelessUtils;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class PreferencesTile extends QuickSettingsTile {

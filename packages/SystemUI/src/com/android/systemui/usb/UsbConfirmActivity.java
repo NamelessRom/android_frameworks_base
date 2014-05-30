@@ -40,7 +40,6 @@ import android.widget.TextView;
 
 import com.android.internal.app.AlertActivity;
 import com.android.internal.app.AlertController;
-import com.android.systemui.R;
 
 public class UsbConfirmActivity extends AlertActivity
         implements DialogInterface.OnClickListener, CheckBox.OnCheckedChangeListener {

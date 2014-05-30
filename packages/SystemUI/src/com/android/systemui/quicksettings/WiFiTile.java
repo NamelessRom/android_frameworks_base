@@ -5,9 +5,7 @@ import android.net.wifi.WifiManager;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
-import com.android.systemui.statusbar.policy.MSimNetworkController;
 import com.android.systemui.statusbar.policy.NetworkController;
 
 public class WiFiTile extends NetworkTile {

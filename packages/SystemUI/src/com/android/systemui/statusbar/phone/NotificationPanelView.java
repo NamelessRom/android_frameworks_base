@@ -39,8 +39,6 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 
-import com.android.systemui.EventLogTags;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.GestureRecorder;
 
 import java.io.File;

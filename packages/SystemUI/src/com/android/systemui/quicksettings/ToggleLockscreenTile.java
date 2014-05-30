@@ -5,14 +5,11 @@ import android.app.KeyguardManager.KeyguardLock;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 
 @SuppressWarnings("deprecation")
 public class ToggleLockscreenTile extends QuickSettingsTile

@@ -27,8 +27,6 @@ import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.LruCache;
 
-import com.android.systemui.R;
-
 /**
  * This class is our LRU cache controller. It holds
  * the app icons and the task screenshots.

@@ -24,8 +24,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.systemui.R;
-
 class QuickSettingsBasicTile extends QuickSettingsTileView {
     private final TextView mTextView;
     private final ImageView mImageView;

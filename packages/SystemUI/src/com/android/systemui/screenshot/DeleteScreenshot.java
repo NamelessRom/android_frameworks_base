@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.android.systemui.R;
 import com.android.systemui.screenshot.GlobalScreenshot;
 
 public class DeleteScreenshot extends BroadcastReceiver {

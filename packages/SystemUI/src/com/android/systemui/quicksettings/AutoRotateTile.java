@@ -5,15 +5,12 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 
 import com.android.internal.view.RotationPolicy;
-import com.android.systemui.R; 
 import com.android.systemui.statusbar.phone.QuickSettingsController;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 
 public class AutoRotateTile extends QuickSettingsTile {
 

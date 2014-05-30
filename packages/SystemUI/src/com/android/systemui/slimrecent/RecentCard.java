@@ -24,8 +24,6 @@ import android.view.ViewGroup;
 import com.android.cards.internal.Card;
 import com.android.cards.internal.CardHeader;
 
-import com.android.systemui.R;
-
 /**
  * This class handles our base card view.
  */

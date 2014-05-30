@@ -29,7 +29,6 @@ import android.widget.FrameLayout;
 import android.widget.ScrollView;
 
 import com.android.systemui.ExpandHelper;
-import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
 import com.android.systemui.statusbar.policy.NotificationRowLayout;
 
@@ -130,7 +129,7 @@ public class StatusBarWindowView extends FrameLayout
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (DEBUG) {
-            Paint pt = new Paint();
+            final Paint pt = new Paint();
             pt.setColor(0x80FFFF00);
             pt.setStrokeWidth(12.0f);
             pt.setStyle(Paint.Style.STROKE);

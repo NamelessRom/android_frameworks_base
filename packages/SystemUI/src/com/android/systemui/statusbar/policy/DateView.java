@@ -25,16 +25,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.text.format.DateFormat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.ViewParent;
 import android.widget.TextView;
-
-import com.android.systemui.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

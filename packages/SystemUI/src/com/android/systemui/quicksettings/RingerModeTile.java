@@ -11,7 +11,6 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 import java.util.ArrayList;

@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.cards.internal.CardThumbnail;
-import com.android.systemui.R;
 
 /**
  * This class handles the view of our app icon.

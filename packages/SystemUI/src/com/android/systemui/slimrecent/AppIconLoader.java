@@ -29,8 +29,6 @@ import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Process;
 
-import com.android.systemui.R;
-
 import java.lang.ref.WeakReference;
 
 /**

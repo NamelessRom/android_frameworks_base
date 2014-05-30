@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
-import android.view.LayoutInflater;
 import android.view.View;
 
-import com.android.systemui.R;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class WifiAPTile extends QuickSettingsTile {

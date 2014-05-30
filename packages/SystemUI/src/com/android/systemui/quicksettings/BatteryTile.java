@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.android.systemui.BatteryMeterView;
-import com.android.systemui.R;
 import com.android.systemui.BatteryMeterView.BatteryMeterMode;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 import com.android.systemui.statusbar.policy.BatteryController;

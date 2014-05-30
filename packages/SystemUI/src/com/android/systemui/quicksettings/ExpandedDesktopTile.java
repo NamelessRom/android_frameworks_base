@@ -7,11 +7,8 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
-import android.view.LayoutInflater;
 import android.view.View;
 
-import com.android.systemui.R;
-import com.android.systemui.statusbar.phone.QuickSettingsContainerView;
 import com.android.systemui.statusbar.phone.QuickSettingsController;
 
 public class ExpandedDesktopTile extends QuickSettingsTile {

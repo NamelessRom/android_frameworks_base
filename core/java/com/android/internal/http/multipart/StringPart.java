@@ -35,7 +35,6 @@ import java.io.IOException;
 
 import org.apache.http.util.EncodingUtils;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Simple string parameter for a multipart post

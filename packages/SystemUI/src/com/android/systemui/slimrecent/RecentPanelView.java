@@ -17,7 +17,6 @@
 
 package com.android.systemui.slimrecent;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.TaskStackBuilder;
@@ -42,7 +41,6 @@ import android.widget.ImageView;
 import com.android.cards.internal.Card;
 import com.android.cards.internal.CardArrayAdapter;
 import com.android.cards.view.CardListView;
-import com.android.systemui.R;
 
 import java.util.ArrayList;
 import java.util.List;

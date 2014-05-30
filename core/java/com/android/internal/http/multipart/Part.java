@@ -36,7 +36,6 @@ import java.io.OutputStream;
 
 import org.apache.http.util.EncodingUtils;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract class for one Part of a multipart post object.

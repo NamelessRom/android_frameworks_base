@@ -19,8 +19,6 @@ package com.android.systemui;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-import com.android.systemui.R;
-
 public class DessertCaseDreamSettings extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

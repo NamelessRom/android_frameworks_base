@@ -16,8 +16,6 @@
 
 package com.android.systemui.statusbar.policy;
 
-import com.android.systemui.R;
-
 class WifiIcons {
     static final int[][] WIFI_SIGNAL_STRENGTH = {
             { R.drawable.stat_sys_wifi_signal_0,
