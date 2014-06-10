@@ -1566,7 +1566,7 @@ public final class ViewRootImpl implements ViewParent,
                     if (mAttachInfo.mHardwareRenderer != null &&
                             mAttachInfo.mHardwareRenderer.isEnabled()) {
                         // Destroy hardware layers before hardware renderer is destroyed
-                        mAttachInfo.mHardwareRenderer.destroyLayers(mView);
+                        mAttachInfo.mHardwareRenderer.destroyHardwareResources(mView);
 
                         mAttachInfo.mHardwareRenderer.destroy(true);
                     }
