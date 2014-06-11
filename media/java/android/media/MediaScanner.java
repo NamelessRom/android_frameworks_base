@@ -125,6 +125,16 @@ public class MediaScanner
             Files.FileColumns.DATE_MODIFIED, // 3
     };
 
+    private static final String[] FILES_FASTINSERT_PROJECTION = new String[] {
+            Files.FileColumns._ID, // 0
+            Files.FileColumns.MIME_TYPE, //1
+            Files.FileColumns.SIZE,//2
+            Files.FileColumns.DATA, // 3
+            Files.FileColumns.FORMAT, // 4
+            Files.FileColumns.DATE_MODIFIED, // 5
+
+    };
+
     private static final String[] ID_PROJECTION = new String[] {
             Files.FileColumns._ID,
     };
@@ -133,6 +143,13 @@ public class MediaScanner
     private static final int FILES_PRESCAN_PATH_COLUMN_INDEX = 1;
     private static final int FILES_PRESCAN_FORMAT_COLUMN_INDEX = 2;
     private static final int FILES_PRESCAN_DATE_MODIFIED_COLUMN_INDEX = 3;
+
+    private static final int FILES_FASTINSERT_ID_COLUMN_INDEX = 0;
+    private static final int FILES_FASTINSERT_MIMETYPE_COLUMN_INDEX = 1;
+    private static final int FILES_FASTINSERT_SIZE_COLUMN_INDEX = 2;
+    private static final int FILES_FASTINSERT_PATH_COLUMN_INDEX =3;
+    private static final int FILES_FASTINSERT_FORMAT_COLUMN_INDEX = 4;
+    private static final int FILES_FASTINSERT_DATE_MODIFIED_COLUMN_INDEX =5;
 
     private static final String[] PLAYLIST_MEMBERS_PROJECTION = new String[] {
             Audio.Playlists.Members.PLAYLIST_ID, // 0
@@ -374,6 +391,35 @@ public class MediaScanner
         }
     }
 
+     private static class FileEntryFastMediaScan {
+        long mRowId;
+        String mPath;
+        long mLastModified;
+        int mFormat;
+        String mMimeType;
+        long mSize;
+        boolean mIsMediaFile;
+        boolean mIsDirectory;
+
+        FileEntryFastMediaScan(long rowId, String path, long lastModified, int format,
+                                        String mimeType, long size, boolean IsMediaFile, boolean IsDirectory) {
+            mRowId = rowId;
+            mPath = path;
+            mLastModified = lastModified;
+            mFormat = format;
+            mMimeType = mimeType;
+            mSize = size;
+            mIsMediaFile = IsMediaFile;
+            mIsDirectory = IsDirectory;
+         }
+
+         @Override
+         public String toString() {
+            return mPath + " mRowId: " + mRowId;
+         }
+    }
+
+
     private static class PlaylistEntry {
         String path;
         long bestmatchid;
@@ -385,6 +431,16 @@ public class MediaScanner
     private MediaInserter mMediaInserter;
 
     private ArrayList<FileEntry> mPlayLists;
+
+    private ArrayList<FileEntryFastMediaScan> mInternalVolList;
+
+    private ArrayList<FileEntryFastMediaScan> mExternalVolList;
+
+    private String mInternalVolume;
+
+    private String mExternalVolume;
+
+    private boolean mFastScan = false;
 
     private DrmManagerClient mDrmManagerClient = null;
 
@@ -565,16 +621,16 @@ public class MediaScanner
                                 }
                             }
                         }
+                        if (mFastScan == false) {
+                                // we only extract metadata for audio and video files
+                                 if (isaudio || isvideo) {
+                                 processFile(path, mimeType, this);
+                                 }
 
-                        // we only extract metadata for audio and video files
-                        if (isaudio || isvideo) {
-                            processFile(path, mimeType, this);
+                                if (isimage) {
+                                processImageFile(path);
+                                }
                         }
-
-                        if (isimage) {
-                            processImageFile(path);
-                        }
-
                         result = endFile(entry, ringtones, notifications, alarms, music, podcasts);
                     }
                 }
@@ -584,6 +640,59 @@ public class MediaScanner
 //            long t2 = System.currentTimeMillis();
 //            Log.v(TAG, "scanFile: " + path + " took " + (t2-t1));
             return result;
+        }
+
+       //Added to support fast Mediascan
+        public Uri doFastMediaScanFile(String path, String mimeType, long lastModified,
+               long fileSize, boolean isDirectory, boolean scanAlways, boolean noMedia) {
+            Uri result = null;
+            long t1 = System.currentTimeMillis();
+            try {
+                FileEntry entry = beginFile(path, mimeType, lastModified,
+                                 fileSize, isDirectory, noMedia);
+                // prescan for metadata if file was modified since last scan
+                if (entry != null ) {
+                    if (noMedia) {
+                        result = endFile(entry, false, false, false, false, false);
+                    } else {
+                        String lowpath = path.toLowerCase(Locale.ROOT);
+                        boolean ringtones = (lowpath.indexOf(RINGTONES_DIR) > 0);
+                        boolean notifications = (lowpath.indexOf(NOTIFICATIONS_DIR) > 0);
+                        boolean alarms = (lowpath.indexOf(ALARMS_DIR) > 0);
+                        boolean podcasts = (lowpath.indexOf(PODCAST_DIR) > 0);
+                        boolean music = (lowpath.indexOf(MUSIC_DIR) > 0) ||
+                                                    (!ringtones && !notifications && !alarms && !podcasts);
+                        boolean isaudio = MediaFile.isAudioFileType(mFileType);
+                        boolean isvideo = MediaFile.isVideoFileType(mFileType);
+                        boolean isimage = MediaFile.isImageFileType(mFileType);
+
+                        if (isaudio || isvideo || isimage) {
+                            if (mExternalIsEmulated && path.startsWith(mExternalStoragePath)) {
+                               // try to rewrite the path to bypass the sd card fuse layer
+                               String directPath = Environment.getMediaStorageDirectory() +
+                                                           path.substring(mExternalStoragePath.length());
+                               File f = new File(directPath);
+                               if (f.exists()) {
+                                     path = directPath;
+                               }
+                            }
+                        }
+                        // we only extract metadata for audio and video files
+                        if (isaudio || isvideo) {
+                            processFile(path, mimeType, this);
+                        }
+                        if (isimage) {
+                            processImageFile(path);
+                        }
+                        result = endFile(entry, ringtones, notifications, alarms, music, podcasts);
+                    }
+                }
+             } catch (RemoteException e) {
+                      Log.e(TAG, "RemoteException in MediaScanner.scanFile()", e);
+             }
+                     //long t2 = System.currentTimeMillis();
+                     //Log.d(TAG, "scanFile: " + path + " took " + (t2-t1));
+                     return result;
         }
 
         private int parseSubstring(String s, int start, int defaultValue) {
@@ -1185,6 +1294,154 @@ public class MediaScanner
         }
     }
 
+    private void generateInternalVolList() {
+        Cursor c = null;
+        String where = null;
+        String[] selectionArgs = null;
+
+        if (mExternalVolList == null) {
+            mInternalVolList = new ArrayList<FileEntryFastMediaScan>();
+        } else {
+            mInternalVolList.clear();
+        }
+        try {
+             where = MediaStore.Files.FileColumns._ID + ">?";
+             selectionArgs = new String[] { "" };
+
+             long lastId = Long.MIN_VALUE;
+             Uri limitUri = mFilesUri.buildUpon().appendQueryParameter("limit", "1000").build();
+
+             while (true) {
+                    selectionArgs[0] = "" + lastId;
+                    if (c != null) {
+                    c.close();
+                    c = null;
+                    }
+                    c = mMediaProvider.query(mPackageName, limitUri, FILES_FASTINSERT_PROJECTION ,
+                                 where, selectionArgs, MediaStore.Files.FileColumns._ID, null);
+                    if (c == null) {
+                        break;
+                    }
+                    int num = c.getCount();
+                    if (num == 0) {
+                        break;
+                    }
+                    while (c.moveToNext()) {
+                           FileEntryFastMediaScan entry = new FileEntryFastMediaScan (0,"",0,0,"",0,false,false);
+                           entry.mRowId = c.getLong(FILES_FASTINSERT_ID_COLUMN_INDEX);
+                           entry.mPath = c.getString(FILES_FASTINSERT_PATH_COLUMN_INDEX );
+                           entry.mFormat = c.getInt(FILES_FASTINSERT_FORMAT_COLUMN_INDEX );
+                           entry.mLastModified = c.getLong(FILES_FASTINSERT_DATE_MODIFIED_COLUMN_INDEX );
+                           entry.mSize = c.getLong(FILES_FASTINSERT_SIZE_COLUMN_INDEX );
+                           entry.mMimeType = c.getString(FILES_FASTINSERT_MIMETYPE_COLUMN_INDEX);
+                           lastId = entry.mRowId;
+                           entry.mIsMediaFile = isNoMediaFile(entry.mPath);
+                           File file = new File(entry.mPath);
+                           if (file.isDirectory())
+                               entry.mIsDirectory = true;
+                           else
+                           entry.mIsDirectory = false;
+                           mInternalVolList.add(entry);
+                    }
+             }
+
+      } catch (RemoteException e) {
+      } finally {
+             if (c != null) {
+                 c.close();
+             }
+      }
+
+   }
+
+   private void generateExternalVolList() {
+      Cursor c = null;
+      String where = null;
+      String[] selectionArgs = null;
+
+      if (mExternalVolList == null) {
+          mExternalVolList = new ArrayList<FileEntryFastMediaScan>();
+      } else {
+          mExternalVolList.clear();
+      }
+      try {
+             where = MediaStore.Files.FileColumns._ID + ">?";
+             selectionArgs = new String[] { "" };
+
+             long lastId = Long.MIN_VALUE;
+             Uri limitUri = mFilesUri.buildUpon().appendQueryParameter("limit", "1000").build();
+
+             while (true) {
+                    selectionArgs[0] = "" + lastId;
+                    if (c != null) {
+                    c.close();
+                    c = null;
+                    }
+                    c = mMediaProvider.query(mPackageName, limitUri, FILES_FASTINSERT_PROJECTION ,
+                                 where, selectionArgs, MediaStore.Files.FileColumns._ID, null);
+                    if (c == null) {
+                        break;
+                    }
+                    int num = c.getCount();
+                    if (num == 0) {
+                        break;
+                    }
+                    while (c.moveToNext()) {
+                           FileEntryFastMediaScan entry = new FileEntryFastMediaScan (0,"",0,0,"",0,false,false);
+                           entry.mRowId = c.getLong(FILES_FASTINSERT_ID_COLUMN_INDEX);
+                           entry.mPath = c.getString(FILES_FASTINSERT_PATH_COLUMN_INDEX );
+                           entry.mFormat = c.getInt(FILES_FASTINSERT_FORMAT_COLUMN_INDEX );
+                           entry.mLastModified = c.getLong(FILES_FASTINSERT_DATE_MODIFIED_COLUMN_INDEX );
+                           entry.mSize = c.getLong(FILES_FASTINSERT_SIZE_COLUMN_INDEX );
+                           entry.mMimeType = c.getString(FILES_FASTINSERT_MIMETYPE_COLUMN_INDEX);
+                           lastId = entry.mRowId;
+                           entry.mIsMediaFile = isNoMediaFile(entry.mPath);
+                           File file = new File(entry.mPath);
+                           if (file.isDirectory())
+                               entry.mIsDirectory = true;
+                           else
+                           entry.mIsDirectory = false;
+                           mExternalVolList.add(entry);
+                    }
+            }
+
+       } catch (RemoteException e) {
+       } finally {
+             if (c != null) {
+                 c.close();
+             }
+       }
+
+    }
+
+
+    private void  processInternalVolList () {
+       Iterator<FileEntryFastMediaScan> iterator = mInternalVolList.iterator();
+             while (iterator.hasNext()) {
+                 FileEntryFastMediaScan entry = iterator.next();
+                 if (entry != null) {
+                     mClient.doFastMediaScanFile(entry.mPath, entry.mMimeType, entry.mLastModified,
+                                            entry.mSize,entry.mIsDirectory, false, entry.mIsMediaFile );
+                 }
+             }
+
+    }
+
+
+    private void  processExternalVolList () {
+       Iterator<FileEntryFastMediaScan> iterator = mExternalVolList.iterator();
+             while (iterator.hasNext()) {
+                 FileEntryFastMediaScan entry = iterator.next();
+                 if (entry != null) {
+                     mClient.doFastMediaScanFile(entry.mPath, entry.mMimeType, entry.mLastModified,
+                                        entry.mSize,entry.mIsDirectory, false, entry.mIsMediaFile );
+                 }
+             }
+
+    }
+
+
+
     private boolean inScanDirectory(String path, String[] directories) {
         for (int i = 0; i < directories.length; i++) {
             String directory = directories[i];
@@ -1321,6 +1578,32 @@ public class MediaScanner
             mCaseInsensitivePaths = true;
         }
     }
+    private void initializeInternalVolume() {
+        mMediaProvider = mContext.getContentResolver().acquireProvider("media");
+
+        mAudioUri = Audio.Media.getContentUri(mInternalVolume);
+        mVideoUri = Video.Media.getContentUri(mInternalVolume);
+        mImagesUri = Images.Media.getContentUri(mInternalVolume);
+        mThumbsUri = Images.Thumbnails.getContentUri(mInternalVolume);
+        mFilesUri = Files.getContentUri(mInternalVolume);
+        mFilesUriNoNotify = mFilesUri.buildUpon().appendQueryParameter("nonotify", "1").build();
+    }
+
+     private void initializeExternalVolume() {
+        mMediaProvider = mContext.getContentResolver().acquireProvider("media");
+
+        mAudioUri = Audio.Media.getContentUri(mExternalVolume);
+        mVideoUri = Video.Media.getContentUri(mExternalVolume);
+        mImagesUri = Images.Media.getContentUri(mExternalVolume);
+        mThumbsUri = Images.Thumbnails.getContentUri(mExternalVolume);
+        mFilesUri = Files.getContentUri(mExternalVolume);
+        mFilesUriNoNotify = mFilesUri.buildUpon().appendQueryParameter("nonotify", "1").build();
+
+        mProcessPlaylists = true;
+        mProcessGenres = true;
+        mPlaylistsUri = Playlists.getContentUri(mExternalVolume);
+        mCaseInsensitivePaths = true;
+   }
 
     public void scanDirectories(String[] directories, String volumeName) {
         try {
@@ -1367,6 +1650,75 @@ public class MediaScanner
         }
     }
 
+    public void fastMediaScan_scanDirectories(String[] internalDirectories, String[] externalDirectories,
+                                                           String internalVolume, String externalVolume) {
+         try {
+             long time1=0, time2=0;
+             long start = System.currentTimeMillis();
+             mInternalVolume = internalVolume;
+             mExternalVolume = externalVolume;
+             mFastScan = true;
+             if (mInternalVolume != null ) {
+                 initializeInternalVolume();
+                 prescan(null, true);
+                 if (ENABLE_BULK_INSERTS) {
+                     // create MediaInserter for bulk inserts
+                     mMediaInserter = new MediaInserter(mMediaProvider, mPackageName, 500);
+                 }
+                 for (int i = 0; i < internalDirectories.length; i++) {
+                      processDirectory(internalDirectories[i], mClient);
+                 }
+                 if (ENABLE_BULK_INSERTS) {
+                 // flush remaining inserts
+                 mMediaInserter.flushAll();
+                 mMediaInserter = null;
+                 }
+             }
+             time1 = System.currentTimeMillis();
+             Log.d(TAG, "Time for internal S1: " + (time1 - start) + "ms\n");
+             if (mExternalVolume != null ) {
+                 initializeExternalVolume();
+                 prescan(null, true);
+                 if (ENABLE_BULK_INSERTS) {
+                    // create MediaInserter for bulk inserts
+                     mMediaInserter = new MediaInserter(mMediaProvider, mPackageName, 500);
+                }
+                for (int i = 0; i < externalDirectories.length; i++) {
+                     processDirectory(externalDirectories[i], mClient);
+                }
+                if (ENABLE_BULK_INSERTS) {
+                   // flush remaining inserts
+                    mMediaInserter.flushAll();
+                    mMediaInserter = null;
+                }
+             }
+             time2 = System.currentTimeMillis();
+             Log.d(TAG, "Time for external S1: " + (time2 - time1) + "ms\n");
+             if (mInternalVolume != null ) {
+                 generateInternalVolList();
+                 processInternalVolList();
+             }
+
+             if (mExternalVolume != null ) {
+                 generateExternalVolList();
+                 processExternalVolList();
+             }
+             long scan = System.currentTimeMillis();
+             postscan(externalDirectories);
+             long end = System.currentTimeMillis();
+             Log.d(TAG, "Total time for scan: " + (end - start) + "ms\n");
+
+           } catch (SQLException e) {
+              // this might happen if the SD card is removed while the media scanner is running
+             Log.e(TAG, "SQLException in MediaScanner.scan()", e);
+           } catch (UnsupportedOperationException e) {
+             // this might happen if the SD card is removed while the media scanner is running
+             Log.e(TAG, "UnsupportedOperationException in MediaScanner.scan()", e);
+           } catch (RemoteException e) {
+              Log.e(TAG, "RemoteException in MediaScanner.scan()", e);
+       }
+
+    }
     // this function is used to scan a single file
     public Uri scanSingleFile(String path, String volumeName, String mimeType) {
         try {
