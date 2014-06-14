@@ -470,7 +470,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         if (showOnTheGo) {
             mItems.add(
                     new SinglePressAction(R.drawable.ic_lock_onthego,
-                            R.string.global_action_onthego) {
+                            R.string.onthego) {
 
                         public void onPress() {
                             NamelessActions.processAction(mContext,
