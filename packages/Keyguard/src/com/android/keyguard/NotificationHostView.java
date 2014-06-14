@@ -25,9 +25,8 @@ import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.graphics.*;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
@@ -43,10 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.RemoteViews;
-import android.widget.ScrollView;
+import android.widget.*;
 
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.keyguard.KeyguardViewMediator.ViewMediatorCallback;
@@ -63,7 +59,7 @@ public class NotificationHostView extends FrameLayout {
     private static final float SWIPE = 0.2f;
     private static final int ANIMATION_MAX_DURATION = 300;
     private static final int PPMS = 2;
-    private static final int MAX_ALPHA = 150;
+    private static final int MAX_ALPHA = 200;
 
     //Here we store dimissed notifications so we don't add them again in onFinishInflate
     private static HashMap<String, StatusBarNotification> mDismissedNotifications = new HashMap<String, StatusBarNotification>();
@@ -244,6 +240,12 @@ public class NotificationHostView extends FrameLayout {
                                 mScrollView.requestDisallowInterceptTouchEvent(true);
                                 v.cancelPendingInputEvents();
                                 v.setTranslationX((!canBeDismissed() && x < 0) ? -4 * (float)Math.sqrt(-x) : x);
+
+                                int color = NotificationViewManager.config.notificationColor;
+                                int maxAlpha = (0xFF000000 & color) >> 3 * 8;
+                                v.setBackgroundColor(Color.argb(maxAlpha -
+                                                (int) (Math.abs(xr) / v.getWidth() * maxAlpha),
+                                        (0xFF0000 & color) >> 2*8, (0xFF00 & color) >> 1*8, (0xFF & color)));
                             }
                         }
                         break;
@@ -431,10 +433,15 @@ public class NotificationHostView extends FrameLayout {
                     LayoutParams.WRAP_CONTENT));
 
         remoteView.setX(mDisplayWidth - mNotificationMinHeight);
-        setBackgroundRecursive((ViewGroup)remoteView);
-        remoteView.setBackgroundColor(NotificationViewManager.config.notificationColor);
+        setBackgroundRecursive((ViewGroup) remoteView);
+        remoteView.setBackgroundColor(0x00FFFFFF & NotificationViewManager.config.notificationColor);
         remoteView.setAlpha(1f);
 
+        View v = remoteView.findViewById(android.R.id.icon);
+        if (v instanceof ImageView) {
+            ImageView icon = (ImageView)v;
+            icon.setBackgroundColor(0);
+        }
         remoteView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -447,6 +454,7 @@ public class NotificationHostView extends FrameLayout {
                 return true;
             }
         });
+
 
         if (oldView != null){
             //The notification already exists, so it was just changed. Remove the old view and add the new one
@@ -466,6 +474,7 @@ public class NotificationHostView extends FrameLayout {
                         } else {
                             oldView.getChildAt(0).setX(0);
                         }
+                        oldView.getChildAt(0).setBackgroundColor(NotificationViewManager.config.notificationColor);
                     }
                     oldView.statusBarNotification = sbn;
                 }
@@ -518,7 +527,7 @@ public class NotificationHostView extends FrameLayout {
             if (v.shown) {
                 if (mShownNotifications > 0) mShownNotifications--;
                 if (mShownNotifications == 0) {
-                    animateBackgroundColor(0);
+                    animateBackgroundColor(this, 0);
                 }
             }
             if (!sbn.isClearable()) {
@@ -530,7 +539,6 @@ public class NotificationHostView extends FrameLayout {
             v.onAnimationEnd = new Runnable() {
                 public void run() {
                     if (dismiss) {
-                        Log.e(TAG, "dismiss");
                         dismiss(sbn);
                     }
                     mNotifView.removeView(v);
@@ -586,8 +594,9 @@ public class NotificationHostView extends FrameLayout {
             animateTranslation(nv, targetX, 0, duration);
             if (mShownNotifications == 0 ||
                     (mShownNotifications == 1 && nv.shown)) {
-                animateBackgroundColor(Color.argb(MAX_ALPHA, 0, 0, 0));
+                animateBackgroundColor(this, Color.argb(MAX_ALPHA, 0, 0, 0));
             }
+            animateBackgroundColor(v, NotificationViewManager.config.notificationColor);
             if (!nv.shown) {
                 nv.shown = true;
                 mShownNotifications++;
@@ -602,7 +611,8 @@ public class NotificationHostView extends FrameLayout {
         int targetX = Math.round(mDisplayWidth - mNotificationMinHeight);
         int duration = getDurationFromDistance(v, targetX, (int)v.getY(), Math.abs(nv.getVelocity()));
         if (mShownNotifications > 0 && nv.shown) mShownNotifications--;
-        if (mShownNotifications == 0) animateBackgroundColor(0);
+        if (mShownNotifications == 0) animateBackgroundColor(this, 0);
+        animateBackgroundColor(v, 0x00FFFFFF & NotificationViewManager.config.notificationColor);
         animateTranslation(nv, targetX, 0, duration);
         nv.shown = false;
         setButtonDrawable();
@@ -647,12 +657,12 @@ public class NotificationHostView extends FrameLayout {
         }
     }
 
-    private void animateBackgroundColor(final int targetColor) {
-        if (!(getBackground() instanceof ColorDrawable)) {
-            setBackgroundColor(0x0);
+    private void animateBackgroundColor(final View v, final int targetColor) {
+        if (!(v.getBackground() instanceof ColorDrawable)) {
+            v.setBackgroundColor(0x0);
         }
-        final ObjectAnimator colorFade = ObjectAnimator.ofObject(this, "backgroundColor", new ArgbEvaluator(),
-                ((ColorDrawable)getBackground()).getColor(),
+        final ObjectAnimator colorFade = ObjectAnimator.ofObject(v, "backgroundColor", new ArgbEvaluator(),
+                ((ColorDrawable)v.getBackground()).getColor(),
                 targetColor);
         colorFade.setDuration(ANIMATION_MAX_DURATION);
         Runnable r = new Runnable() {
