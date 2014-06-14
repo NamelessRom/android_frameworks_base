@@ -3477,6 +3477,12 @@ public final class Settings {
          */
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
+         /**
+          * Whether to enable navigation on the  status bar
+          *
+          * @hide
+          */
+        public static final String STATUS_BAR_NAVIGATION = "status_bar_navigation";
         /**
          * Disable FC Notifications
          * @hide
@@ -4148,6 +4154,8 @@ public final class Settings {
          * @hide
          */
         public static final String VOLUME_KEY_CURSOR_CONTROL = "volume_key_cursor_control";
+
+        public static final String NAV_BAR_POS = "nav_bar_pos";
 
         /**
          * toggle to "fix" the following: (found in NotificationManagerService)

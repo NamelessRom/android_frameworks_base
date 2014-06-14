@@ -236,6 +236,226 @@
             />
     </FrameLayout>
 
+    <!-- layout for portrait nav bar left -->
+    <FrameLayout android:id="@+id/rot90left"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:paddingTop="0dp"
+        >
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="left"
+            android:layout_gravity="left"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:id="@+id/container"
+            >
+            <include layout="@layout/left_navigation_bar_land"/>
+
+        </LinearLayout>
+
+                <!-- lights out layout to match exactly -->
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="left"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible"
+            >
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+            <!-- lights out layout to match exactly -->
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="left"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp"
+                android:id="@+id/lights_out"
+                android:visibility="gone"
+                >
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+            </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <com.android.systemui.statusbar.policy.KeyButtonView
+            android:layout_width="@dimen/navigation_key_width"
+            android:id="@+id/search_light"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/search_light"
+            android:scaleType="center"
+            android:visibility="gone"
+            />
+
+        <com.android.systemui.statusbar.policy.DeadZone
+            android:id="@+id/deadzone"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            systemui:minSize="@dimen/navigation_bar_deadzone_size"
+            systemui:maxSize="@dimen/navigation_bar_deadzone_size_max"
+            systemui:holdTime="@integer/navigation_bar_deadzone_hold"
+            systemui:decayTime="@integer/navigation_bar_deadzone_decay"
+            systemui:orientation="vertical"
+            android:layout_gravity="top"
+            />
+    </FrameLayout>
+
+    <!-- layout for portrait nav bar right -->
+    <FrameLayout android:id="@+id/rot90right"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:paddingTop="0dp"
+        >
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="right"
+            android:layout_gravity="right"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:id="@+id/container"
+            >
+            <include layout="@layout/right_navigation_bar_land"/>
+
+        </LinearLayout>
+
+                <!-- lights out layout to match exactly -->
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="right"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible"
+            >
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+            <!-- lights out layout to match exactly -->
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="right"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp"
+                android:id="@+id/lights_out"
+                android:visibility="gone"
+                >
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+                <ImageView
+                    android:layout_width="@dimen/navigation_key_width" 
+                    android:paddingLeft="0dp" 
+                    android:paddingRight="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_sysbar_lights_out_dot_large"
+                    android:scaleType="center"
+                    />
+            </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <com.android.systemui.statusbar.policy.KeyButtonView
+            android:layout_width="@dimen/navigation_key_width"
+            android:id="@+id/search_light"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/search_light"
+            android:scaleType="center"
+            android:visibility="gone"
+            />
+
+        <com.android.systemui.statusbar.policy.DeadZone
+            android:id="@+id/deadzone"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            systemui:minSize="@dimen/navigation_bar_deadzone_size"
+            systemui:maxSize="@dimen/navigation_bar_deadzone_size_max"
+            systemui:holdTime="@integer/navigation_bar_deadzone_hold"
+            systemui:decayTime="@integer/navigation_bar_deadzone_decay"
+            systemui:orientation="vertical"
+            android:layout_gravity="top"
+            />
+    </FrameLayout>
+
     <!-- not used -->
     <View android:id="@+id/rot270"
         android:layout_height="match_parent"
