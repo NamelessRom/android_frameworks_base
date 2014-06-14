@@ -83,6 +83,9 @@ import com.android.systemui.statusbar.policy.NotificationRowLayout;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.util.Slog;
+import android.provider.Settings;
+
 public abstract class BaseStatusBar extends SystemUI implements
         CommandQueue.Callbacks {
     public static final String TAG = "StatusBar";
@@ -210,11 +213,15 @@ public abstract class BaseStatusBar extends SystemUI implements
                     Settings.System.EXPANDED_DESKTOP_STYLE), false, this);
             resolver.registerContentObserver(Settings.Nameless.getUriFor(
                     Settings.Nameless.NEW_RECENTS_SCREEN), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAV_BAR_POS), false, this);
             update();
         }
 
         @Override
         public void onChange(boolean selfChange) {
+            /** To take over changes without reboot! **/
+             android.os.Process.killProcess(android.os.Process.myPid());
             update();
         }
 
@@ -1276,6 +1283,17 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     public boolean inKeyguardRestrictedInputMode() {
         return KeyguardTouchDelegate.getInstance(mContext).isInputRestricted();
+    }
+
+    public int getExpandedDesktopMode() {
+        ContentResolver resolver = mContext.getContentResolver();
+        boolean expanded = Settings.System.getIntForUser(resolver,
+                Settings.System.EXPANDED_DESKTOP_STATE, 0, UserHandle.USER_CURRENT) == 1;
+        if (expanded) {
+            return Settings.System.getIntForUser(resolver,
+                    Settings.System.EXPANDED_DESKTOP_STYLE, 0, UserHandle.USER_CURRENT);
+        }
+        return 0;
     }
 
     public void setInteracting(int barWindow, boolean interacting) {
