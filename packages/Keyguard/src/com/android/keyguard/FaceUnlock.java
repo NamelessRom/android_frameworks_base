@@ -37,7 +37,7 @@ import android.view.View;
 
 public class FaceUnlock implements BiometricSensorUnlock, Handler.Callback {
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final String TAG = "FULLockscreen";
 
     private final Context mContext;

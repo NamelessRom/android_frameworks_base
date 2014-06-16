@@ -21,6 +21,7 @@ import android.content.res.TypedArray;
 import android.text.SpannableStringBuilder;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.Button;
@@ -40,8 +41,11 @@ public class NumPadKey extends Button {
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View thisView) {
+            Log.e("NumPadKey", "View.OnClick()");
             if (mTextView == null) {
+                Log.e("NumPadKey", "mTextView == null");
                 if (mTextViewResId > 0) {
+                    Log.e("NumPadKey", "mTextViewResId > 0");
                     final View v = NumPadKey.this.getRootView().findViewById(mTextViewResId);
                     if (v != null && v instanceof TextView) {
                         mTextView = (TextView) v;
@@ -50,7 +54,12 @@ public class NumPadKey extends Button {
             }
             // check for time-based lockouts
             if (mTextView != null && mTextView.isEnabled()) {
+                Log.e("NumPadKey", "mTextView != null && mTextView.isEnabled()");
                 mTextView.append(String.valueOf(mDigit));
+            } else if (mTextView != null) {
+                Log.e("NumPadKey", "mTextView == null");
+            } else if (!mTextView.isEnabled()) {
+                Log.e("NumPadKey", "!mTextView.isEnabled()");
             }
             doHapticKeyClick();
         }

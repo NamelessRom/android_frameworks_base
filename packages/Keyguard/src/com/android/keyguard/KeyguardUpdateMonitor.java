@@ -72,8 +72,8 @@ import java.util.ArrayList;
 public class KeyguardUpdateMonitor {
 
     private static final String TAG = "KeyguardUpdateMonitor";
-    private static final boolean DEBUG = false;
-    private static final boolean DEBUG_SIM_STATES = DEBUG || false;
+    private static final boolean DEBUG = true;
+    private static final boolean DEBUG_SIM_STATES = DEBUG;
     private static final int FAILED_BIOMETRIC_UNLOCK_ATTEMPTS_BEFORE_BACKUP = 3;
     private static final int LOW_BATTERY_THRESHOLD = 20;
 
