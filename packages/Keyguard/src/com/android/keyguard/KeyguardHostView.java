@@ -316,7 +316,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
     };
 
-    private static final boolean isMusicPlaying(int playbackState) {
+    private static boolean isMusicPlaying(int playbackState) {
         // This should agree with the list in AudioService.isPlaystateActive()
         switch (playbackState) {
             case RemoteControlClient.PLAYSTATE_PLAYING:
@@ -940,8 +940,8 @@ public class KeyguardHostView extends KeyguardViewBase {
             } else {
                 return super.onClickHandler(view, pendingIntent, fillInIntent);
             }
-        };
-    };
+        }
+    }
 
     // Used to ignore callbacks from methods that are no longer current (e.g. face unlock).
     // This avoids unwanted asynchronous events from messing with the state.
