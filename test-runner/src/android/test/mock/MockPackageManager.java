@@ -400,6 +400,7 @@ public class MockPackageManager extends PackageManager {
         throw new UnsupportedOperationException();
     }
 
+    /** @hide */
     @Override
     public Resources getResourcesForApplicationAsUser(String appPackageName, int userId) {
         throw new UnsupportedOperationException();
@@ -412,6 +413,7 @@ public class MockPackageManager extends PackageManager {
         return null;
     }
 
+    /** @hide */
     @Override
     public Resources getThemedResourcesForApplication(String appPackageName, String themePkgName)
             throws NameNotFoundException {
