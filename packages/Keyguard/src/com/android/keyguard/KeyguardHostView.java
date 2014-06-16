@@ -316,7 +316,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
     };
 
-    private static final boolean isMusicPlaying(int playbackState) {
+    private static boolean isMusicPlaying(int playbackState) {
         // This should agree with the list in AudioService.isPlaystateActive()
         switch (playbackState) {
             case RemoteControlClient.PLAYSTATE_PLAYING:
@@ -438,6 +438,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     private final OnLongClickListener mFastUnlockClickListener = new OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
+            Log.d("KeyguardHostView", "mFastUnlockClickListener.onClick()");
             if (mLockPatternUtils.isTactileFeedbackEnabled()) {
                 v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
                         HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
@@ -628,6 +629,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
 
         public void dismiss(boolean authenticated) {
+            Log.d("KeyguardSecurityCallback", "dismiss("+String.valueOf(authenticated)+")");
             showNextSecurityScreenOrFinish(authenticated);
         }
 
@@ -660,6 +662,12 @@ public class KeyguardHostView extends KeyguardViewBase {
         @Override
         public void setOnDismissAction(OnDismissAction action) {
             KeyguardHostView.this.setOnDismissAction(action);
+        }
+
+        @Override
+        public SecurityMode getSecurityMode() {
+            if (mSecurityModel != null) return mSecurityModel.getSecurityMode();
+            return null;
         }
 
     };
@@ -934,14 +942,15 @@ public class KeyguardHostView extends KeyguardViewBase {
                 if (hostView.mViewStateManager.isChallengeShowing()) {
                     hostView.mViewStateManager.showBouncer(true);
                 } else {
+                    Log.e("KeyguardHostView", "hostView.mCallback.dismiss(false)");
                     hostView.mCallback.dismiss(false);
                 }
                 return true;
             } else {
                 return super.onClickHandler(view, pendingIntent, fillInIntent);
             }
-        };
-    };
+        }
+    }
 
     // Used to ignore callbacks from methods that are no longer current (e.g. face unlock).
     // This avoids unwanted asynchronous events from messing with the state.
@@ -979,6 +988,11 @@ public class KeyguardHostView extends KeyguardViewBase {
 
         @Override
         public void dismiss(boolean securityVerified) {
+        }
+
+        @Override
+        public SecurityMode getSecurityMode() {
+            return null;
         }
     };
 
@@ -1799,6 +1813,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     public boolean handleMenuKey() {
         // The following enables the MENU key to work for testing automation
         if (shouldEnableMenuKey()) {
+            Log.d("KeyguardHostView", "shouldEnableMenuKey()");
             showNextSecurityScreenOrFinish(false);
             return true;
         }
@@ -1808,6 +1823,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     public boolean handleHomeKey() {
         // The following enables the HOME key to work for testing automation
         if (shouldEnableHomeKey()) {
+            Log.d("KeyguardHostView", "shouldEnableHomeKey()");
             showNextSecurityScreenOrFinish(false);
             return true;
         }
@@ -1817,6 +1833,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     public boolean handleCameraKey() {
         // The following enables the CAMERA key to work for testing automation
         if (shouldEnableCameraKey()) {
+            Log.d("KeyguardHostView", "shouldEnableCameraKey()");
             showNextSecurityScreenOrFinish(false);
             return true;
         }
@@ -1831,6 +1848,7 @@ public class KeyguardHostView extends KeyguardViewBase {
             return true;
         }
         if (mCurrentSecuritySelection != SecurityMode.None) {
+            Log.d("KeyguardHostView", "mCallback.dismiss(false)");
             mCallback.dismiss(false);
             return true;
         }
@@ -1841,6 +1859,7 @@ public class KeyguardHostView extends KeyguardViewBase {
      *  Dismisses the keyguard by going to the next screen or making it gone.
      */
     public void dismiss() {
+        Log.d("KeyguardHostView", "dismiss()");
         showNextSecurityScreenOrFinish(false);
     }
 

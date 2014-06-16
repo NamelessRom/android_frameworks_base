@@ -127,6 +127,7 @@ public class MSimKeyguardSimPinView extends KeyguardSimPinView {
         //Before closing the keyguard, report back that the sim is unlocked
         //so it knows right away.
         if (mSubscription >= 0) updateMonitor.reportSimUnlocked(mSubscription);
+        Log.d("MSimKeyguardSimPinView", "mCallback.dismiss(true)");
         mCallback.dismiss(true);
     }
 

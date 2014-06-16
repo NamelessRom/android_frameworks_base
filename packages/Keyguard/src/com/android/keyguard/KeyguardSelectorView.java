@@ -108,10 +108,12 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                     case R.drawable.ic_lockscreen_unlock_phantom:
                     case R.drawable.ic_lockscreen_unlock:
                         mCallback.userActivity(0);
+                        Log.d("KeyguardSelectorView", "mCallback.dismiss(false)1");
                         mCallback.dismiss(false);
                     break;
                 }
             } else if (target == mTargetOffset) {
+                Log.d("KeyguardSelectorView", "mCallback.dismiss(false)2");
                 mCallback.dismiss(false);
             } else {
                 int realTarget = target - mTargetOffset - 1;
@@ -119,6 +121,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
                         ? mStoredTargets[realTarget] : null;
 
                 if (LockscreenTargetUtils.EMPTY_TARGET.equals(targetUri)) {
+                    Log.d("KeyguardSelectorView", "mCallback.dismiss(false)3");
                     mCallback.dismiss(false);
                 } else {
                     try {

@@ -47,7 +47,7 @@ import java.util.List;
 public class KeyguardPatternView extends LinearLayout implements KeyguardSecurityView {
 
     private static final String TAG = "SecurityPatternView";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     // how long before we clear the wrong pattern
     private static final int PATTERN_CLEAR_TIMEOUT_MS = 2000;
@@ -295,6 +295,7 @@ public class KeyguardPatternView extends LinearLayout implements KeyguardSecurit
             if (mLockPatternUtils.checkPattern(pattern)) {
                 mCallback.reportSuccessfulUnlockAttempt();
                 mLockPatternView.setDisplayMode(LockPatternView.DisplayMode.Correct);
+                Log.d("KeyguardPatternView", "mCallback.dismiss(true)");
                 mCallback.dismiss(true);
             } else {
                 if (pattern.size() > MIN_PATTERN_BEFORE_POKE_WAKELOCK) {

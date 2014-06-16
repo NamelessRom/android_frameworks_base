@@ -26,6 +26,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -157,10 +158,17 @@ public abstract class KeyguardAbsKeyInputView extends LinearLayout
                     mCallback.userActivity(0);
                 }
                 if (mQuickUnlock) {
+                    final KeyguardSecurityModel.SecurityMode secMode = mCallback != null
+                            ? mCallback.getSecurityMode()
+                            : null;
                     String entry = mPasswordEntry.getText().toString();
                     if (entry.length() > MINIMUM_PASSWORD_LENGTH_BEFORE_REPORT
-                            && mLockPatternUtils.checkPassword(entry)) {
+                            && mLockPatternUtils.checkPassword(entry)
+                            && secMode != null
+                            && secMode != KeyguardSecurityModel.SecurityMode.SimPin
+                            && secMode != KeyguardSecurityModel.SecurityMode.SimPuk) {
                         mCallback.reportSuccessfulUnlockAttempt();
+                        Log.d("KeyguardAbsKeyInputView", "mCallback.dismiss(true)1");
                         mCallback.dismiss(true);
                     }
                 }
@@ -193,6 +201,7 @@ public abstract class KeyguardAbsKeyInputView extends LinearLayout
         String entry = mPasswordEntry.getText().toString();
         if (mLockPatternUtils.checkPassword(entry)) {
             mCallback.reportSuccessfulUnlockAttempt();
+            Log.d("KeyguardAbsKeyInputView", "mCallback.dismiss(true)2");
             mCallback.dismiss(true);
         } else if (entry.length() > MINIMUM_PASSWORD_LENGTH_BEFORE_REPORT ) {
             // to avoid accidental lockout, only count attempts that are long enough to be a

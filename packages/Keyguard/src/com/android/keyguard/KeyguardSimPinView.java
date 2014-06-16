@@ -271,6 +271,7 @@ public class KeyguardSimPinView extends KeyguardAbsKeyInputView
                                 // before closing the keyguard, report back that the sim is unlocked
                                 // so it knows right away.
                                 KeyguardUpdateMonitor.getInstance(getContext()).reportSimUnlocked();
+                                Log.d("KeyguardSimPinView", "mCallback.dismiss(true)");
                                 mCallback.dismiss(true);
                             } else {
                                 if (result == PhoneConstants.PIN_PASSWORD_INCORRECT) {

@@ -65,4 +65,6 @@ public interface KeyguardSecurityCallback {
      */
     void setOnDismissAction(OnDismissAction action);
 
+    KeyguardSecurityModel.SecurityMode getSecurityMode();
+
 }

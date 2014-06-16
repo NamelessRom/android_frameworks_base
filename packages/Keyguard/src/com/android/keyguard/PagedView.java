@@ -64,8 +64,8 @@ import java.util.ArrayList;
 public abstract class PagedView extends ViewGroup implements ViewGroup.OnHierarchyChangeListener {
     private static final int WARP_SNAP_DURATION = 160;
     private static final String TAG = "WidgetPagedView";
-    private static final boolean DEBUG = false;
-    private static final boolean DEBUG_WARP = false;
+    private static final boolean DEBUG = true;
+    private static final boolean DEBUG_WARP = true;
     protected static final int INVALID_PAGE = -1;
     private static final int WARP_PEEK_ANIMATION_DURATION = 150;
     private static final float WARP_ANIMATE_AMOUNT = -75.0f; // in dip
