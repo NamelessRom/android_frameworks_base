@@ -40,19 +40,30 @@ import android.util.Log;
  * these calls.</p>
  *
  */
+
 public class MediaActionSound {
+
     private static final int NUM_MEDIA_SOUND_STREAMS = 1;
 
+    private static final String PROP_CAMERA_SOUND = "persist.sys.camera-sound";
+    
     private SoundPool mSoundPool;
     private int[]     mSoundIds;
     private int       mSoundIdToPlay;
 
-    private static final String[] SOUND_FILES = {
-        "/system/media/audio/ui/camera_click.ogg",
-        "/system/media/audio/ui/camera_focus.ogg",
-        "/system/media/audio/ui/VideoRecord.ogg",
-        "/system/media/audio/ui/VideoRecord.ogg"
+    private static String[] SOUND_FILES = {
     };
+
+    if (SystemProperties.getBoolean(PROP_CAMERA_SOUND, false)) {
+
+        String[] SOUND_FILES = {
+                "/system/media/audio/ui/camera_click.ogg",
+                "/system/media/audio/ui/camera_focus.ogg",
+                "/system/media/audio/ui/VideoRecord.ogg",
+                "/system/media/audio/ui/VideoRecord.ogg"
+        };
+
+    }
 
     private static final String TAG = "MediaActionSound";
     /**
@@ -89,7 +100,6 @@ public class MediaActionSound {
 
     private static final int SOUND_NOT_LOADED = -1;
 
-    private static final String PROP_CAMERA_SOUND = "persist.sys.camera-sound";
 
     /**
      * Construct a new MediaActionSound instance. Only a single instance is
@@ -175,19 +185,19 @@ public class MediaActionSound {
 
     private SoundPool.OnLoadCompleteListener mLoadCompleteListener =
             new SoundPool.OnLoadCompleteListener() {
-        public void onLoadComplete(SoundPool soundPool,
-                int sampleId, int status) {
-            if (status == 0) {
-                if (mSoundIdToPlay == sampleId) {
-                    soundPool.play(sampleId, 1.0f, 1.0f, 0, 0, 1.0f);
-                    mSoundIdToPlay = SOUND_NOT_LOADED;
+                public void onLoadComplete(SoundPool soundPool,
+                                           int sampleId, int status) {
+                    if (status == 0) {
+                        if (mSoundIdToPlay == sampleId) {
+                            soundPool.play(sampleId, 1.0f, 1.0f, 0, 0, 1.0f);
+                            mSoundIdToPlay = SOUND_NOT_LOADED;
+                        }
+                    } else {
+                        Log.e(TAG, "Unable to load sound for playback (status: " +
+                                status + ")");
+                    }
                 }
-            } else {
-                Log.e(TAG, "Unable to load sound for playback (status: " +
-                        status + ")");
-            }
-        }
-    };
+            };
 
     /**
      * Free up all audio resources used by this MediaActionSound instance. Do
