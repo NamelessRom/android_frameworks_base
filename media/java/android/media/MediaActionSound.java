@@ -48,10 +48,10 @@ public class MediaActionSound {
     private int       mSoundIdToPlay;
 
     private static final String[] SOUND_FILES = {
-        "/system/media/audio/ui/camera_click.ogg",
-        "/system/media/audio/ui/camera_focus.ogg",
-        "/system/media/audio/ui/VideoRecord.ogg",
-        "/system/media/audio/ui/VideoRecord.ogg"
+            "/system/media/audio/ui/camera_click.ogg",
+            "/system/media/audio/ui/camera_focus.ogg",
+            "/system/media/audio/ui/VideoRecord.ogg",
+            "/system/media/audio/ui/VideoRecord.ogg"
     };
 
     private static final String TAG = "MediaActionSound";
@@ -161,6 +161,9 @@ public class MediaActionSound {
      * @see #STOP_VIDEO_RECORDING
      */
     public synchronized void play(int soundName) {
+        if (SystemProperties.getBoolean(PROP_CAMERA_SOUND, true)) {
+            throw new RuntimeException("Shutter sounds are disabled");
+        }
         if (soundName < 0 || soundName >= SOUND_FILES.length) {
             throw new RuntimeException("Unknown sound requested: " + soundName);
         }
@@ -175,19 +178,19 @@ public class MediaActionSound {
 
     private SoundPool.OnLoadCompleteListener mLoadCompleteListener =
             new SoundPool.OnLoadCompleteListener() {
-        public void onLoadComplete(SoundPool soundPool,
-                int sampleId, int status) {
-            if (status == 0) {
-                if (mSoundIdToPlay == sampleId) {
-                    soundPool.play(sampleId, 1.0f, 1.0f, 0, 0, 1.0f);
-                    mSoundIdToPlay = SOUND_NOT_LOADED;
+                public void onLoadComplete(SoundPool soundPool,
+                                           int sampleId, int status) {
+                    if (status == 0) {
+                        if (mSoundIdToPlay == sampleId) {
+                            soundPool.play(sampleId, 1.0f, 1.0f, 0, 0, 1.0f);
+                            mSoundIdToPlay = SOUND_NOT_LOADED;
+                        }
+                    } else {
+                        Log.e(TAG, "Unable to load sound for playback (status: " +
+                                status + ")");
+                    }
                 }
-            } else {
-                Log.e(TAG, "Unable to load sound for playback (status: " +
-                        status + ")");
-            }
-        }
-    };
+            };
 
     /**
      * Free up all audio resources used by this MediaActionSound instance. Do
