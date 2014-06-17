@@ -40,12 +40,22 @@ import android.util.Log;
  * these calls.</p>
  *
  */
+
 public class MediaActionSound {
+
     private static final int NUM_MEDIA_SOUND_STREAMS = 1;
 
     private SoundPool mSoundPool;
     private int[]     mSoundIds;
     private int       mSoundIdToPlay;
+
+
+    if (SystemProperties.getBoolean(PROP_CAMERA_SOUND, true)) {
+
+    private static final String[] SOUND_FILES = {
+    };
+
+    } else {
 
     private static final String[] SOUND_FILES = {
         "/system/media/audio/ui/camera_click.ogg",
@@ -53,6 +63,8 @@ public class MediaActionSound {
         "/system/media/audio/ui/VideoRecord.ogg",
         "/system/media/audio/ui/VideoRecord.ogg"
     };
+
+    }
 
     private static final String TAG = "MediaActionSound";
     /**
