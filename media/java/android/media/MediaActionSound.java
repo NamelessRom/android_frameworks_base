@@ -40,12 +40,22 @@ import android.util.Log;
  * these calls.</p>
  *
  */
+
 public class MediaActionSound {
+
     private static final int NUM_MEDIA_SOUND_STREAMS = 1;
 
     private SoundPool mSoundPool;
     private int[]     mSoundIds;
     private int       mSoundIdToPlay;
+
+
+    if (SystemProperties.getBoolean(PROP_CAMERA_SOUND, true)) {
+
+    private static final String[] SOUND_FILES = {
+    };
+
+    } else {
 
     private static final String[] SOUND_FILES = {
         "/system/media/audio/ui/camera_click.ogg",
@@ -53,6 +63,8 @@ public class MediaActionSound {
         "/system/media/audio/ui/VideoRecord.ogg",
         "/system/media/audio/ui/VideoRecord.ogg"
     };
+
+    }
 
     private static final String TAG = "MediaActionSound";
     /**
@@ -161,16 +173,18 @@ public class MediaActionSound {
      * @see #STOP_VIDEO_RECORDING
      */
     public synchronized void play(int soundName) {
-        if (soundName < 0 || soundName >= SOUND_FILES.length) {
-            throw new RuntimeException("Unknown sound requested: " + soundName);
-        }
-        if (mSoundIds[soundName] == SOUND_NOT_LOADED) {
-            mSoundIdToPlay =
-                    mSoundPool.load(SOUND_FILES[soundName], 1);
-            mSoundIds[soundName] = mSoundIdToPlay;
-        } else {
-            mSoundPool.play(mSoundIds[soundName], 1.0f, 1.0f, 0, 0, 1.0f);
-        }
+        if (SystemProperties.getBoolean(PROP_CAMERA_SOUND, true)) {
+            if (soundName < 0 || soundName >= SOUND_FILES.length) {
+                throw new RuntimeException("Unknown sound requested: " + soundName);
+            }
+            if (mSoundIds[soundName] == SOUND_NOT_LOADED) {
+                mSoundIdToPlay =
+                        mSoundPool.load(SOUND_FILES[soundName], 1);
+                mSoundIds[soundName] = mSoundIdToPlay;
+            } else {
+                mSoundPool.play(mSoundIds[soundName], 1.0f, 1.0f, 0, 0, 1.0f);
+            }
+         }
     }
 
     private SoundPool.OnLoadCompleteListener mLoadCompleteListener =
