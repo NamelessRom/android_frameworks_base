@@ -174,7 +174,7 @@ import javax.net.ssl.SSLSession;
 public class ConnectivityService extends IConnectivityManager.Stub {
     private static final String TAG = "ConnectivityService";
 
-    protected static final boolean DBG = true;
+    protected static final boolean DBG = false;
     protected static final boolean VDBG = false;
 
     protected static final boolean LOGD_RULES = false;
