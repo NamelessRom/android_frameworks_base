@@ -52,6 +52,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.SystemProperties;
+import android.os.UserHandle;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
@@ -227,11 +228,11 @@ public class KeyguardViewManager {
     }
 
     private boolean shouldEnableScreenRotation() {
-        Resources res = mContext.getResources();
-        boolean enableLockScreenRotation = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_ROTATION, 0) != 0;
-        boolean enableAccelerometerRotation = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.ACCELEROMETER_ROTATION, 1) != 0;
+        final ContentResolver resolver = mContext.getContentResolver();
+        boolean enableLockScreenRotation = Settings.System.getBooleanForUser(resolver,
+                Settings.System.LOCKSCREEN_ROTATION, true, UserHandle.USER_CURRENT);
+        boolean enableAccelerometerRotation = Settings.System.getIntForUser(resolver,
+                Settings.System.ACCELEROMETER_ROTATION, 1, UserHandle.USER_CURRENT) != 0;
         return SystemProperties.getBoolean("lockscreen.rot_override",false)
                 || (enableLockScreenRotation && enableAccelerometerRotation);
     }
