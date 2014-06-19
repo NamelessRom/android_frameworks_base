@@ -3549,6 +3549,18 @@ public final class Settings {
          */
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
+         /**
+          * Whether to enable navigation on the status bar
+          *
+          * @hide
+          */
+        public static final String STATUS_BAR_NAVIGATION = "status_bar_navigation";
+
+        /**
+         * @hide
+         */
+        public static final String NAV_BAR_POSITION = "nav_bar_position";
+
         /**
          * Disable FC Notifications
          * @hide

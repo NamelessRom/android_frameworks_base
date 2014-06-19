@@ -429,6 +429,8 @@ public interface WindowManagerPolicy {
         public void shutdown(boolean confirm);
         public void rebootSafeMode(boolean confirm);
         public void reboot();
+        public void recovery();
+        public void bootloader();
         public boolean isShutdownSequenceStarted();
 
         /**
