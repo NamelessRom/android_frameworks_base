@@ -2093,6 +2093,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    private void loadScreenAnimationStyle(SQLiteDatabase db) {
+        db.beginTransaction();
+        SQLiteStatement stmt = null;
+        try {
+            stmt = db.compileStatement("INSERT OR REPLACE INTO system(name,value)"
+                    + " VALUES(?,?);");
+            loadIntegerSetting(stmt, Settings.System.SCREEN_ANIMATION_STYLE,
+                    R.integer.def_screen_animation_style);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            if (stmt != null) stmt.close();
+        }
+    }
+
+    private void loadRibbonSetting(SQLiteStatement stmt) {
+        String tiles = mContext.getResources().getString(R.string.def_quick_settings_ribbon_tiles);
+        if (!TextUtils.isEmpty(tiles)) {
+            loadSetting(stmt, Settings.System.QS_QUICK_ACCESS, "1");
+            loadSetting(stmt, Settings.System.QS_QUICK_ACCESS_LINKED, "0");
+            loadSetting(stmt, Settings.System.QUICK_SETTINGS_RIBBON_TILES, tiles);
+        }
+    }
+
+    private void loadHeadsUpSetting(SQLiteStatement stmt) {
+        String headsUpValues = mContext.getResources()
+                .getString(R.string.def_heads_up_notification_values);
+        if (!TextUtils.isEmpty(headsUpValues)) {
+            loadSetting(stmt, Settings.System.HEADS_UP_NOTIFICATION, "0");
+            loadSetting(stmt, Settings.System.HEADS_UP_CUSTOM_VALUES, headsUpValues);
+        }
+    }
+
     private void loadSettings(SQLiteDatabase db) {
         loadSystemSettings(db);
         loadSecureSettings(db);
@@ -2167,6 +2200,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 loadStringSetting(stmt, Settings.System.LOCKSCREEN_TARGETS,
                         R.string.def_lockscreen_targets_no_telephony);
             }
+
+            loadIntegerSetting(stmt, Settings.System.DOUBLE_TAP_SLEEP_GESTURE,
+                    R.integer.def_double_tap_sleep_gesture);
+
+            loadRibbonSetting(stmt);
+
+            loadHeadsUpSetting(stmt);
+
         } finally {
             if (stmt != null) stmt.close();
         }
