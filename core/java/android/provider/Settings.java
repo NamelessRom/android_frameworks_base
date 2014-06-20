@@ -1285,6 +1285,12 @@ public final class Settings {
          */
         public static final String HARDWARE_KEYS_DISABLE = "hardware_keys_disable";
 
+        /**
+         * Whether to use the non intrusive ui for incoming calls or not
+         * @hide
+         */
+        public static final String NON_INTRUSIVE_UI = "non_intrusive_ui";
+
     }
 
     /**
