@@ -18,4 +18,21 @@
 ** limitations under the License.
 */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="global_action_screenrecord">Снимање екрана</string>
+  <string name="animation_default">Подразумевано</string>
+  <string name="animation_fade">Бледо</string>
+  <string name="animation_slide_right">Клизање у лево</string>
+  <string name="animation_slide_left">Клизање у десно</string>
+  <string name="animation_slide_right_no_fade">Клизање у десно (без изблеђивања)</string>
+  <string name="animation_slide_left_no_fade">Клизање у лево (без изблеђивања)</string>
+  <string name="animation_slide_up">Клизање на доле</string>
+  <string name="animation_slide_down">Клизање на горе</string>
+  <string name="animation_translucent">Провидно</string>
+  <string name="animation_grow_shrink">Расте (ка горе)</string>
+  <string name="animation_grow_shrink_center">Расте (ка центру)</string>
+  <string name="animation_grow_shrink_bottom">Расте (ка доле)</string>
+  <string name="animation_grow_shrink_left">Расте (ка лево)</string>
+  <string name="animation_grow_shrink_right">Расте (ка десно)</string>
+  <string name="animation_random">Насумице</string>
+</resources>

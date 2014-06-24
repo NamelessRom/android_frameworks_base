@@ -18,4 +18,21 @@
 ** limitations under the License.
 */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="global_action_screenrecord">Înregistrare Ecran</string>
+  <string name="animation_default">Implicit</string>
+  <string name="animation_fade">Diminuează</string>
+  <string name="animation_slide_right">Glisează de la dreapta</string>
+  <string name="animation_slide_left">Glisează de la stânga</string>
+  <string name="animation_slide_right_no_fade">Glisează de la dreapta (Fără diminuare)</string>
+  <string name="animation_slide_left_no_fade">Glisează de la stânga (Fără diminuare)</string>
+  <string name="animation_slide_up">Glisează de jos</string>
+  <string name="animation_slide_down">Glisează de sus</string>
+  <string name="animation_translucent">Translucid</string>
+  <string name="animation_grow_shrink">Crește în (Sus)</string>
+  <string name="animation_grow_shrink_center">Crește în (Centru)</string>
+  <string name="animation_grow_shrink_bottom">Crește în (Jos)</string>
+  <string name="animation_grow_shrink_left">Crește în (Stânga)</string>
+  <string name="animation_grow_shrink_right">Crește în (Dreapta)</string>
+  <string name="animation_random">Aleatoriu</string>
+</resources>

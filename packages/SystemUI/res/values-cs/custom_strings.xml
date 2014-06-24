@@ -17,4 +17,31 @@
  * limitations under the License.
  */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="screenrecord_notif_title">Obrazovka je nahrávána</string>
+  <string name="screenrecord_notif_stop">Zastavit</string>
+  <string name="screenrecord_notif_pointer">Zobrazit ukazatel</string>
+  <string name="screenrecord_notif_error">Nahrávání obrazovky není možné</string>
+  <string name="memory">RAM</string>
+  <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> volné</string>
+  <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> využité</string>
+  <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> využité*</string>
+  <string name="service_started_by_app">Spouštěno aplikací</string>
+  <string name="running_processes_item_description_s_s">Procesy: <xliff:g id="numprocess">%1$d</xliff:g> a služby: <xliff:g id="numservices">%2$d</xliff:g></string>
+  <string name="running_processes_item_description_s_p">Procesy: <xliff:g id="numprocess">%1$d</xliff:g> a služby: <xliff:g id="numservices">%2$d</xliff:g></string>
+  <string name="running_processes_item_description_p_s">Procesy: <xliff:g id="numprocess">%1$d</xliff:g> a služby: <xliff:g id="numservices">%2$d</xliff:g></string>
+  <string name="running_processes_item_description_p_p">Procesy: <xliff:g id="numprocess">%1$d</xliff:g> a služby: <xliff:g id="numservices">%2$d</xliff:g></string>
+  <string name="running_process_item_user_label">Uživatel: <xliff:g id="user_name">%1$s</xliff:g></string>
+  <string name="onthego_notif_ticker">On-The-Go aktivováno</string>
+  <string name="onthego_notif_title">On-The-Go je aktivní</string>
+  <string name="onthego_notif_stop">Zastavit</string>
+  <string name="onthego_notif_options">Možnosti</string>
+  <string name="onthego_notif_error">Nelze spustit On-The-Go</string>
+  <string name="onthego_notif_restart">Restartovat On-The-Go</string>
+  <string name="onthego_notif_camera_changed">Mód kamery změněn</string>
+  <string name="onthego_transparency">Průhlednost</string>
+  <string name="onthego_front_camera">Použít přední kameru</string>
+  <string name="onthego_service_toggle">Automaticky restartovat službu</string>
+  <string name="quick_settings_onthego_back">Zadní Kamera</string>
+  <string name="quick_settings_onthego_front">Přední Kamera</string>
+</resources>

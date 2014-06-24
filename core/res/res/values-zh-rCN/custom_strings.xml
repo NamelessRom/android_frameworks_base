@@ -18,4 +18,21 @@
 ** limitations under the License.
 */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="global_action_screenrecord">屏幕录像</string>
+  <string name="animation_default">默认</string>
+  <string name="animation_fade">淡入淡出</string>
+  <string name="animation_slide_right">右侧滑动</string>
+  <string name="animation_slide_left">左侧滑动</string>
+  <string name="animation_slide_right_no_fade">右侧滑动（无淡入淡出）</string>
+  <string name="animation_slide_left_no_fade">左侧滑动（无淡入淡出）</string>
+  <string name="animation_slide_up">底部滑动</string>
+  <string name="animation_slide_down">顶部滑动</string>
+  <string name="animation_translucent">半透明</string>
+  <string name="animation_grow_shrink">缩放（顶部）</string>
+  <string name="animation_grow_shrink_center">缩放（中间）</string>
+  <string name="animation_grow_shrink_bottom">缩放（底部）</string>
+  <string name="animation_grow_shrink_left">缩放（左侧）</string>
+  <string name="animation_grow_shrink_right">缩放（右侧）</string>
+  <string name="animation_random">随机</string>
+</resources>
