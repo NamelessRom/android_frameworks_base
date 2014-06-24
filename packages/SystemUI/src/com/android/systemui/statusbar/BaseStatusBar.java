@@ -170,7 +170,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     private RecentController mNewRecents;
     private boolean mUseNewRecents = false;
 
-    private int mExpandedDesktopStyle = 0;
+    protected int mExpandedDesktopStyle = 0;
 
     public IStatusBarService getStatusBarService() {
         return mBarService;
