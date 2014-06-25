@@ -180,7 +180,7 @@ public final class ShutdownThread extends Thread {
                     // Include options in power menu for rebooting into recovery or bootloader
                     sConfirmDialog = new AlertDialog.Builder(context)
                             .setTitle(titleResourceId)
-                            .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
+                            .setItems(com.android.internal.R.array.shutdown_reboot_options, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     if (which < 0)
                                         return;
@@ -191,10 +191,7 @@ public final class ShutdownThread extends Thread {
                                         mRebootReason = actions[which];
                                         mRebootSoft = actions[which].equals(SOFT_REBOOT);
                                     }
-                                }
-                            })
-                            .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+
                                     if (mRebootSoft) {
                                         mRebootSoft = false;
                                         try {
@@ -210,13 +207,6 @@ public final class ShutdownThread extends Thread {
                                         mReboot = true;
                                         beginShutdownSequence(context);
                                     }
-                                }
-                            })
-                            .setNegativeButton(com.android.internal.R.string.no, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mReboot = false;
-                                    mRebootSoft = false;
-                                    dialog.cancel();
                                 }
                             })
                             .create();
