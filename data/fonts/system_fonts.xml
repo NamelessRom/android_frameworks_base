@@ -27,10 +27,21 @@
             <name>verdana</name>
         </nameset>
         <fileset>
+            <file>Roboto-Black.ttf</file>
             <file>Roboto-Regular.ttf</file>
             <file>Roboto-Bold.ttf</file>
             <file>Roboto-Italic.ttf</file>
             <file>Roboto-BoldItalic.ttf</file>
+        </fileset>
+    </family>
+
+    <family>
+        <nameset>
+            <name>sans-serif-medium</name>
+        </nameset>
+        <fileset>
+            <file>Roboto-Medium.ttf</file>
+            <file>Roboto-MediumItalic.ttf</file>
         </fileset>
     </family>
 
@@ -63,6 +74,9 @@
             <file>RobotoCondensed-Bold.ttf</file>
             <file>RobotoCondensed-Italic.ttf</file>
             <file>RobotoCondensed-BoldItalic.ttf</file>
+            <file>RobotoCondensed-Light.ttf</file>
+            <file>RobotoCondensed-LightItalic.ttf</file>
+
         </fileset>
     </family>
     <family>
