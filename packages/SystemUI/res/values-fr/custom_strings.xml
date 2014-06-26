@@ -26,7 +26,7 @@
   <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> libre</string>
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> utilisé</string>
   <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> utilisé*</string>
-  <string name="service_started_by_app">Commencée par l\'application.</string>
+  <string name="service_started_by_app">Démarré par l\'application.</string>
   <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g>
 processus et <xliff:g id="numservices">%2$d</xliff:g> service</string>
   <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g>
@@ -40,12 +40,12 @@ processus et <xliff:g id="numservices">%2$d</xliff:g> services</string>
   <string name="onthego_notif_title">On-The-Go est actif</string>
   <string name="onthego_notif_stop">Arrêt</string>
   <string name="onthego_notif_options">Options</string>
-  <string name="onthego_notif_error">Non à été possible initier On-The-Go</string>
-  <string name="onthego_notif_restart">Reboot On-The-Go</string>
-  <string name="onthego_notif_camera_changed">Mode de caméra changé</string>
+  <string name="onthego_notif_error">Impossible de démarrer On-The-Go</string>
+  <string name="onthego_notif_restart">Redémarrer On-The-Go</string>
+  <string name="onthego_notif_camera_changed">Mode de caméra modifié</string>
   <string name="onthego_transparency">Transparence</string>
-  <string name="onthego_front_camera">Utilisation de la caméra de front</string>
-  <string name="onthego_service_toggle">Reboot automatiquement le service</string>
+  <string name="onthego_front_camera">Utilisation de la caméra frontale</string>
+  <string name="onthego_service_toggle">Redémarrer automatiquement le service</string>
   <string name="quick_settings_onthego_back">Caméra arrière</string>
   <string name="quick_settings_onthego_front">Caméra frontale</string>
 </resources>
