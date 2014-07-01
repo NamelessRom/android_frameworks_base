@@ -17,4 +17,30 @@
  * limitations under the License.
  */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="screenrecord_notif_stop">Стоп</string>
+  <string name="screenrecord_notif_pointer">Укључи стрелицу</string>
+  <string name="screenrecord_notif_error">Неуспело снимање екрана</string>
+  <string name="memory">РАМ</string>
+  <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> слободно</string>
+  <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> искоришћено</string>
+  <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> искоришћено*</string>
+  <string name="service_started_by_app">Апликација је започела.</string>
+  <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g>
+        процес и <xliff:g id="numservices">%2$d</xliff:g> сервис</string>
+  <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g>
+        процес и <xliff:g id="numservices">%2$d</xliff:g> сервиси</string>
+  <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g>
+        процес и <xliff:g id="numservices">%2$d</xliff:g> сервис</string>
+  <string name="running_processes_item_description_p_p"><xliff:g id="numprocess">%1$d</xliff:g>
+        процеси и <xliff:g id="numservices">%2$d</xliff:g> сервиси</string>
+  <string name="running_process_item_user_label">Корисник: <xliff:g id="user_name">%1$s</xliff:g></string>
+  <string name="onthego_notif_stop">Стоп</string>
+  <string name="onthego_notif_options">Опције</string>
+  <string name="onthego_notif_camera_changed">Мод камере је промењен</string>
+  <string name="onthego_transparency">Прозирност</string>
+  <string name="onthego_front_camera">Користи предњу камеру</string>
+  <string name="onthego_service_toggle">Аутоматски рестартуј сервис</string>
+  <string name="quick_settings_onthego_back">Задња камера</string>
+  <string name="quick_settings_onthego_front">Предња камера</string>
+</resources>
