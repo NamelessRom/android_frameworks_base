@@ -16,5 +16,6 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <string name="crop_wallpaper">Kép körülvágása</string>
+  <string name="wallpaper_instructions">Beállítás háttérképként</string>
   <string name="wallpaper_load_fail">Nem lehet a képet háttérképként betölteni</string>
 </resources>
