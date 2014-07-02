@@ -97,6 +97,8 @@
 
     <!-- NamelessRom Additions -->
     <uses-permission android:name="org.namelessrom.flashlight.TOGGLE_TORCH" />
+    <!-- Device Control -->
+    <uses-permission android:name="org.namelessrom.devicecontrol.API" />
 
     <application
         android:name="com.android.systemui.nameless.NamelessApplication"
