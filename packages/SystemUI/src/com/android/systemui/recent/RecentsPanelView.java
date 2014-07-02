@@ -25,9 +25,11 @@ import android.app.ActivityOptions;
 import android.app.TaskStackBuilder;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageDataObserver;
 import android.content.pm.PackageManager;
@@ -45,6 +47,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -70,13 +73,14 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.internal.util.MemInfoReader;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
 import com.android.systemui.statusbar.StatusBarPanel;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
 
 import java.util.ArrayList;
+
+import org.namelessrom.devicecontrol.api.IRemoteService;
 
 public class RecentsPanelView extends RelativeLayout implements OnItemClickListener,
         RecentsCallback, StatusBarPanel, Animator.AnimatorListener {
@@ -108,6 +112,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
 
     private ImageView mClearAllRecents;
 
+    private boolean canUseRamBar;
     private boolean ramBarEnabled;
     private boolean ramBarIncludeCached;
 
@@ -116,9 +121,8 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
 
     Handler mHandler = new Handler();
     ActivityManager mAm;
-    long SECONDARY_SERVER_MEM;
 
-    final MemInfoReader mMemInfoReader = new MemInfoReader();
+    private IRemoteService mIRemoteService;
 
     private ContentObserver mObserver = new ContentObserver(mHandler) {
         @Override
@@ -319,10 +323,34 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         mRecentTasksLoader = RecentTasksLoader.getInstance(context);
         a.recycle();
 
-        ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
-        mAm.getMemoryInfo(memInfo);
-        SECONDARY_SERVER_MEM = memInfo.secondaryServerThreshold;
+        // binding to our remote device control service
+        try {
+            mContext.bindService(new Intent(IRemoteService.class.getName()), mConnection,
+                    Context.BIND_AUTO_CREATE);
+        } catch (SecurityException exception) {
+            if (DEBUG) Log.d(TAG, "No permission to use DeviceControl API!");
+            canUseRamBar = false;
+        }
     }
+
+    /**
+     * Our ServiceConnection to DeviceControl's RemoteService
+     */
+    private final ServiceConnection mConnection = new ServiceConnection() {
+
+        public void onServiceConnected(final ComponentName className, final IBinder service) {
+            if (DEBUG) Log.v(TAG, "Service connected!");
+            mIRemoteService = IRemoteService.Stub.asInterface(service);
+            canUseRamBar = true;
+            mHandler.postDelayed(updateRamBarTask, 200);
+        }
+
+        public void onServiceDisconnected(final ComponentName className) {
+            if (DEBUG) Log.v(TAG, "Service has unexpectedly disconnected");
+            mIRemoteService = null;
+            canUseRamBar = false;
+        }
+    };
 
     public int numItemsInOneScreenful() {
         return mRecentsContainer.numItemsInOneScreenful();
@@ -341,10 +369,11 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     }
 
     public void dismissContextMenuIfAny() {
-        if(mPopup != null) {
+        if (mPopup != null) {
             mPopup.dismiss();
         }
     }
+
     public void show(boolean show) {
         show(show, null, false, false);
     }
@@ -412,7 +441,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     }
 
     @Override
-    protected void onAttachedToWindow () {
+    protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (!mAttached) {
             mAttached = true;
@@ -439,6 +468,14 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         if (mAttached) {
             mAttached = false;
             mContext.getContentResolver().unregisterContentObserver(mObserver);
+
+            try {
+                mContext.unbindService(mConnection);
+                if (DEBUG) Log.v(TAG, "Service disconnected!");
+            } catch (SecurityException exception) {
+                if (DEBUG) Log.d(TAG, "No permission to use DeviceControl API!");
+            }
+            canUseRamBar = false;
         }
     }
 
@@ -464,10 +501,10 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     public void onAnimationEnd(Animator animation) {
         if (mShowing) {
             final LayoutTransition transitioner = new LayoutTransition();
-            ((ViewGroup)mRecentsContainer).setLayoutTransition(transitioner);
+            ((ViewGroup) mRecentsContainer).setLayoutTransition(transitioner);
             createCustomAnimations(transitioner);
         } else {
-            ((ViewGroup)mRecentsContainer).setLayoutTransition(null);
+            ((ViewGroup) mRecentsContainer).setLayoutTransition(null);
         }
     }
 
@@ -526,7 +563,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         mRecentsNoApps = findViewById(R.id.recents_no_apps);
 
         mClearAllRecents = (ImageView) findViewById(R.id.recents_clear);
-        if (mClearAllRecents != null){
+        if (mClearAllRecents != null) {
             mClearAllRecents.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -548,7 +585,6 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         mRamUsageBar = (LinearColorBar) findViewById(R.id.ram_usage_bar);
         mForegroundProcessText = (TextView) findViewById(R.id.foregroundText);
         mBackgroundProcessText = (TextView) findViewById(R.id.backgroundText);
-        mHandler.postDelayed(updateRamBarTask, 200);
     }
 
     public void setMinSwipeAlpha(float minAlpha) {
@@ -584,8 +620,9 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             // scale the image to fill the full width of the ImageView. do this only if
             // we haven't set a bitmap before, or if the bitmap size has changed
             if (h.thumbnailViewDrawable == null ||
-                h.thumbnailViewDrawable.getIntrinsicWidth() != thumbnail.getIntrinsicWidth() ||
-                h.thumbnailViewDrawable.getIntrinsicHeight() != thumbnail.getIntrinsicHeight()) {
+                    h.thumbnailViewDrawable.getIntrinsicWidth() != thumbnail.getIntrinsicWidth() ||
+                    h.thumbnailViewDrawable.getIntrinsicHeight() != thumbnail
+                            .getIntrinsicHeight()) {
                 if (mFitThumbnailToXY) {
                     h.thumbnailViewImage.setScaleType(ScaleType.FIT_XY);
                 } else {
@@ -616,10 +653,10 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                             R.id.recents_linear_layout);
                 }
                 // Look for a view showing this thumbnail, to update.
-                for (int i=0; i < container.getChildCount(); i++) {
+                for (int i = 0; i < container.getChildCount(); i++) {
                     View v = container.getChildAt(i);
                     if (v != null && v.getTag() instanceof ViewHolder) {
-                        ViewHolder h = (ViewHolder)v.getTag();
+                        ViewHolder h = (ViewHolder) v.getTag();
                         if (!h.loadedThumbnailAndIcon && h.taskDescription == td) {
                             // only fade in the thumbnail if recents is already visible-- we
                             // show it immediately otherwise
@@ -649,7 +686,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             final ViewHolder holder = mItemToAnimateInWhenWindowAnimationIsFinished;
             final TimeInterpolator cubic = new DecelerateInterpolator(1.5f);
             FirstFrameAnimatorHelper.initializeDrawListener(holder.iconView);
-            for (View v : new View[] { holder.iconView, holder.labelView, holder.calloutLine }) {
+            for (View v : new View[]{holder.iconView, holder.labelView, holder.calloutLine}) {
                 if (v != null) {
                     ViewPropertyAnimator vpa = v.animate().translationX(0).translationY(0)
                             .alpha(1f).setStartDelay(startDelay)
@@ -984,24 +1021,24 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         @Override
         public void run() {
             if (DEBUG) Log.v(TAG, "updateRamBarTask running!");
-            if (!ramBarEnabled) return;
+            if (!canUseRamBar || !ramBarEnabled || mIRemoteService == null) return;
 
-            mMemInfoReader.readMemInfo();
-            long availMem = mMemInfoReader.getFreeSize()
-                    + (ramBarIncludeCached ? 0 : mMemInfoReader.getCachedSize())
-                    - SECONDARY_SERVER_MEM;
-
-            if (availMem < 0) {
-                availMem = 0;
+            long[] memory;
+            try {
+                memory = mIRemoteService.readMemory();
+            } catch (RemoteException remoteException) {
+                if (DEBUG) Log.e(TAG, "Error at readMemory(): " + remoteException.getMessage());
+                memory = new long[] {0, 0, 0};
             }
-
-            final long totalMem = mMemInfoReader.getTotalSize();
+            final long totalMem = memory[0];
+            final long availMem = (ramBarIncludeCached ? memory[1] : (memory[1] + memory[2]));
 
             String sizeStr = Formatter.formatShortFileSize(mContext, totalMem - availMem);
             mForegroundProcessText.setText(getResources().getString(
                     (ramBarIncludeCached
                             ? R.string.service_foreground_processes_cached
-                            : R.string.service_foreground_processes), sizeStr));
+                            : R.string.service_foreground_processes), sizeStr
+            ));
             sizeStr = Formatter.formatShortFileSize(mContext, availMem);
             mBackgroundProcessText.setText(getResources().getString(
                     R.string.service_background_processes, sizeStr));
@@ -1019,7 +1056,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
 
     private void updateView() {
         if (mRamUsageBar != null) {
-            mRamUsageBar.setVisibility(ramBarEnabled ? View.VISIBLE : View.GONE);
+            mRamUsageBar.setVisibility((ramBarEnabled && canUseRamBar) ? View.VISIBLE : View.GONE);
         }
     }
 
