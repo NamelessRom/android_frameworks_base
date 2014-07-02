@@ -8,7 +8,8 @@ LOCAL_RESOURCE_DIR := $(addprefix $(LOCAL_PATH)/, $(res_dirs))
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
-    src/com/android/systemui/EventLogTags.logtags
+    src/com/android/systemui/EventLogTags.logtags \
+    ../../../../packages/apps/DeviceControl/app/src/main/aidl/org/namelessrom/devicecontrol/api/IRemoteService.aidl
 
 LOCAL_JAVA_LIBRARIES := telephony-common
 LOCAL_STATIC_JAVA_LIBRARIES := android-opt-cards android-support-v4 android-support-v13 jsr305 acra android-visualizer
