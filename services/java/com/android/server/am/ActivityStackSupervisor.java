@@ -1055,7 +1055,7 @@ public final class ActivityStackSupervisor {
 
         r.task.stack.setLaunchTime(r);
 
-        if (app != null && app.thread != null) {
+        if (app != null && app.thread != null && !app.killedByAm) {
             try {
                 if ((r.info.flags&ActivityInfo.FLAG_MULTIPROCESS) == 0
                         || !"android".equals(r.info.packageName)) {
