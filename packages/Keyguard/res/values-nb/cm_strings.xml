@@ -18,4 +18,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <string name="app_name">Låseskjerm</string>
   <string name="keyguard_discharging">Utlader, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
+  <string name="missed_call">Tapt anrop</string>
+  <string name="message_from">melding fra</string>
+  <string name="message_from_person">melding fra %1$s</string>
 </resources>
