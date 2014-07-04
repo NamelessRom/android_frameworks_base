@@ -342,13 +342,14 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             if (DEBUG) Log.v(TAG, "Service connected!");
             mIRemoteService = IRemoteService.Stub.asInterface(service);
             canUseRamBar = true;
-            mHandler.postDelayed(updateRamBarTask, 200);
+            mHandler.postDelayed(updateRamBarTask, 100);
         }
 
         public void onServiceDisconnected(final ComponentName className) {
             if (DEBUG) Log.v(TAG, "Service has unexpectedly disconnected");
             mIRemoteService = null;
             canUseRamBar = false;
+            mHandler.postDelayed(updateRamBarTask, 100);
         }
     };
 
@@ -1021,6 +1022,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         @Override
         public void run() {
             if (DEBUG) Log.v(TAG, "updateRamBarTask running!");
+            updateView();
             if (!canUseRamBar || !ramBarEnabled || mIRemoteService == null) return;
 
             long[] memory;
