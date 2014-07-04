@@ -16,6 +16,9 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="app_name">Закључан екран</string>
-  <string name="keyguard_discharging">Пражњење, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
+  <string name="app_name">Закључавање екрана</string>
+  <string name="keyguard_discharging">Пражњење, <xliff:g id="број">%d</xliff:g><xliff:g id="процената">%%</xliff:g></string>
+  <string name="missed_call">Пропуштен позив</string>
+  <string name="message_from">Порука од</string>
+  <string name="message_from_person">Порука од %1$s</string>
 </resources>

@@ -16,6 +16,9 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="app_name">Ecran de blocare</string>
-  <string name="keyguard_discharging">Se descarcă, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
+  <string name="app_name">Lockscreen</string>
+  <string name="keyguard_discharging">Descărcare, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
+  <string name="missed_call">apel pierdut</string>
+  <string name="message_from">mesaj de la</string>
+  <string name="message_from_person">mesaje de la %1$s</string>
 </resources>
