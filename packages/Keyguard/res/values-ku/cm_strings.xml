@@ -16,6 +16,9 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="app_name">قوفڵی شاشە</string>
-  <string name="keyguard_discharging">بارگاوی نەکردن, <xliff:g id="ژمارە">%d</xliff:g><xliff:g id="لەسەدا">%%</xliff:g></string>
+  <string name="app_name">قوفڵی شاشه‌ی</string>
+  <string name="keyguard_discharging">بارگاوی نه‌کردن, <xliff:g id="ژماره‌">%d</xliff:g><xliff:g id="له‌سه‌دا">%%</xliff:g></string>
+  <string name="missed_call">په‌یوه‌ندی وه‌ڵام نه‌دراوه‌</string>
+  <string name="message_from">نامه‌یه‌ک له‌لایه‌ن</string>
+  <string name="message_from_person">نامه‌یه‌ک له‌لایه‌ن %1$s</string>
 </resources>
