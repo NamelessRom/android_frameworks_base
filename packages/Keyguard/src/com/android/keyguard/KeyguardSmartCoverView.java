@@ -116,7 +116,7 @@ public class KeyguardSmartCoverView extends LinearLayout {
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("com.cyanogenmod.lockclock.action.WEATHER_UPDATE_FINISHED".equals(intent
+            if ("org.namelessrom.providers.weather.action.WEATHER_UPDATE_FINISHED".equals(intent
                     .getAction())) {
                 if (!intent.getBooleanExtra("update_cancelled", true)) {
                     refreshWeatherStatus();
@@ -159,7 +159,7 @@ public class KeyguardSmartCoverView extends LinearLayout {
     public KeyguardSmartCoverView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         setBackgroundColor(0xFF000000);
-        mContext.sendBroadcast(new Intent("com.cyanogenmod.lockclock.action.REQUEST_WEATHER_UPDATE"));
+        mContext.sendBroadcast(new Intent("org.namelessrom.providers.weather.action.REQUEST_WEATHER_UPDATE"));
     }
 
     private void setEnableMarquee(boolean enabled) {
@@ -339,11 +339,11 @@ public class KeyguardSmartCoverView extends LinearLayout {
         };
 
         Cursor c = mContext.getContentResolver().query(
-                Uri.parse("content://com.cyanogenmod.lockclock.weather.provider/weather/current"),
+                Uri.parse("content://org.namelessrom.providers/weather/current"),
                 projection, null, null, null);
         if (c == null) {
             mFadeInWeather = true;
-            mContext.sendBroadcast(new Intent("com.cyanogenmod.lockclock.action.FORCE_WEATHER_UPDATE"));
+            mContext.sendBroadcast(new Intent("org.namelessrom.providers.weather.action.FORCE_WEATHER_UPDATE"));
             if(DEBUG) Log.e(TAG, "cursor was null for temperature");
             return null;
         }
@@ -431,7 +431,7 @@ public class KeyguardSmartCoverView extends LinearLayout {
 
         IntentFilter f = new IntentFilter();
         f.addAction(Intent.ACTION_LOCALE_CHANGED);
-        f.addAction("com.cyanogenmod.lockclock.action.WEATHER_UPDATE_FINISHED");
+        f.addAction("org.namelessrom.providers.weather.action.WEATHER_UPDATE_FINISHED");
         mContext.registerReceiver(mBroadcastReceiver, f);
 
         mContext.getContentResolver().registerContentObserver(
