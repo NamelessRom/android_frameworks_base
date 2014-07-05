@@ -342,6 +342,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     int mLidKeyboardAccessibility;
     int mLidNavigationAccessibility;
     boolean mLidControlsSleep;
+    boolean mLidWake;
     int mLongPressOnPowerBehavior = -1;
     boolean mScreenOnEarly = false;
     boolean mScreenOnFully = false;
@@ -732,6 +733,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.Nameless.getUriFor(
                     Settings.Nameless.HARDWARE_KEYS_DISABLE), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.LOCKSCREEN_LID_WAKE), false, this,
                     UserHandle.USER_ALL);
 
             updateSettings();
@@ -1820,6 +1824,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (mImmersiveModeConfirmation != null) {
                 mImmersiveModeConfirmation.loadSetting();
             }
+
+            mLidWake = Settings.System.getIntForUser(resolver,
+                    Settings.System.LOCKSCREEN_LID_WAKE, 1, UserHandle.USER_CURRENT) == 1;
         }
 
         if (updateRotation) {
@@ -4539,9 +4546,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         updateRotation(true);
 
         if (lidOpen) {
-            mPowerManager.wakeUp(SystemClock.uptimeMillis());
-        } else if (!mLidControlsSleep) {
-            mPowerManager.userActivity(SystemClock.uptimeMillis(), false);
+            if (mLidWake) {
+                mPowerManager.wakeUp(SystemClock.uptimeMillis());
+            } else if (!mLidControlsSleep) {
+                mPowerManager.userActivity(SystemClock.uptimeMillis(), false);
+            }
         }
     }
 
@@ -6044,6 +6053,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        }
+
+        if (mLidState == LID_CLOSED && mLidControlsSleep && mLidWake) {
+            mPowerManager.goToSleep(SystemClock.uptimeMillis());
         }
     }
 
