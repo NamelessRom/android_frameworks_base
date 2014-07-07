@@ -88,7 +88,6 @@ import com.android.systemui.quicksettings.MobileNetworkTypeTile;
 import com.android.systemui.quicksettings.NetworkAdbTile;
 import com.android.systemui.quicksettings.NfcTile;
 import com.android.systemui.quicksettings.OnTheGoTile;
-import com.android.systemui.quicksettings.PerformanceProfileTile;
 import com.android.systemui.quicksettings.PreferencesTile;
 import com.android.systemui.quicksettings.ProfileTile;
 import com.android.systemui.quicksettings.QuickSettingsTile;
@@ -273,10 +272,10 @@ public class QuickSettingsController {
                 if (QSUtils.systemProfilesEnabled(resolver)) {
                     qs = new ProfileTile(mContext, this);
                 }
-            } else if (tile.equals(TILE_PERFORMANCE_PROFILE)) {
+/*            } else if (tile.equals(TILE_PERFORMANCE_PROFILE)) {
                 if (QSUtils.deviceSupportsPerformanceProfiles(mContext)) {
                     qs = new PerformanceProfileTile(mContext, this);
-                }
+                }*/
             } else if (tile.equals(TILE_NFC)) {
                 // User cannot add the NFC tile if the device does not support it
                 // No need to check again here
