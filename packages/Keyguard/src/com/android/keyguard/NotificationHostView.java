@@ -414,6 +414,14 @@ public class NotificationHostView extends FrameLayout {
 
         bigContentView &= bigContentAvailable;
         bigContentView &= NotificationViewManager.config.expandedView;
+
+        if (sbn.getNotification().contentView == null) {
+            if (!bigContentAvailable) {
+                return;
+            }
+            bigContentView = true;
+        }
+
         RemoteViews rv = bigContentView ? sbn.getNotification().bigContentView : sbn.getNotification().contentView;
 
         final View remoteView = rv.apply(mContext, null);
