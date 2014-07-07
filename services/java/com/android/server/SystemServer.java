@@ -241,6 +241,7 @@ class ServerThread {
         boolean disableNonCoreServices = SystemProperties.getBoolean("config.disable_noncore", false);
         boolean disableNetwork = SystemProperties.getBoolean("config.disable_network", false);
         boolean disableAtlas = SystemProperties.getBoolean("config.disable_atlas", false);
+        boolean disableDock = SystemProperties.getBoolean("config.disable_dock", false);
 
         try {
             Slog.i(TAG, "Display Manager");
@@ -726,7 +727,7 @@ class ServerThread {
                 }
             }
 
-            if (!disableNonCoreServices) {
+            if (!disableNonCoreServices && !disableDock) {
                 try {
                     Slog.i(TAG, "Dock Observer");
                     // Listen for dock station changes
