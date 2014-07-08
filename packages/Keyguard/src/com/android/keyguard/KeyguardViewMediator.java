@@ -44,6 +44,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -564,8 +565,6 @@ public class KeyguardViewMediator {
         mKeyguardViewManager = new KeyguardViewManager(context, wm, mViewMediatorCallback,
                 mLockPatternUtils);
 
-        final ContentResolver cr = mContext.getContentResolver();
-
         mScreenOn = mPM.isScreenOn();
 
         mLockSounds = new SoundPool(1, AudioManager.STREAM_SYSTEM, 0);
@@ -574,8 +573,21 @@ public class KeyguardViewMediator {
                 com.android.internal.R.integer.config_lockSoundVolumeDb);
         mLockSoundVolume = (float)Math.pow(10, (float)lockSoundDefaultAttenuation/20);
 
-        SettingsObserver observer = new SettingsObserver(new Handler());
+        final SettingsObserver observer = new SettingsObserver(new Handler());
         observer.observe();
+
+        if (SmartCoverHW.isSupported()) {
+            final FileObserver fileObserver = new FileObserver(SmartCoverHW.getPath()) {
+                @Override public void onEvent(final int event, final String s) {
+                    if (FileObserver.MODIFY != event) return;
+                    final Intent intent = new Intent();
+                    intent.setAction(WindowManagerPolicy.ACTION_LID_STATE_CHANGED);
+                    intent.putExtra("state", SmartCoverHW.isOpen() ? 1 : 0);
+                    mContext.sendBroadcast(intent);
+                }
+            };
+            fileObserver.startWatching();
+        }
     }
 
     public void reloadSounds() {
