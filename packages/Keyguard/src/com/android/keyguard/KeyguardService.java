@@ -37,6 +37,8 @@ import com.android.internal.policy.IKeyguardShowCallback;
 import com.android.internal.widget.LockPatternUtils;
 
 public class KeyguardService extends Service {
+    private static final boolean DEBUG = false;
+
     static final String TAG = "KeyguardService";
     static final String PERMISSION = android.Manifest.permission.CONTROL_KEYGUARD;
     private KeyguardViewMediator mKeyguardViewMediator;
@@ -47,7 +49,7 @@ public class KeyguardService extends Service {
             mKeyguardViewMediator = new KeyguardViewMediator(
                     KeyguardService.this, new LockPatternUtils(KeyguardService.this));
         }
-        Log.v(TAG, "onCreate()");
+        if (DEBUG) Log.v(TAG, "onCreate()");
     }
 
     @Override
