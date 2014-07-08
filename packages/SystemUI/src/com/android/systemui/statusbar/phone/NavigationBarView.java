@@ -407,6 +407,7 @@ public class NavigationBarView extends LinearLayout {
     public void updateResources(Resources res) {
         mThemedResources = res;
         getIcons(mThemedResources);
+        mBarTransitions.updateResources(res);
         for (int i = 0; i < mRotatedViews.length; i++) {
             ViewGroup container = (ViewGroup) mRotatedViews[i];
             if (container != null) {
