@@ -27,6 +27,8 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.provider.BaseColumns;
 import android.provider.CallLog.Calls;
 import android.provider.ContactsContract;
@@ -39,6 +41,8 @@ import android.text.style.CharacterStyle;
 import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -54,7 +58,7 @@ import java.util.Locale;
 
 public class KeyguardSmartCoverView extends LinearLayout {
     private static final boolean DEBUG = KeyguardViewMediator.DEBUG;
-    private static final String  TAG   = "KeyguardStatusView";
+    private static final String  TAG   = "KeyguardSmartCoverView";
 
     private LockPatternUtils mLockPatternUtils;
 
@@ -63,7 +67,7 @@ public class KeyguardSmartCoverView extends LinearLayout {
     private TextClock mClockView;
     private TextView  mAmPm;
     private TextView  mWeatherImage, mWeatherStatus;
-    private TextView mLine1, mLine2, mLine3;
+    private TextView  mLine1, mLine2, mLine3;
     private ImageView mBatteryImage;
 
     private int mMissedCalls, mUnreadMessages;
@@ -83,6 +87,10 @@ public class KeyguardSmartCoverView extends LinearLayout {
 
     // how long to wait before sending the screen to sleep
     public static final int SMART_COVER_TIMEOUT = 8000;
+
+    private PowerManager mPowerManager;
+
+    private GestureDetector mDetector;
 
     private KeyguardUpdateMonitorCallback mInfoCallback = new KeyguardUpdateMonitorCallback() {
 
@@ -160,8 +168,18 @@ public class KeyguardSmartCoverView extends LinearLayout {
     public KeyguardSmartCoverView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         setBackgroundColor(0xFF000000);
+
+        mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        mDetector = new GestureDetector(mContext, new SmartCoverGestureListener());
+
         mContext.sendBroadcast(
                 new Intent("org.namelessrom.providers.weather.action.REQUEST_WEATHER_UPDATE"));
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(final MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        return super.onInterceptTouchEvent(event); // we are just a middleware
     }
 
     private void setEnableMarquee(boolean enabled) {
@@ -453,15 +471,17 @@ public class KeyguardSmartCoverView extends LinearLayout {
         mContext.registerReceiver(mBroadcastReceiver, f);
 
         mContext.getContentResolver().registerContentObserver(
-                Settings.System.getUriFor(Settings.System.TIME_12_24), false, mContentObserver);
+                Settings.System.getUriFor(Settings.System.TIME_12_24),
+                false, mContentObserver);
         mContext.getContentResolver().registerContentObserver(
                 Settings.System.getUriFor(Settings.System.NEXT_ALARM_FORMATTED),
                 false, mContentObserver);
 
         mContext.getContentResolver().registerContentObserver(
-                Calls.CONTENT_URI, true,
-                mContentObserver);
-        mContext.getContentResolver().registerContentObserver(Uri.parse("content://sms/inbox"),
+                Calls.CONTENT_URI,
+                true, mContentObserver);
+        mContext.getContentResolver().registerContentObserver(
+                Uri.parse("content://sms/inbox"),
                 true, mContentObserver);
     }
 
@@ -539,4 +559,16 @@ public class KeyguardSmartCoverView extends LinearLayout {
 
         return name;
     }
+
+    private class SmartCoverGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override public boolean onDown(final MotionEvent e) { return true; }
+
+        @Override public boolean onDoubleTap(final MotionEvent event) {
+            mPowerManager.goToSleep(SystemClock.uptimeMillis());
+            return true;
+        }
+
+    }
+
 }
