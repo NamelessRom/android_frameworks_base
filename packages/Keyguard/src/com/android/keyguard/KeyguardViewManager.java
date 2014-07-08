@@ -229,7 +229,7 @@ public class KeyguardViewManager {
                 android.Manifest.permission.CONTROL_KEYGUARD, null);
         mSmartCoverCoords = mContext.getResources().getIntArray(
                 com.android.internal.R.array.config_smartCoverWindowCoords);
-        if(mSmartCoverCoords.length != 4) {
+        if (mSmartCoverCoords.length != 4) {
             // make sure there are exactly 4 dimensions provided, or ignore the values
             mSmartCoverCoords = null;
         }
@@ -778,9 +778,7 @@ public class KeyguardViewManager {
             view = inflater.inflate(R.layout.keyguard_smart_cover, mKeyguardHost, true);
             mCoverView = (KeyguardSmartCoverView) view.findViewById(R.id.keyguard_cover_layout);
 
-            int flags =  WindowManager.LayoutParams.FLAG_FULLSCREEN
-                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                    ;
+            int flags =  WindowManager.LayoutParams.FLAG_FULLSCREEN;
 
             final int type = WindowManager.LayoutParams.TYPE_KEYGUARD;
 
