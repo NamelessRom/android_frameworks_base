@@ -135,6 +135,9 @@ import static android.view.WindowManager.LayoutParams.*;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.LID_ABSENT;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.LID_OPEN;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.LID_CLOSED;
+import static android.view.WindowManagerPolicy.WindowManagerFuncs.FLIP_ABSENT;
+import static android.view.WindowManagerPolicy.WindowManagerFuncs.FLIP_OPEN;
+import static android.view.WindowManagerPolicy.WindowManagerFuncs.FLIP_CLOSED;
 
 /**
  * WindowManagerPolicy implementation for the Android phone UI.  This
@@ -312,6 +315,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mLanguageSwitchKeyPressed;
 
     int mLidState = LID_ABSENT;
+    int mFlipState = FLIP_ABSENT;
     boolean mHaveBuiltInKeyboard;
 
     boolean mSystemReady;
@@ -2029,6 +2033,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mLidState = mWindowManagerFuncs.getLidState();
     }
 
+    void readFlipState() {
+        mFlipState = mWindowManagerFuncs.getFlipState();
+    }
+
     private boolean isHidden(int accessibilityMode) {
         switch (accessibilityMode) {
             case 1:
@@ -2051,7 +2059,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mHaveBuiltInKeyboard = (keyboardPresence & PRESENCE_INTERNAL) != 0;
 
         readLidState();
+        readFlipState();
         applyLidSwitchState();
+        applyFlipSwitchState();
 
         if (config.keyboard == Configuration.KEYBOARD_NOKEYS
                 || (keyboardPresence == PRESENCE_INTERNAL
@@ -4553,6 +4563,35 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         } else if (!mLidControlsSleep) {
             mPowerManager.userActivity(SystemClock.uptimeMillis(), false);
         }
+
+    }
+
+    /** {@inheritDoc} */
+    public void notifyFlipSwitchChanged(long whenNanos, boolean flipOpen) {
+        // do nothing if headless
+        if (mHeadless) return;
+
+        // flip changed state
+        final int newFlipState = flipOpen ? FLIP_OPEN : FLIP_CLOSED;
+        if (newFlipState == mFlipState) {
+            return;
+        }
+
+        mFlipState = newFlipState;
+
+        Intent intent = new Intent(ACTION_FLIP_STATE_CHANGED);
+        intent.putExtra(EXTRA_FLIP_STATE, mFlipState);
+        mContext.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
+
+        applyFlipSwitchState();
+        updateRotation(true);
+
+        if (flipOpen) {
+            if (mLidControlsSleep) mPowerManager.wakeUp(SystemClock.uptimeMillis());
+        } else if (!mLidControlsSleep) {
+            mPowerManager.userActivity(SystemClock.uptimeMillis(), false);
+        }
+
     }
 
     void setHdmiPlugged(boolean plugged) {
@@ -6038,7 +6077,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     @Override
     public void enableScreenAfterBoot() {
         readLidState();
+        readFlipState();
         applyLidSwitchState();
+        applyFlipSwitchState();
         updateRotation(true);
     }
 
@@ -6046,6 +6087,21 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mPowerManager.setKeyboardVisibility(isBuiltInKeyboardVisible());
 
         if (mLidState == LID_CLOSED && mLidControlsSleep) {
+            ITelephony telephonyService = getTelephonyService();
+            try {
+                if (telephonyService != null && telephonyService.isIdle()) {
+                    mPowerManager.goToSleep(SystemClock.uptimeMillis());
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void applyFlipSwitchState() {
+        mPowerManager.setKeyboardVisibility(isBuiltInKeyboardVisible());
+
+        if (mFlipState == FLIP_CLOSED && mLidControlsSleep) {
             ITelephony telephonyService = getTelephonyService();
             try {
                 if (telephonyService != null && telephonyService.isIdle()) {
@@ -6565,6 +6621,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         pw.print(prefix); pw.print("mLidState="); pw.print(mLidState);
                 pw.print(" mLidOpenRotation="); pw.print(mLidOpenRotation);
                 pw.print(" mHdmiPlugged="); pw.println(mHdmiPlugged);
+                pw.print(" mFlipState="); pw.println(mFlipState);
         if (mLastSystemUiFlags != 0 || mResettingSystemUiFlags != 0
                 || mForceClearedSystemUiFlags != 0) {
             pw.print(prefix); pw.print("mLastSystemUiFlags=0x");
