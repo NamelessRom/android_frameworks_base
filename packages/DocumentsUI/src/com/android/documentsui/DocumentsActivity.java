@@ -54,6 +54,7 @@ import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -1079,6 +1080,17 @@ public class DocumentsActivity extends Activity {
                 }
             }
         } else if (mState.action == ACTION_STANDALONE) {
+            if (doc.isApplication(doc.derivedUri)) {
+                // File picked is an apk, attempt to install
+                // for now limited to internal storage
+                if (DocumentUtils.getPath(this, doc.derivedUri) != null) {
+                    DocumentUtils.installApplication(this, doc);
+                } else {
+                    Toast.makeText(this, R.string.toast_no_application, Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
             final Intent view = new Intent(Intent.ACTION_VIEW);
             view.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             view.setData(doc.derivedUri);
