@@ -22,7 +22,13 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.app.admin.DevicePolicyManager;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageDataObserver;
 import android.content.pm.PackageManager;
@@ -68,12 +74,17 @@ import android.widget.TextView;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.statusbar.StatusBarIconList;
+import com.android.internal.util.cm.SpamFilter;
+import com.android.internal.util.cm.SpamFilter.SpamContract.NotificationTable;
+import com.android.internal.util.cm.SpamFilter.SpamContract.PackageTable;
 import com.android.internal.widget.SizeAdaptiveLayout;
 import com.android.systemui.R;
 import com.android.systemui.RecentsComponent;
 import com.android.systemui.SearchPanelView;
 import com.android.systemui.SystemUI;
+import com.android.systemui.cm.SpamMessageProvider;
 import com.android.systemui.slimrecent.RecentController;
+import com.android.systemui.statusbar.NotificationData.Entry;
 import com.android.systemui.statusbar.phone.KeyguardTouchDelegate;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
 import com.android.systemui.statusbar.policy.NotificationRowLayout;
@@ -111,6 +122,12 @@ public abstract class BaseStatusBar extends SystemUI implements
     private static final boolean CLOSE_PANEL_WHEN_EMPTIED = true;
     private static final int COLLAPSE_AFTER_DISMISS_DELAY = 200;
     private static final int COLLAPSE_AFTER_REMOVE_DELAY = 400;
+
+    private static final Uri SPAM_MESSAGE_URI = new Uri.Builder()
+            .scheme(ContentResolver.SCHEME_CONTENT)
+            .authority(SpamMessageProvider.AUTHORITY)
+            .appendPath("message")
+            .build();
 
     protected CommandQueue mCommandQueue;
     protected IStatusBarService mBarService;
@@ -489,7 +506,9 @@ public abstract class BaseStatusBar extends SystemUI implements
         return new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                final String packageNameF = (String) v.getTag();
+                final NotificationData.Entry entry = (Entry) v.getTag();
+                final StatusBarNotification sbNotification = entry.notification;
+                final String packageNameF = sbNotification.getPackageName();
                 if (packageNameF == null) return false;
                 if (v.getWindowToken() == null) return false;
                 mNotificationBlamePopup = new PopupMenu(mContext, v);
@@ -551,6 +570,14 @@ public abstract class BaseStatusBar extends SystemUI implements
                             item.setChecked(!item.isChecked());
                             setIconHiddenByUser(packageNameF, item.isChecked());
                             updateNotificationIcons();
+                        } else if (item.getItemId() == R.id.notification_spam_item) {
+                            ContentValues values = new ContentValues();
+                            String message = SpamFilter.getNotificationContent(
+                                    sbNotification.getNotification());
+                            values.put(NotificationTable.MESSAGE_TEXT, message);
+                            values.put(PackageTable.PACKAGE_NAME, packageNameF);
+                            mContext.getContentResolver().insert(SPAM_MESSAGE_URI, values);
+                            removeNotification(entry.key);
                         } else {
                             return false;
                         }
@@ -810,7 +837,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                 R.layout.status_bar_notification_row, parent, false);
 
         // for blaming (see SwipeHelper.setLongPressListener)
-        row.setTag(sbn.getPackageName());
+        row.setTag(entry);
 
         workAroundBadLayerDrawableOpacity(row);
         View vetoButton = updateNotificationVetoButton(row, sbn);
