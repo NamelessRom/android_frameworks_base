@@ -305,6 +305,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     // for heads up notifications
     private HeadsUpNotificationView mHeadsUpNotificationView;
     private int mHeadsUpNotificationDecay;
+    private boolean mHeadsUpNotificationViewAttached;
 
     // on-screen navigation buttons
     private NavigationBarView mNavigationBarView = null;
@@ -1381,10 +1382,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private void addHeadsUpView() {
-        if (mHeadsUpNotificationView != null && mHeadsUpNotificationView.isAttachedToWindow()) {
+        if (mHeadsUpNotificationViewAttached) {
             return;
         }
 
+        mHeadsUpNotificationViewAttached = true;
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_STATUS_BAR_PANEL, // above the status bar!
@@ -1408,7 +1410,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private void removeHeadsUpView() {
-        if (mHeadsUpNotificationView != null && mHeadsUpNotificationView.isAttachedToWindow()) {
+        if (mHeadsUpNotificationViewAttached) {
+            mHeadsUpNotificationViewAttached = false;
             mWindowManager.removeView(mHeadsUpNotificationView);
         }
     }
@@ -3488,7 +3491,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private void setHeadsUpVisibility(boolean vis) {
         if (!ENABLE_HEADS_UP) return;
         if (DEBUG) Log.v(TAG, (vis ? "showing" : "hiding") + " heads up window");
-        if (mHeadsUpNotificationView != null && mHeadsUpNotificationView.isAttachedToWindow()) {
+        if (mHeadsUpNotificationViewAttached) {
             mHeadsUpNotificationView.setVisibility(vis ? View.VISIBLE : View.GONE);
             if (!vis) {
                 if (DEBUG) Log.d(TAG, "setting heads up entry to null");
