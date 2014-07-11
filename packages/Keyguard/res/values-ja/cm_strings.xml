@@ -25,5 +25,6 @@
     <item quantity="other">%d通の未読メッセージ</item>
   </plurals>
   <string name="missed_call">不在着信</string>
+  <string name="message_from">からのメッセージ</string>
   <string name="message_from_person">%1$sからのメッセージ</string>
 </resources>
