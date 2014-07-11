@@ -1320,6 +1320,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private Resources getNavbarThemedResources() {
+        if (mCurrentTheme == null) return mContext.getResources();
         String pkgName = mCurrentTheme.getOverlayPkgNameForApp(ThemeConfig.SYSTEMUI_NAVBAR_PKG);
         Resources res = null;
         try {
