@@ -12,7 +12,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) \
     ../../../../packages/apps/DeviceControl/app/src/main/aidl/org/namelessrom/devicecontrol/api/IRemoteService.aidl
 
 LOCAL_JAVA_LIBRARIES := telephony-common
-LOCAL_STATIC_JAVA_LIBRARIES := android-opt-cards android-support-v4 android-support-v13 jsr305 acra android-visualizer
+LOCAL_STATIC_JAVA_LIBRARIES := android-opt-cards android-support-v4 android-support-v13 jsr305 android-visualizer
 
 LOCAL_PACKAGE_NAME := SystemUI
 LOCAL_CERTIFICATE := platform
