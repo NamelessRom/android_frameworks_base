@@ -625,10 +625,12 @@ public class NavigationBarView extends LinearLayout {
                 && mLockUtils.getCameraEnabled();
 
         final boolean showNotifs = showSearch &&
-            Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.LOCKSCREEN_NOTIFICATIONS, 1) == 1 &&
-                Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.LOCKSCREEN_NOTIFICATIONS_PRIVACY_MODE, 0) == 0;
+                Settings.System.getBoolean(mContext.getContentResolver(),
+                        Settings.System.LOCKSCREEN_NOTIFICATIONS, true) &&
+                Settings.System.getBoolean(mContext.getContentResolver(),
+                        Settings.System.LOCKSCREEN_NOTIFICATIONS_PRIVACY_MODE, false) &&
+                Settings.System.getBoolean(mContext.getContentResolver(),
+                        Settings.System.LOCKSCREEN_NOTIFICATIONS_BUTTON, true);
         setVisibleOrGone(getSearchLight(), showSearch);
         setVisibleOrGone(getCameraButton(), showCamera && mModLockDisabled);
         setVisibleOrGone(getNotifsButton(), showNotifs && mWasNotifsButtonVisible);
