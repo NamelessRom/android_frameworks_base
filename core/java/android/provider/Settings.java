@@ -3898,6 +3898,12 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_NOTIFICATIONS_WAKE_ON_NOTIFICATION = "lockscreen_notifications_wake_on_notification";
 
+        /**
+         * Whether to show the navigation bar button at the keyguard or not
+         * @hide
+         */
+        public static final String LOCKSCREEN_NOTIFICATIONS_BUTTON = "lockscreen_notifications_button";
+
        /**
         * Sets the portrait background of notification drawer
         * @hide
