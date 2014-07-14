@@ -42,8 +42,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Shader.TileMode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.NinePatchDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,7 +55,10 @@ import android.os.UserHandle;
 import android.provider.Settings;
 import android.text.format.Formatter;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.LruCache;
+//import android.widget.Button;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -87,10 +92,14 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         RecentsCallback, StatusBarPanel, Animator.AnimatorListener {
     static final String TAG = "RecentsPanelView";
     static final boolean DEBUG = PhoneStatusBar.DEBUG;
+
+    private boolean mUseCardStack = Recents.mUseCardStack;
     private PopupMenu mPopup;
     private View mRecentsScrim;
     private View mRecentsNoApps;
     private RecentsScrollView mRecentsContainer;
+    private int mRecentsCardWidth;
+    private int mRecentsCardHeight;
 
     private boolean mShowing;
     private boolean mAttached;
@@ -108,6 +117,11 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     private boolean mFitThumbnailToXY;
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
+    private int mDefaultAppBarColor;
+    private int mAppColorBarHeight;
+    private int mAppColorBarLabelColorDark;
+    private int mAppColorBarLabelColorLight;
+    private ArrayList<TaskDescription> mReuseTaskDescriptions;
 
     private LinearLayout mRecentsBar;
     private LinearColorBar mRamUsageBar;
@@ -173,6 +187,9 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         TextView labelView;
         TextView descriptionView;
         View calloutLine;
+        View appColorBarView;
+        //Button appKillButton;
+        //Button appFloatingButton;
         TaskDescription taskDescription;
         boolean loadedThumbnailAndIcon;
         ImageView lockAppView;
@@ -213,6 +230,11 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             holder.calloutLine = convertView.findViewById(R.id.recents_callout_line);
             holder.descriptionView = (TextView) convertView.findViewById(R.id.app_description);
             holder.lockAppView = (ImageView) convertView.findViewById(R.id.lock_app);
+            if (mUseCardStack) {
+                holder.appColorBarView = (View)convertView.findViewById(R.id.app_top_colored_bar);
+                //holder.appKillButton = (Button)convertView.findViewById(R.id.app_kill);
+                //holder.appFloatingButton= (Button)convertView.findViewById(R.id.app_floating);
+            }
 
             convertView.setTag(holder);
             return convertView;
@@ -224,6 +246,10 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             }
             final ViewHolder holder = (ViewHolder) convertView.getTag();
 
+            // Panel is being destroyed, don't try to obtain thumbnails
+            if (mUseCardStack && mRecentTaskDescriptions == null)
+                return convertView;
+
             // index is reverse since most recent appears at the bottom...
             final int index = mRecentTaskDescriptions.size() - position - 1;
 
@@ -232,9 +258,28 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             holder.labelView.setText(td.getLabel());
             holder.thumbnailView.setContentDescription(td.getLabel());
             holder.loadedThumbnailAndIcon = td.isLoaded();
+
             if (td.isLoaded()) {
                 updateThumbnail(holder, td.getThumbnail(), true, false);
                 updateIcon(holder, td.getIcon(), true, false);
+            }
+            if (mUseCardStack) {
+                int abColor = td.getABColor();
+                if (abColor == 0) {
+                    // sometimes we get an empty td here, fill with default
+                    abColor = mDefaultAppBarColor;;
+                    td.setABColor(abColor);
+                    td.setABUseLight(false);
+                }
+                holder.appColorBarView.setBackgroundColor(abColor);
+                int topPadding = mAppColorBarHeight - td.getABHeight();
+                holder.thumbnailViewImage.setPadding(0, topPadding, 0, 0);
+                holder.labelView.setTextColor(td.getABUseLight() ?
+                        mAppColorBarLabelColorLight : mAppColorBarLabelColorDark);
+                //holder.appKillButton.setBackgroundResource(td.getABUseLight() ?
+                //        R.drawable.recents_kill_light : R.drawable.recents_kill);
+                //holder.appFloatingButton.setBackgroundResource(td.getABUseLight() ?
+                //        R.drawable.recents_floating_light : R.drawable.recents_floating);
             }
             if (index == 0) {
                 if (mAnimateIconOfFirstTask) {
@@ -279,9 +324,11 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             holder.thumbnailView.setTag(td);
             holder.thumbnailView.setOnLongClickListener(new OnLongClickDelegate(convertView));
             holder.taskDescription = td;
+
             boolean isLocked = isAppLockedByUser(td.packageName);
             holder.isLocked = isLocked;
             holder.lockAppView.setVisibility(isLocked ? View.VISIBLE : View.GONE);
+
             return convertView;
         }
 
@@ -330,7 +377,19 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RecentsPanelView,
                 defStyle, 0);
 
-        mRecentItemLayoutId = a.getResourceId(R.styleable.RecentsPanelView_recentItemLayout, 0);
+        if (!mUseCardStack) {
+            mRecentItemLayoutId = a.getResourceId(R.styleable.RecentsPanelView_recentItemLayout, 0);
+        } else {
+            mRecentItemLayoutId = R.layout.status_bar_recent_card;
+            mDefaultAppBarColor = getResources().getColor(
+                    R.color.status_bar_recents_app_bar_color);
+            mAppColorBarHeight = getResources().getDimensionPixelSize(
+                    R.dimen.status_bar_recents_app_color_bar_height);
+            mAppColorBarLabelColorDark = getResources().getColor(
+                    R.color.status_bar_recents_app_label_color_dark);
+            mAppColorBarLabelColorLight = getResources().getColor(
+                    R.color.status_bar_recents_app_label_color_light);
+        }
         mRecentTasksLoader = RecentTasksLoader.getInstance(context);
         a.recycle();
 
@@ -405,6 +464,14 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             mWaitingToShow = true;
             refreshRecentTasksList(recentTaskDescriptions, firstScreenful);
             showIfReady();
+            if (mUseCardStack) {
+                // Avoid blank recents screen
+                post(new Runnable() {
+                    public void run() {
+                        refreshViews();
+                    }
+                });
+            }
         } else {
             showImpl(false);
         }
@@ -563,13 +630,50 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mRecentsContainer = (RecentsScrollView) findViewById(R.id.recents_container);
-        mRecentsContainer.setOnScrollListener(new Runnable() {
-            public void run() {
-                // need to redraw the faded edges
-                invalidate();
+
+        if (mUseCardStack) {
+            int orientation;
+            int width, height;
+            DisplayMetrics dm = getResources().getDisplayMetrics();
+            int cardPadding = getResources().getDimensionPixelSize(com.android.internal.R.dimen.status_bar_recents_card_margin);
+
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                orientation = CardStackView.PORTRAIT;
+
+                // Full width, but padding reduces width of content a little bit
+                width = dm.widthPixels;
+                // Height without padding, content height will match display height
+                // in landscape mode (no scaling necessary)
+                height = dm.widthPixels + (cardPadding * 2);
+            } else {
+                orientation = CardStackView.LANDSCAPE;
+
+                // Width without padding, content width will match display width in
+                // portrait mode (no scaling necessary)
+                width = dm.heightPixels + (cardPadding * 2);
+                // Full height, but padding reduces height of content a little bit
+                height = dm.heightPixels;
             }
-        });
+            RecentsCardStackView container =
+                    new RecentsCardStackView(mContext, mRecentsActivity, orientation);
+            container.setCardWidth(width);
+            container.setCardHeight(height);
+            addView((View)container, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            mRecentsContainer = container;
+
+            // Card size without padding
+            mRecentsCardWidth = width - (cardPadding * 2);
+            mRecentsCardHeight = height - (cardPadding * 2);
+        } else {
+            mRecentsContainer = (RecentsScrollView) findViewById(R.id.recents_container);
+            mRecentsContainer.setOnScrollListener(new Runnable() {
+                public void run() {
+                    // need to redraw the faded edges
+                    invalidate();
+                }
+            });
+        }
+
         mListAdapter = new TaskDescriptionAdapter(mContext);
         mRecentsContainer.setAdapter(mListAdapter);
         mRecentsContainer.setCallback(this);
@@ -645,14 +749,50 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             // scale the image to fill the full width of the ImageView. do this only if
             // we haven't set a bitmap before, or if the bitmap size has changed
             if (h.thumbnailViewDrawable == null ||
-                    h.thumbnailViewDrawable.getIntrinsicWidth() != thumbnail.getIntrinsicWidth() ||
-                    h.thumbnailViewDrawable.getIntrinsicHeight() != thumbnail
-                            .getIntrinsicHeight()) {
-                if (mFitThumbnailToXY) {
+                h.thumbnailViewDrawable.getIntrinsicWidth() != thumbnail.getIntrinsicWidth() ||
+                h.thumbnailViewDrawable.getIntrinsicHeight() != thumbnail.getIntrinsicHeight()) {
+                if (mFitThumbnailToXY && !mUseCardStack) {
                     h.thumbnailViewImage.setScaleType(ScaleType.FIT_XY);
                 } else {
                     Matrix scaleMatrix = new Matrix();
-                    float scale = mThumbnailWidth / (float) thumbnail.getIntrinsicWidth();
+                    float scale;
+                    if (mUseCardStack) {
+                        // Scale shorter edge of thumbnail to size of
+                        // CardStackView item
+                        //Log.v(TAG, "thumb width: " + thumbnail.getIntrinsicWidth());
+                        //Log.v(TAG, "thumb height: " + thumbnail.getIntrinsicHeight());
+
+                        // Get card width and height without padding of outer layout
+                        int width = mRecentsCardWidth;
+                        int height = mRecentsCardHeight;
+
+                        // The card contains a background 9 patch drawable for
+                        // rendering a drop shadow. This introduces additional
+                        // padding, which needs to be removed as well.
+                        Rect backgroundPadding = new Rect();
+                        NinePatchDrawable npd = (NinePatchDrawable)getResources().getDrawable(R.drawable.status_bar_recent_card_shadow);
+                        if (npd != null && npd.getPadding(backgroundPadding)) {
+                            width -= backgroundPadding.left + backgroundPadding.right;
+                            height -= backgroundPadding.top + backgroundPadding.bottom;
+                        }
+
+                        //Log.v(TAG, "card width: " + width);
+                        //Log.v(TAG, "card height: " + height);
+
+                        // Compute scale factor
+                        if (thumbnail.getIntrinsicWidth() < thumbnail.getIntrinsicHeight()) {
+                            scale = (float)(width) /
+                                            (float)thumbnail.getIntrinsicWidth();
+                            //Log.v(TAG, "scale to width");
+                        } else {
+                            scale = (float)(height) /
+                                            (float)thumbnail.getIntrinsicHeight();
+                            //Log.v(TAG, "scale to height");
+                        }
+                        //Log.v(TAG, "scale factor: " + scale);
+                    } else {
+                        scale = mThumbnailWidth / (float) thumbnail.getIntrinsicWidth();
+                    }
                     scaleMatrix.setScale(scale, scale);
                     h.thumbnailViewImage.setScaleType(ScaleType.MATRIX);
                     h.thumbnailViewImage.setImageMatrix(scaleMatrix);
@@ -673,7 +813,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         synchronized (td) {
             if (mRecentsContainer != null) {
                 ViewGroup container = (ViewGroup) mRecentsContainer;
-                if (container instanceof RecentsScrollView) {
+                if (!mUseCardStack && container instanceof RecentsScrollView) {
                     container = (ViewGroup) container.findViewById(
                             R.id.recents_linear_layout);
                 }
@@ -742,6 +882,11 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     public void onTaskLoadingCancelled() {
         // Gets called by RecentTasksLoader when it's cancelled
         if (mRecentTaskDescriptions != null) {
+            if (mUseCardStack) {
+                // Keep copy of current descriptions for AB color information
+                // reuse
+                mReuseTaskDescriptions = mRecentTaskDescriptions;
+            }
             mRecentTaskDescriptions = null;
             mListAdapter.notifyDataSetInvalidated();
         }
@@ -1150,5 +1295,9 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     class FakeClearUserDataObserver extends IPackageDataObserver.Stub {
         public void onRemoveCompleted(final String packageName, final boolean succeeded) {
         }
+    }
+
+    public ArrayList<TaskDescription> getReuseTaskDescriptions() {
+        return mReuseTaskDescriptions;
     }
 }

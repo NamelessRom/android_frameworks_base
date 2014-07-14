@@ -4525,6 +4525,12 @@ public final class Settings {
         public static final String FLIP_ACTION_KEY = "flip_action";
 
         /**
+         * Card stack view for recents
+         * @hide
+         */
+        public static final String STATUS_BAR_RECENTS_CARD_STACK = "status_bar_recents_card_stack";
+
+        /**
          * Whether to enable voice wakeup.  The value is boolean (1 or 0).
          * @hide
          */

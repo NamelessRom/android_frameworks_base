@@ -32,6 +32,7 @@ import android.os.Handler;
 import android.os.Process;
 import android.os.UserHandle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -72,12 +73,23 @@ public class RecentTasksLoader implements View.OnTouchListener {
     private enum State { LOADING, LOADED, CANCELLED };
     private State mState = State.CANCELLED;
 
+    private static final int EDGE_DETECTION_MAX_DIFF = 30;
+    private static final int EDGE_DETECTION_SKIP_AMOUNT = 30; // dp
+    private static final int EDGE_DETECTION_SCAN_AMOUNT = 60; // dp
+    private static final int GRAYSCALE_THRESHOLD_DARK = 192;
+    private boolean mUseCardStack;
+    private int mDefaultAppBarColor;
+    private int mEdgeDetectionScanPixels;
+    private int mEdgeDetectionSkipPixels;
+    private ArrayList<TaskDescription> mReusableTasks;
+
 
     private static RecentTasksLoader sInstance;
     public static RecentTasksLoader getInstance(Context context) {
         if (sInstance == null) {
             sInstance = new RecentTasksLoader(context);
         }
+        sInstance.mUseCardStack = Recents.mUseCardStack;
         return sInstance;
     }
 
@@ -111,6 +123,12 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
         mDefaultThumbnailBackground =
                 new ColorDrawableWithDimensions(color, thumbnailWidth, thumbnailHeight);
+
+        mDefaultAppBarColor = res.getColor(R.color.status_bar_recents_app_bar_color);
+        mEdgeDetectionSkipPixels = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                EDGE_DETECTION_SKIP_AMOUNT, res.getDisplayMetrics());
+        mEdgeDetectionScanPixels = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                EDGE_DETECTION_SCAN_AMOUNT, res.getDisplayMetrics());
     }
 
     public void setRecentsPanel(RecentsPanelView newRecentsPanel, RecentsPanelView caller) {
@@ -156,7 +174,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
     // Create an TaskDescription, returning null if the title or icon is null
     TaskDescription createTaskDescription(int taskId, int persistentTaskId, Intent baseIntent,
-            ComponentName origActivity, CharSequence description) {
+            ComponentName origActivity, CharSequence description, TaskDescription reuseTask) {
         Intent intent = new Intent(baseIntent);
         if (origActivity != null) {
             intent.setComponent(origActivity);
@@ -178,6 +196,19 @@ public class RecentTasksLoader implements View.OnTouchListener {
                         description);
                 item.setLabel(title);
 
+                if (mUseCardStack) {
+                    if (reuseTask != null) {
+                        //Log.v(TAG, "Reuse task description color: " + reuseTask.getABColor());
+                        item.setABHeight(reuseTask.getABHeight());
+                        item.setABColor(reuseTask.getABColor());
+                        item.setABUseLight(reuseTask.getABUseLight());
+                    } else {
+                        item.setABHeight(0);
+                        item.setABColor(mDefaultAppBarColor);
+                        item.setABUseLight(false);
+                    }
+                }
+
                 return item;
             } else {
                 if (DEBUG) Log.v(TAG, "SKIPPING item " + persistentTaskId);
@@ -186,23 +217,159 @@ public class RecentTasksLoader implements View.OnTouchListener {
         return null;
     }
 
+    boolean isEdgeAtPosition(int[] pixels, int position) {
+        int r1, r2, r3, g1, g2, g3, b1, b2, b3, diff;
+        int val = pixels[position-1];
+
+        r1 = (val >> 16) & 0xff;
+        g1 = (val >> 8) & 0xff;
+        b1 =  val & 0xff;
+
+        val = pixels[position];
+
+        r2 = (val >> 16) & 0xff;
+        g2 = (val >> 8) & 0xff;
+        b2 =  val & 0xff;
+
+        val = pixels[position+1];
+
+        r3 = (val >> 16) & 0xff;
+        g3 = (val >> 8) & 0xff;
+        b3 =  val & 0xff;
+
+        diff = Math.abs(r1 - r3);
+        diff += Math.abs(g1 - g3);
+        diff += Math.abs(b1 - b3);
+
+        return diff > EDGE_DETECTION_MAX_DIFF;
+    }
+
+    int detectEdge(int[] pixels, int length) {
+        // simple 1D Laplacian operator for edge detection on each channel
+        if (length > mEdgeDetectionSkipPixels+1) {
+            int r1, r2, r3, g1, g2, g3, b1, b2, b3, diff;
+            int val = pixels[mEdgeDetectionSkipPixels-1];
+
+            r1 = (val >> 16) & 0xff;
+            g1 = (val >> 8) & 0xff;
+            b1 = val & 0xff;
+
+            val = pixels[mEdgeDetectionSkipPixels];
+
+            r2 = (val >> 16) & 0xff;
+            g2 = (val >> 8) & 0xff;
+            b2 = val & 0xff;
+
+            for (int i = mEdgeDetectionSkipPixels+1; i < length; ++i) {
+                diff = 0;
+                val = pixels[i];
+
+                r3 = (val >> 16) & 0xff;
+                g3 = (val >> 8) & 0xff;
+                b3 = val & 0xff;
+
+                // do the math for each channel and fuse in diff
+                diff += Math.abs(r1 - r3);
+                diff += Math.abs(g1 - g3);
+                diff += Math.abs(b1 - b3);
+
+                if (diff > EDGE_DETECTION_MAX_DIFF) {
+                    return i-1;
+                }
+
+                // move on to next pixel
+                r1 = r2;
+                g1 = g2;
+                b1 = b2;
+                r2 = r3;
+                g2 = g3;
+                b2 = b3;
+            }
+        }
+
+        return -1;
+    }
+
     void loadThumbnailAndIcon(TaskDescription td) {
         final ActivityManager am = (ActivityManager)
                 mContext.getSystemService(Context.ACTIVITY_SERVICE);
         final PackageManager pm = mContext.getPackageManager();
         Bitmap thumbnail = am.getTaskTopThumbnail(td.persistentTaskId);
+
+        if (thumbnail != null && (td.intent.getFlags() & Intent.FLAG_FLOATING_WINDOW) != 0) {
+            // See Activity.java:5300 for the values
+            int x = Math.round(thumbnail.getWidth() * 0.05f);
+            int y = Math.round(thumbnail.getHeight() * 0.15f);
+            int width = Math.round(thumbnail.getWidth() * 0.9f);
+            Bitmap tmp = Bitmap.createBitmap(thumbnail, x, y, width, thumbnail.getHeight() - y);
+            thumbnail.recycle();
+            thumbnail = tmp;
+        }
+
         Drawable icon = getFullResIcon(td.resolveInfo, pm);
 
         if (DEBUG) Log.v(TAG, "Loaded bitmap for task "
                 + td + ": " + thumbnail);
         synchronized (td) {
+            int abHeight = 0;
+            int abColor = mDefaultAppBarColor;
+
             if (thumbnail != null) {
                 td.setThumbnail(new BitmapDrawable(mContext.getResources(), thumbnail));
+
+                if (mUseCardStack) {
+                    int maxHeight = Math.min(thumbnail.getHeight(), mEdgeDetectionScanPixels);
+                    if (mEdgeDetectionSkipPixels < maxHeight) {
+                        // Crop bitmap to single rightmost column of pixels,
+                        // starting at mEdgeDetectionSkipPixels till maxHeight
+                        Bitmap thumbRight = Bitmap.createBitmap(thumbnail, thumbnail.getWidth()-1, 0, 1, maxHeight);
+                        Bitmap thumbLeft = Bitmap.createBitmap(thumbnail, 0, 0, 1, maxHeight);
+
+                        // Obtain pixels from bitmap
+                        int[] pixelsRight = new int[maxHeight];
+                        thumbRight.getPixels(pixelsRight, 0, 1, 0, 0, 1, maxHeight);
+                        int[] pixelsLeft = new int[maxHeight];
+                        thumbLeft.getPixels(pixelsLeft, 0, 1, 0, 0, 1, maxHeight);
+
+                        // Detect edges on the right side
+                        abHeight = detectEdge(pixelsRight, maxHeight);
+
+                        // Check abHeight and if there is also an edge on the left
+                        if (abHeight != -1 && isEdgeAtPosition(pixelsLeft, abHeight)) {
+                            //Log.v(TAG, "Edge found at " + abHeight);
+                            abColor = pixelsRight[abHeight-1];
+                        } else {
+                            //Log.v(TAG, "No edge found");
+                            abHeight = 0;
+
+                            int curColor = td.getABColor();
+                            if (curColor != 0 && curColor != mDefaultAppBarColor) {
+                                // Reuse existing color
+                                abColor = curColor;
+                            } else {
+                                // Take top color if its the same left and right
+                                if (pixelsRight[0] == pixelsLeft[0]) {
+                                    abColor = pixelsRight[0];
+                                }
+                            }
+                        }
+                        thumbRight.recycle();
+                        thumbLeft.recycle();
+                    }
+                }
             } else {
                 td.setThumbnail(mDefaultThumbnailBackground);
             }
             if (icon != null) {
                 td.setIcon(icon);
+            }
+
+            if (mUseCardStack) {
+                td.setABHeight(abHeight);
+                td.setABColor(abColor);
+                td.setABUseLight(.2126f * ((abColor >> 16) & 0xff)
+                               + .7152f * ((abColor >> 8) & 0xff)
+                               + .0722f * (abColor & 0xff) < GRAYSCALE_THRESHOLD_DARK);
             }
             td.setLoaded(true);
         }
@@ -390,7 +557,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
             item = createTaskDescription(recentInfo.id,
                     recentInfo.persistentId, recentInfo.baseIntent,
-                    recentInfo.origActivity, recentInfo.description);
+                    recentInfo.origActivity, recentInfo.description, null);
             if (item != null) {
                 loadThumbnailAndIcon(item);
             }
@@ -399,7 +566,49 @@ public class RecentTasksLoader implements View.OnTouchListener {
         return null;
     }
 
+    public TaskDescription findFirstTask() {
+        final ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+
+        final List<ActivityManager.RecentTaskInfo> recentTasks = am.getRecentTasksForUser(
+                MAX_TASKS, ActivityManager.RECENT_IGNORE_UNAVAILABLE, UserHandle.CURRENT.getIdentifier());
+        TaskDescription item = null;
+        int i = -1;
+        for (ActivityManager.RecentTaskInfo recentInfo : recentTasks) {
+            i++;
+            Intent intent = new Intent(recentInfo.baseIntent);
+            if (recentInfo.origActivity != null) {
+                intent.setComponent(recentInfo.origActivity);
+            }
+
+            // Don't load the current home activity
+            if (isCurrentHomeActivity(intent.getComponent(), null)) {
+                continue;
+            }
+
+            // Don't load ourselves
+            if (intent.getComponent().getPackageName().equals(mContext.getPackageName())) {
+                continue;
+            }
+
+            item = createTaskDescription(recentInfo.id,
+                    recentInfo.persistentId, recentInfo.baseIntent,
+                    recentInfo.origActivity, recentInfo.description, null);
+            if (item != null) {
+                loadThumbnailAndIcon(item);
+            }
+            // don't load the first activity
+            if (i == 0) {
+                continue;
+            }
+            return item;
+        }
+        return null;
+    }
+
     public void loadTasksInBackground() {
+        if (mUseCardStack && mRecentsPanel != null) {
+            mReusableTasks = mRecentsPanel.getReuseTaskDescriptions();
+        }
         loadTasksInBackground(false);
     }
     public void loadTasksInBackground(final boolean zeroeth) {
@@ -472,7 +681,7 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
                     TaskDescription item = createTaskDescription(recentInfo.id,
                             recentInfo.persistentId, recentInfo.baseIntent,
-                            recentInfo.origActivity, recentInfo.description);
+                            recentInfo.origActivity, recentInfo.description, reuseTask);
 
                     if (item != null) {
                         while (true) {
@@ -494,6 +703,11 @@ public class RecentTasksLoader implements View.OnTouchListener {
                         }
                         ++index;
                     }
+                }
+
+                if (mUseCardStack && mReusableTasks != null) {
+                    // Clear reusable tasks, not absolutely necessary though
+                    mReusableTasks = null;
                 }
 
                 if (!isCancelled()) {

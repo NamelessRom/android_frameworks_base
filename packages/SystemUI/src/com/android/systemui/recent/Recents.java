@@ -25,13 +25,16 @@ import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.NinePatchDrawable;
 import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SettingConfirmationHelper;
 import android.view.Display;
 import android.view.View;
 
@@ -43,6 +46,9 @@ public class Recents extends SystemUI implements RecentsComponent {
     private static final String TAG = "Recents";
     private static final boolean DEBUG = false;
 
+    private boolean mInitCardStack = false;
+    static boolean mUseCardStack = false;
+
     @Override
     public void start() {
         putComponent(RecentsComponent.class, this);
@@ -53,6 +59,25 @@ public class Recents extends SystemUI implements RecentsComponent {
             View statusBarView, int expandedDesktopStyle) {
         if (DEBUG) Log.d(TAG, "toggle recents panel");
         try {
+            int cardStackStatus = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK, 0, UserHandle.USER_CURRENT);
+
+            boolean useCardStack = false;
+            if (cardStackStatus == 1) {
+                useCardStack = true;
+            }
+
+            boolean toggleCardStack = false;
+            if (!mInitCardStack) {
+                // First run, accept value from settings
+                mInitCardStack = true;
+                mUseCardStack = useCardStack;
+            } else if (useCardStack != mUseCardStack) {
+                // No first run and setting has been flipped, toggle view
+                toggleCardStack = true;
+                mUseCardStack = useCardStack;
+            }
+
             TaskDescription firstTask = RecentTasksLoader.getInstance(mContext).getFirstTask();
 
             Intent intent = new Intent(RecentsActivity.TOGGLE_RECENTS_INTENT);
@@ -73,7 +98,6 @@ public class Recents extends SystemUI implements RecentsComponent {
                     mContext.startActivityAsUser(intent, new UserHandle(
                             UserHandle.USER_CURRENT));
                 }
-
             } else {
                 Bitmap first = null;
                 if (firstTask.getThumbnail() instanceof BitmapDrawable) {
@@ -85,10 +109,55 @@ public class Recents extends SystemUI implements RecentsComponent {
                 }
                 final Resources res = mContext.getResources();
 
-                float thumbWidth = res
-                        .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width);
-                float thumbHeight = res
-                        .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_height);
+                DisplayMetrics dm = new DisplayMetrics();
+                if (immersiveModeStyle == IMMERSIVE_MODE_FULL ||
+                    immersiveModeStyle == IMMERSIVE_MODE_HIDE_ONLY_NAVBAR ||
+                    immersiveModeStyle == IMMERSIVE_MODE_APP) {
+                    display.getRealMetrics(dm);
+                } else {
+                    display.getMetrics(dm);
+                }
+
+                final Configuration config = res.getConfiguration();
+
+                float thumbWidth;
+                float thumbHeight;
+
+                int cardPadding = res.getDimensionPixelSize(
+                        com.android.internal.R.dimen.status_bar_recents_card_margin);
+                Rect backgroundPadding = new Rect();
+                if (mUseCardStack) {
+                    float aspectRatio =
+                        (float)first.getWidth() / (float)first.getHeight();
+
+                    // The card contains a background 9 patch drawable for
+                    // rendering a drop shadow. This introduces additional
+                    // padding, which needs to be removed as well.
+                    NinePatchDrawable npd = (NinePatchDrawable)res.getDrawable(R.drawable.status_bar_recent_card_shadow);
+
+                    if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        // Full width, but padding reduces width of content a little bit
+                        thumbWidth = dm.widthPixels - (cardPadding * 2);
+                        if (npd != null && npd.getPadding(backgroundPadding)) {
+                            thumbWidth -= backgroundPadding.left + backgroundPadding.right;
+                        }
+                        thumbHeight = thumbWidth / aspectRatio;
+                    } else {
+                        // Full height, but padding reduces height of content a little bit
+                        thumbHeight = dm.heightPixels - (cardPadding * 2);
+                        if (npd != null && npd.getPadding(backgroundPadding)) {
+                            thumbHeight -= backgroundPadding.top + backgroundPadding.bottom;
+                        }
+                        thumbWidth = thumbHeight * aspectRatio;
+                    }
+
+                } else {
+                    thumbWidth = res
+                            .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_width);
+                    thumbHeight = res
+                            .getDimensionPixelSize(R.dimen.status_bar_recents_thumbnail_height);
+                }
+
                 if (first == null) {
                     throw new RuntimeException("Recents thumbnail is null");
                 }
@@ -98,20 +167,46 @@ public class Recents extends SystemUI implements RecentsComponent {
                     if (first == null) {
                         throw new RuntimeException("Recents thumbnail is null");
                     }
+                    if (mUseCardStack) {
+                        // Compute reduced card size
+                        if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                            thumbHeight = dm.widthPixels - (backgroundPadding.top + backgroundPadding.bottom);
+                        } else {
+                            thumbWidth = dm.heightPixels - (backgroundPadding.left + backgroundPadding.right);
+                        }
+
+                        // Ensure thumbnail size is smaller or equal than bitmap
+                        if (first.getWidth() < thumbWidth) {
+                            thumbWidth = first.getWidth();
+                        }
+                        if (first.getHeight() < thumbHeight) {
+                            thumbHeight = first.getHeight();
+                        }
+
+                        // Crop thumbnail to reduced card size
+                        if (first.getWidth() != thumbWidth || first.getHeight() != thumbHeight) {
+                            first = Bitmap.createBitmap(first, 0, 0, (int)thumbWidth, (int)thumbHeight);
+                            if (first == null) {
+                                throw new RuntimeException("Recents thumbnail is null");
+                            }
+                        }
+                    }
                 }
 
-
-                DisplayMetrics dm = new DisplayMetrics();
-                if (expandedDesktopStyle == 2) {
-                    display.getRealMetrics(dm);
-                } else {
-                    display.getMetrics(dm);
-                }
                 // calculate it here, but consider moving it elsewhere
                 // first, determine which orientation you're in.
-                final Configuration config = res.getConfiguration();
                 int x, y;
 
+                if (mUseCardStack) {
+                    int cardPos = RecentsCardStackView.getLastCardPos();
+                    if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        x = cardPadding + backgroundPadding.left;
+                        y = cardPos + cardPadding + backgroundPadding.top;
+                    } else {
+                        x = cardPos + cardPadding + backgroundPadding.left;
+                        y = cardPadding + backgroundPadding.top;
+                    }
+                } else {
                 if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
                     float appLabelLeftMargin = res.getDimensionPixelSize(
                             R.dimen.status_bar_recents_app_label_left_margin);
@@ -178,6 +273,7 @@ public class Recents extends SystemUI implements RecentsComponent {
                     y = (int) ((dm.heightPixels - statusBarHeight - height) / 2f + thumbTopMargin
                             + recentsItemTopPadding + thumbBgPadding + statusBarHeight);
                 }
+                }
 
                 ActivityOptions opts = ActivityOptions.makeThumbnailScaleDownAnimation(
                         statusBarView,
@@ -195,6 +291,43 @@ public class Recents extends SystemUI implements RecentsComponent {
                 mContext.startActivityAsUser(intent, opts.toBundle(), new UserHandle(
                         UserHandle.USER_CURRENT));
             }
+
+            if (toggleCardStack) {
+                restartRecentsActivity();
+            }
+
+            if (cardStackStatus == 0 || cardStackStatus == 3) {
+                SettingConfirmationHelper.showConfirmationDialogForSetting(
+                    mContext,
+                    mContext.getString(R.string.status_bar_recents_card_stack_title),
+                    mContext.getString(R.string.status_bar_recents_card_stack_message),
+                    mContext.getResources().getDrawable(R.drawable.status_bar_recents_card_stack),
+                    Settings.System.STATUS_BAR_RECENTS_CARD_STACK,
+                    new SettingConfirmationHelper.OnSelectListener() {
+                        @Override
+                        public void onSelect(boolean enabled) {
+                            if (mUseCardStack != enabled) {
+                                mUseCardStack = enabled;
+                                restartRecentsActivity();
+                            }
+                        }
+                    });
+            }
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "Failed to launch RecentAppsIntent", e);
+        }
+    }
+
+    private void restartRecentsActivity() {
+        try {
+            Intent intent = new Intent(RecentsActivity.TOGGLE_RECENTS_INTENT);
+            intent.setClassName("com.android.systemui",
+                    "com.android.systemui.recent.RecentsActivity");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            mContext.startActivityAsUser(intent, new UserHandle(
+                    UserHandle.USER_CURRENT));
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Failed to launch RecentAppsIntent", e);
         }

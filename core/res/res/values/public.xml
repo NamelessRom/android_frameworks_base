@@ -1476,6 +1476,7 @@
   <public type="dimen" name="dialog_min_width_minor" id="0x01050004" />
   <public type="dimen" name="notification_large_icon_width" id="0x01050005" />
   <public type="dimen" name="notification_large_icon_height" id="0x01050006" />
+  <public type="dimen" name="status_bar_recents_card_margin" id="0x01050007" />
 
   <!-- Standard content view for a {@link android.app.ListFragment}.
      If you are implementing a subclass of ListFragment with your

@@ -74,7 +74,9 @@ import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.Trace;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.EventLog;
 import android.util.Slog;
 import android.view.Display;
@@ -233,6 +235,9 @@ final class ActivityStack {
     int mCurrentUser;
 
     final int mStackId;
+
+    private boolean mInitCardStack = false;
+    private boolean mUseCardStack;
 
     /** Run all ActivityStacks through this */
     final ActivityStackSupervisor mStackSupervisor;
@@ -713,11 +718,61 @@ final class ActivityStack {
         Resources res = mService.mContext.getResources();
         int w = mThumbnailWidth;
         int h = mThumbnailHeight;
-        if (w < 0) {
-            mThumbnailWidth = w =
-                res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_width);
-            mThumbnailHeight = h =
-                res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_height);
+
+        // Always check card stack settings have changed
+        Configuration config = res.getConfiguration();
+        int cardStackStatus = Settings.System.getInt(mContext.getContentResolver(),
+                 Settings.System.STATUS_BAR_RECENTS_CARD_STACK, 0);
+        boolean useCardStack = (cardStackStatus == 1);
+        boolean toggleCardStack = false;
+
+        if (!mInitCardStack) {
+            mInitCardStack = true;
+        } else if (useCardStack != mUseCardStack) {
+            toggleCardStack = true;
+        }
+        mUseCardStack = useCardStack;
+
+        if (w < 0 || toggleCardStack) {
+            // On first run or settings toggled, (re)evaluate thumbnail dimensions
+            if (mUseCardStack) {
+                // Estimate real card size
+                int minSize;
+                DisplayMetrics dm = res.getDisplayMetrics();
+                if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    minSize = dm.widthPixels;
+                } else {
+                    minSize = dm.heightPixels;
+                }
+
+                int cardPadding = res.getDimensionPixelSize(
+                        com.android.internal.R.dimen.status_bar_recents_card_margin);
+
+                // Background drawable (shadow) is not available here.
+                // Therefore, ignore drawable and be more generous in terms of
+                // thumbnail size:
+                //   - real width is: minSize - (cardPadding * 2)
+                //                            - drawable_horizontal_padding
+                //   - real height is: minSize - drawable_vertical_padding
+                w = minSize - (cardPadding * 2);
+                h = minSize + (cardPadding * 2);
+
+                // Only compute portrait mode dimensions, gets swapped later
+                mThumbnailWidth = w;
+                mThumbnailHeight = h;
+            } else {
+                mThumbnailWidth = w =
+                    res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_width);
+                mThumbnailHeight = h =
+                    res.getDimensionPixelSize(com.android.internal.R.dimen.thumbnail_height);
+            }
+        }
+
+        if (mUseCardStack && config.orientation != Configuration.ORIENTATION_PORTRAIT) {
+            // Swap dimensions for non-portrait mode
+            int tmp = w;
+            w = h;
+            h = tmp;
         }
 
         if (w > 0) {
@@ -727,7 +782,7 @@ final class ActivityStack {
                     || mLastScreenshotBitmap.getHeight() != h) {
                 mLastScreenshotActivity = who;
                 mLastScreenshotBitmap = mWindowManager.screenshotApplications(
-                        who.appToken, Display.DEFAULT_DISPLAY, w, h, SCREENSHOT_FORCE_565);
+                        who.appToken, Display.DEFAULT_DISPLAY, w, h, SCREENSHOT_FORCE_565 || mUseCardStack);
             }
             if (mLastScreenshotBitmap != null) {
                 return mLastScreenshotBitmap.copy(mLastScreenshotBitmap.getConfig(), true);
