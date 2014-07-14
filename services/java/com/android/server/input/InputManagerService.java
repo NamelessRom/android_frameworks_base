@@ -90,6 +90,8 @@ import java.util.HashSet;
 import libcore.io.Streams;
 import libcore.util.Objects;
 
+import org.namelessrom.hardware.SmartCoverHW;
+
 /*
  * Wraps the C++ InputManager and provides its callbacks.
  */
@@ -1373,7 +1375,12 @@ public class InputManagerService extends IInputManager.Stub
                     + ", mask=" + Integer.toHexString(switchMask));
         }
 
-        if ((switchMask & SW_LID_BIT) != 0) {
+        if (SmartCoverHW.isMaskable()) {
+            if ((switchMask & SmartCoverHW.SW_BIT) != 0) {
+                final boolean lidOpen = ((switchValues & SmartCoverHW.SW_BIT) == 0);
+                mWindowManagerCallbacks.notifyLidSwitchChanged(whenNanos, lidOpen);
+            }
+        } else if ((switchMask & SW_LID_BIT) != 0) {
             final boolean lidOpen = ((switchValues & SW_LID_BIT) == 0);
             mWindowManagerCallbacks.notifyLidSwitchChanged(whenNanos, lidOpen);
         }
