@@ -521,13 +521,14 @@ public class KeyguardViewMediator {
     }
 
     private void observeSmartWindow() {
-        if (SmartCoverHW.isSupported() && mSmartCoverObserver == null) {
+        if (SmartCoverHW.isSupported() && SmartCoverHW.isMonitorable()
+                    && mSmartCoverObserver == null) {
             if (DEBUG) Log.d(TAG, String.format("SmartCoverHW is supported, observing: %s",
                     SmartCoverHW.getPath()));
             mSmartCoverObserver = new FileObserver(SmartCoverHW.getPath(), FileObserver.MODIFY) {
                 @Override public void onEvent(final int event, final String s) {
                     if (FileObserver.MODIFY != event) return;
-                    final int state = SmartCoverHW.isOpen() ? 1 : 0;
+                    final int state = SmartCoverHW.isPathOpen() ? 1 : 0;
                     final Intent intent = new Intent();
                     intent.setAction(WindowManagerPolicy.ACTION_LID_STATE_CHANGED);
                     intent.putExtra(WindowManagerPolicy.EXTRA_LID_STATE, state);
