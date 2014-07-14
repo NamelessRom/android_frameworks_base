@@ -222,6 +222,10 @@ public class InputManagerService extends IInputManager.Stub
     /** Switch code: Lid switch.  When set, lid is shut. */
     public static final int SW_LID = 0x00;
 
+    // Switch code values must match bionic/libc/kernel/common/linux/input.h
+    /** Switch code: Cover switch.  When set, cover is shut. */
+    public static final int SW_FLIP = 0x15;
+
     /** Switch code: Keypad slide.  When set, keyboard is exposed. */
     public static final int SW_KEYPAD_SLIDE = 0x0a;
 
@@ -235,6 +239,7 @@ public class InputManagerService extends IInputManager.Stub
     public static final int SW_JACK_PHYSICAL_INSERT = 0x07;
 
     public static final int SW_LID_BIT = 1 << SW_LID;
+    public static final int SW_FLIP_BIT = 1 << SW_FLIP;
     public static final int SW_KEYPAD_SLIDE_BIT = 1 << SW_KEYPAD_SLIDE;
     public static final int SW_HEADPHONE_INSERT_BIT = 1 << SW_HEADPHONE_INSERT;
     public static final int SW_MICROPHONE_INSERT_BIT = 1 << SW_MICROPHONE_INSERT;
@@ -1373,8 +1378,9 @@ public class InputManagerService extends IInputManager.Stub
                     + ", mask=" + Integer.toHexString(switchMask));
         }
 
-        if ((switchMask & SW_LID_BIT) != 0) {
-            final boolean lidOpen = ((switchValues & SW_LID_BIT) == 0);
+        if (((switchMask & SW_LID_BIT) != 0) || ((switchMask & SW_FLIP_BIT) != 0)) {
+            final boolean lidOpen = ((switchValues & SW_LID_BIT) == 0)
+                    || ((switchValues & SW_FLIP_BIT) == 0);
             mWindowManagerCallbacks.notifyLidSwitchChanged(whenNanos, lidOpen);
         }
 
