@@ -12,6 +12,7 @@ LOCAL_SRC_FILES := \
 LOCAL_MODULE:= services
 
 LOCAL_JAVA_LIBRARIES := android.policy conscrypt telephony-common
+LOCAL_STATIC_JAVA_LIBRARIES := org.namelessrom.hardware
 
 include $(BUILD_JAVA_LIBRARY)
 
