@@ -6049,7 +6049,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (mLidState == LID_CLOSED && mLidControlsSleep) {
             ITelephony telephonyService = getTelephonyService();
             try {
-                if (telephonyService != null && telephonyService.isIdle()) {
+                if (telephonyService != null && telephonyService.isIdle() && !keyguardOn()) {
                     mPowerManager.goToSleep(SystemClock.uptimeMillis());
                 }
             } catch (RemoteException e) {
