@@ -95,6 +95,9 @@
     <!-- Device Control -->
     <uses-permission android:name="org.namelessrom.devicecontrol.API" />
 
+    <!-- WallpaperManager -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+
     <application
         android:persistent="true"
         android:allowClearUserData="false"
