@@ -109,8 +109,10 @@ class GLES20RenderLayer extends GLES20Layer {
             ((GLES20Canvas) currentCanvas).interrupt();
         }
         HardwareCanvas canvas = getCanvas();
-        canvas.setViewport(mWidth, mHeight);
-        canvas.onPreDraw(dirty);
+        if (canvas != null) {
+            canvas.setViewport(mWidth, mHeight);
+            canvas.onPreDraw(dirty);
+        }
         return canvas;
     }
 
