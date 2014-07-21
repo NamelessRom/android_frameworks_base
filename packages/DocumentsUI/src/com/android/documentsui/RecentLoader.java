@@ -28,7 +28,6 @@ import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
 import android.provider.DocumentsContract.Root;
@@ -133,9 +132,7 @@ public class RecentLoader extends AsyncTaskLoader<DirectoryResult> {
                         uri, null, null, null, DirectoryLoader.getQuerySortOrder(mSortOrder));
                 mWithRoot = new RootCursorWrapper(authority, rootId, cursor, MAX_DOCS_FROM_ROOT);
 
-            } catch (RemoteException e) {
-                Log.w(TAG, "Failed to load " + authority + ", " + rootId, e);
-            } catch (UnsupportedOperationException e) {
+            } catch (Exception e) {
                 Log.w(TAG, "Failed to load " + authority + ", " + rootId, e);
             } finally {
                 ContentProviderClient.releaseQuietly(client);

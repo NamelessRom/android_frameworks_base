@@ -68,7 +68,6 @@ import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.OperationCanceledException;
 import android.os.Parcelable;
-import android.os.RemoteException;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
 import android.text.format.DateUtils;
@@ -103,7 +102,6 @@ import com.android.documentsui.model.DocumentInfo;
 import com.android.documentsui.model.RootInfo;
 import com.google.android.collect.Lists;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -693,8 +691,8 @@ public class DirectoryFragment extends Fragment {
                 }
 
                 DocumentsContract.deleteDocument(client, doc.derivedUri);
-            } catch (RemoteException e) {
-                Log.w(TAG, "Failed to delete " + doc, e);
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to delete " + doc);
                 hadTrouble = true;
             } finally {
                 ContentProviderClient.releaseQuietly(client);
@@ -1181,12 +1179,10 @@ public class DirectoryFragment extends Fragment {
                             context, mThumbSize);
                     thumbs.put(mUri, result);
                 }
-            } catch (OperationCanceledException e) {
-                // Do nothing
-            } catch (RemoteException e) {
-                Log.w(TAG, "Failed to load thumbnail for " + mUri + ": " + e);
-            } catch (IOException e) {
-                Log.w(TAG, "Failed to load thumbnail for " + mUri + ": " + e);
+            } catch (Exception e) {
+                if (!(e instanceof OperationCanceledException)) {
+                    Log.w(TAG, "Failed to load thumbnail for " + mUri + ": " + e);
+                }
             } finally {
                 ContentProviderClient.releaseQuietly(client);
             }
