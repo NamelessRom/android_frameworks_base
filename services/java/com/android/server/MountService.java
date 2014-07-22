@@ -122,6 +122,8 @@ class MountService extends IMountService.Stub
 
     private static final String VOLD_TAG = "VoldConnector";
 
+    private static final String VOLD_SWITCH_PERSIST_PROP = "persist.sys.vold.switchexternal";
+
     /** Maximum number of ASEC containers allowed to be mounted. */
     private static final int MAX_CONTAINERS = 250;
 
@@ -1231,7 +1233,14 @@ class MountService extends IMountService.Stub
 
         Resources resources = mContext.getResources();
 
-        int id = com.android.internal.R.xml.storage_list;
+	int id;
+	String switchExternal = SystemProperties.get(VOLD_SWITCH_PERSIST_PROP, "0");
+	if (switchExternal.equals("1")) {
+	    id = com.android.internal.R.xml.storage_list_switched;
+	} else {
+            id = com.android.internal.R.xml.storage_list;
+	}
+
         XmlResourceParser parser = resources.getXml(id);
         AttributeSet attrs = Xml.asAttributeSet(parser);
 
