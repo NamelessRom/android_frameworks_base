@@ -98,7 +98,7 @@ import org.namelessrom.hardware.SmartCoverHW;
 public class InputManagerService extends IInputManager.Stub
         implements Watchdog.Monitor, DisplayManagerService.InputManagerFuncs {
     static final String TAG = "InputManager";
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     private static final String EXCLUDED_DEVICES_PATH = "etc/excluded-input-devices.xml";
 
@@ -1377,7 +1377,9 @@ public class InputManagerService extends IInputManager.Stub
 
         if (SmartCoverHW.isMaskable()) {
             if ((switchMask & SmartCoverHW.SW_BIT) != 0) {
-                final boolean lidOpen = ((switchValues & SmartCoverHW.SW_BIT) == 0);
+                final boolean lidOpen =
+                        SmartCoverHW.isLidOpen(switchValues & SmartCoverHW.SW_BIT);
+                if (DEBUG) Log.d(TAG, "lidOpen: " + (lidOpen ? "1": "0"));
                 mWindowManagerCallbacks.notifyLidSwitchChanged(whenNanos, lidOpen);
             }
         } else if ((switchMask & SW_LID_BIT) != 0) {
