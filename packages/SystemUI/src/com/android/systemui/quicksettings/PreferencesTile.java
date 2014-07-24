@@ -37,9 +37,9 @@ public class PreferencesTile extends QuickSettingsTile {
     @Override
     public void onFlingLeft() {
         super.onFlingLeft();
-        if (NamelessUtils.isPackageInstalled(mContext, "org.namelessrom.updatecenter")) {
+        if (NamelessUtils.isPackageInstalled(mContext, "org.namelessrom.center")) {
             startSettingsActivity(new Intent()
-                    .setAction("org.namelessrom.updatecenter.activities.MainActivity"));
+                    .setAction("org.namelessrom.center.activities.MainActivity"));
         }
     }
 
