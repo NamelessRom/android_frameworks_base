@@ -156,8 +156,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.namelessrom.hardware.SmartCoverHW;
-
 /** {@hide} */
 public class WindowManagerService extends IWindowManager.Stub
         implements Watchdog.Monitor, WindowManagerPolicy.WindowManagerFuncs,
@@ -5306,29 +5304,17 @@ public class WindowManagerService extends IWindowManager.Stub
     // Called by window manager policy. Not exposed externally.
     @Override
     public int getLidState() {
-        if (SmartCoverHW.isMaskable()) {
-            final int sw = mInputManager.getSwitchState(-1,
-                    InputDevice.SOURCE_ANY, SmartCoverHW.SW_MASK);
-            if (SmartCoverHW.isLidClosed(sw)) {
-                return LID_CLOSED;
-            } else if (SmartCoverHW.isLidOpen(sw)) {
-                return LID_OPEN;
-            } else {
-                return LID_ABSENT;
-            }
+        int sw = mInputManager.getSwitchState(-1, InputDevice.SOURCE_ANY,
+                InputManagerService.SW_LID);
+        if (sw > 0) {
+            // Switch state: AKEY_STATE_DOWN or AKEY_STATE_VIRTUAL.
+            return LID_CLOSED;
+        } else if (sw == 0) {
+            // Switch state: AKEY_STATE_UP.
+            return LID_OPEN;
         } else {
-            int sw = mInputManager.getSwitchState(-1, InputDevice.SOURCE_ANY,
-                    InputManagerService.SW_LID);
-            if (sw > 0) {
-                // Switch state: AKEY_STATE_DOWN or AKEY_STATE_VIRTUAL.
-                return LID_CLOSED;
-            } else if (sw == 0) {
-                // Switch state: AKEY_STATE_UP.
-                return LID_OPEN;
-            } else {
-                // Switch state: AKEY_STATE_UNKNOWN.
-                return LID_ABSENT;
-            }
+            // Switch state: AKEY_STATE_UNKNOWN.
+            return LID_ABSENT;
         }
     }
 
