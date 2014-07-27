@@ -338,7 +338,7 @@ void LayerRenderer::destroyLayerDeferred(Layer* layer) {
 }
 
 void LayerRenderer::flushLayer(Layer* layer) {
-#if defined(GL_EXT_discard_framebuffer) && !defined(EXYNOS4_ENHANCEMENTS)
+#if defined(GL_EXT_discard_framebuffer)
     if (!layer) return;
 
     GLuint fbo = layer->getFbo();
