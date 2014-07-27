@@ -36,7 +36,6 @@ import static com.android.internal.util.cm.QSConstants.TILE_NETWORKMODE;
 import static com.android.internal.util.cm.QSConstants.TILE_NFC;
 import static com.android.internal.util.cm.QSConstants.TILE_ONTHEGO;
 import static com.android.internal.util.cm.QSConstants.TILE_PROFILE;
-import static com.android.internal.util.cm.QSConstants.TILE_PERFORMANCE_PROFILE;
 import static com.android.internal.util.cm.QSConstants.TILE_QUIETHOURS;
 import static com.android.internal.util.cm.QSConstants.TILE_RINGER;
 import static com.android.internal.util.cm.QSConstants.TILE_SCREENTIMEOUT;
@@ -64,9 +63,11 @@ import android.provider.Settings;
 import android.telephony.MSimTelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Slog;
 import android.view.LayoutInflater;
 
 import com.android.internal.util.cm.QSUtils;
+import com.android.systemui.nameless.quicktiles.ExtensionManager;
 import com.android.systemui.quicksettings.AirplaneModeTile;
 import com.android.systemui.quicksettings.AlarmTile;
 import com.android.systemui.quicksettings.AutoRotateTile;
@@ -79,6 +80,7 @@ import com.android.systemui.quicksettings.CompassTile;
 import com.android.systemui.quicksettings.DockBatteryTile;
 import com.android.systemui.quicksettings.EqualizerTile;
 import com.android.systemui.quicksettings.ExpandedDesktopTile;
+import com.android.systemui.quicksettings.ExtensionQuickTile;
 import com.android.systemui.quicksettings.GPSTile;
 import com.android.systemui.quicksettings.HeadsUpTile;
 import com.android.systemui.quicksettings.InputMethodTile;
@@ -108,9 +110,11 @@ import com.android.systemui.quicksettings.WifiAPTile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class QuickSettingsController {
     private static final String TAG = "QuickSettingsController";
+    private static final boolean DEBUG = true;
 
     // Stores the broadcast receivers and content observers
     // quick tiles register for.
@@ -318,6 +322,9 @@ public class QuickSettingsController {
             }
         }
 
+        // load our extension tiles
+        loadExtensionTiles();
+
         if (mRibbonMode) {
             return;
         }
@@ -363,6 +370,22 @@ public class QuickSettingsController {
             QuickSettingsTile qs = new EqualizerTile(mContext, this);
             qs.setupQuickSettingsTile(inflater, mContainerView);
             mQuickSettingsTiles.add(qs);
+        }
+    }
+
+    private void loadExtensionTiles() {
+        // TODO: allow to disable
+        final List<ExtensionQuickTile> quickTiles = ExtensionManager.getInstance(mContext)
+                .getExtensionTiles(this);
+        if (DEBUG) {
+            Slog.d(TAG, String.format("Extensiontiles: %s", quickTiles.size()));
+        }
+        final LayoutInflater inflater = LayoutInflater.from(mContext);
+        for (final ExtensionQuickTile quickTile : quickTiles) {
+            if (quickTile != null) {
+                quickTile.setupQuickSettingsTile(inflater, mContainerView);
+                mQuickSettingsTiles.add(quickTile);
+            }
         }
     }
 

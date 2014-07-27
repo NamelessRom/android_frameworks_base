@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -41,6 +42,7 @@ public class QuickSettingsTile implements OnClickListener {
     protected OnLongClickListener mOnLongClick;
     protected final int mTileLayout;
     protected int mDrawable;
+    protected Drawable mDrawableFull;
     protected String mLabel;
     protected int mTileTextSize;
     protected int mTileTextPadding;
@@ -52,8 +54,8 @@ public class QuickSettingsTile implements OnClickListener {
 
     protected final Vibrator mVibrator;
 
-    private final boolean mFlipRight;
-    private final boolean mShouldVibrate;
+    protected final boolean mFlipRight;
+    protected final boolean mShouldVibrate;
 
     // Gesture
     protected final GestureDetector mGestureDetector;
@@ -77,6 +79,7 @@ public class QuickSettingsTile implements OnClickListener {
                              boolean flipRight, boolean vibrate) {
         mContext = context;
         mDrawable = R.drawable.ic_notifications;
+        mDrawableFull = null;
         mLabel = mContext.getString(R.string.quick_settings_label_enabled);
         mStatusbarService = qsc.mStatusBarService;
         mQsc = qsc;
@@ -173,7 +176,11 @@ public class QuickSettingsTile implements OnClickListener {
         }
         View image = getImageView();
         if (image != null && image instanceof ImageView) {
-            ((ImageView) image).setImageResource(mDrawable);
+            if (mDrawable != -1) {
+                ((ImageView) image).setImageResource(mDrawable);
+            } else if (mDrawableFull != null) {
+                ((ImageView) image).setImageDrawable(mDrawableFull);
+            }
         }
     }
 

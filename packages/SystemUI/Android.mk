@@ -9,10 +9,12 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
     src/com/android/systemui/EventLogTags.logtags \
-    ../../../../packages/apps/DeviceControl/app/src/main/aidl/org/namelessrom/devicecontrol/api/IRemoteService.aidl
+    ../../../../packages/apps/DeviceControl/app/src/main/aidl/org/namelessrom/devicecontrol/api/IRemoteService.aidl \
+    aidl/org/namelessrom/quicktiles/api/ExtensionTile.aidl
 
 LOCAL_JAVA_LIBRARIES := telephony-common
-LOCAL_STATIC_JAVA_LIBRARIES := android-opt-cards android-support-v4 android-support-v13 jsr305 android-visualizer
+LOCAL_STATIC_JAVA_LIBRARIES := android-opt-cards android-support-v4 android-support-v13 jsr305 \
+    android-visualizer quicktile-api
 
 LOCAL_PACKAGE_NAME := SystemUI
 LOCAL_CERTIFICATE := platform
@@ -24,5 +26,14 @@ LOCAL_AAPT_FLAGS := --auto-add-overlay
 LOCAL_AAPT_FLAGS += --extra-packages com.android.cards
 
 include $(BUILD_PACKAGE)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := quicktile-api
+LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := $(call all-java-files-under, api) \
+    aidl/org/namelessrom/quicktiles/api/ExtensionTile.aidl
+
+include $(BUILD_STATIC_JAVA_LIBRARY)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
