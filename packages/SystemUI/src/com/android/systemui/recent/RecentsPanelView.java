@@ -150,6 +150,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         public View findViewForTask(int persistentTaskId);
         public void drawFadedEdges(Canvas c, int left, int right, int top, int bottom);
         public void setOnScrollListener(Runnable listener);
+        public int getRecentsCount();
     }
 
     private final class OnLongClickDelegate implements View.OnLongClickListener {
@@ -172,6 +173,8 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         View calloutLine;
         TaskDescription taskDescription;
         boolean loadedThumbnailAndIcon;
+        ImageView lockAppView;
+        boolean isLocked;
     }
 
     /* package */ final class TaskDescriptionAdapter extends BaseAdapter {
@@ -207,6 +210,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             holder.labelView = (TextView) convertView.findViewById(R.id.app_label);
             holder.calloutLine = convertView.findViewById(R.id.recents_callout_line);
             holder.descriptionView = (TextView) convertView.findViewById(R.id.app_description);
+            holder.lockAppView = (ImageView) convertView.findViewById(R.id.lock_app);
 
             convertView.setTag(holder);
             return convertView;
@@ -273,6 +277,9 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             holder.thumbnailView.setTag(td);
             holder.thumbnailView.setOnLongClickListener(new OnLongClickDelegate(convertView));
             holder.taskDescription = td;
+            boolean isLocked = isAppLockedByUser(td.packageName);
+            holder.isLocked = isLocked;
+            holder.lockAppView.setVisibility(isLocked ? View.VISIBLE : View.GONE);
             return convertView;
         }
 
@@ -300,6 +307,8 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                 holder.calloutLine.setTranslationY(0f);
                 holder.calloutLine.animate().cancel();
             }
+            holder.isLocked = false;
+            holder.lockAppView.setVisibility(INVISIBLE);
             holder.taskDescription = null;
             holder.loadedThumbnailAndIcon = false;
         }
@@ -568,7 +577,15 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             mClearAllRecents.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int delay = mRecentsContainer.getRecentsCount() * 150;
                     ((ViewGroup) mRecentsContainer).removeAllViewsInLayout();
+                    mClearAllRecents.setVisibility(View.INVISIBLE);
+                    postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mClearAllRecents.setVisibility(View.VISIBLE);
+                        }
+                    }, delay);
                 }
             });
         }
@@ -899,12 +916,20 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         mPopup = popup;
         popup.getMenuInflater().inflate(R.menu.recent_popup_menu, popup.getMenu());
 
+        final ViewHolder viewHolder = (ViewHolder) selectedView.getTag();
+        if (viewHolder != null) {
+            final TaskDescription ad = viewHolder.taskDescription;
+            MenuItem lockAppCheck = popup.getMenu().findItem(R.id.recent_lock_item);
+            if (lockAppCheck != null) {
+                lockAppCheck.setChecked(isAppLockedByUser(ad.packageName));
+            }
+        }
+
         final ContentResolver cr = mContext.getContentResolver();
         if (Settings.Secure.getInt(cr, Settings.Secure.DEVELOPMENT_SHORTCUT, 0) == 0) {
             popup.getMenu().findItem(R.id.recent_force_stop).setVisible(false);
             popup.getMenu().findItem(R.id.recent_wipe_app).setVisible(false);
         } else {
-            final ViewHolder viewHolder = (ViewHolder) selectedView.getTag();
             if (viewHolder != null) {
                 final TaskDescription ad = viewHolder.taskDescription;
                 try {
@@ -936,6 +961,17 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                         final TaskDescription ad = viewHolder.taskDescription;
                         startApplicationDetailsActivity(ad.packageName);
                         show(false);
+                    } else {
+                        throw new IllegalStateException("Oops, no tag on view " + selectedView);
+                    }
+                } else if (item.getItemId() == R.id.recent_lock_item) {
+                    item.setChecked(!item.isChecked());
+                    if (viewHolder != null) {
+                        final TaskDescription ad = viewHolder.taskDescription;
+                        setLockAppByUser(ad.packageName, item.isChecked());
+                        viewHolder.isLocked = item.isChecked();
+                        viewHolder.lockAppView.setVisibility(item.isChecked()
+                                ? View.VISIBLE : View.GONE);
                     } else {
                         throw new IllegalStateException("Oops, no tag on view " + selectedView);
                     }
@@ -1060,6 +1096,28 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         if (mRamUsageBar != null) {
             mRamUsageBar.setVisibility((ramBarEnabled && canUseRamBar) ? View.VISIBLE : View.GONE);
         }
+    }
+
+    private void setLockAppByUser(String packageName, boolean locked) {
+        if (packageName == null
+                || packageName.isEmpty()) {
+            return;
+        }
+        mContext.getSharedPreferences("lock_recent_apps", 0)
+                .edit()
+                .putBoolean(packageName, locked)
+                .apply();
+    }
+
+    protected boolean isAppLockedByUser(String packageName) {
+        if (packageName == null
+                || packageName.isEmpty()) {
+            return false;
+
+        }
+        final boolean locked = mContext.getSharedPreferences("lock_recent_apps", 0)
+                .getBoolean(packageName, false);
+        return locked;
     }
 
     class FakeClearUserDataObserver extends IPackageDataObserver.Stub {

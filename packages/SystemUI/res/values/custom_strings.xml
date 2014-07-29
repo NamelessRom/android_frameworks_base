@@ -65,4 +65,7 @@
     <string name="onthego_service_toggle">Automatically restart service</string>
     <string name="quick_settings_onthego_back">Rear Camera</string>
     <string name="quick_settings_onthego_front">Front Camera</string>
+
+    <!-- Recents menu -->
+    <string name="status_bar_recent_lock_item_title">Lock app in list</string>
 </resources>

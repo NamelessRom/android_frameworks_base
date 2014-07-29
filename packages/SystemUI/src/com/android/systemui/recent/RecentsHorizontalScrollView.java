@@ -188,7 +188,10 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
             postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    dismissChild(child);
+                    RecentsPanelView.ViewHolder holder = (RecentsPanelView.ViewHolder) child.getTag();
+                    if (!holder.isLocked) {
+                        dismissChild(child);
+                    }
                 }
             }, i * 150);
         }
@@ -388,6 +391,10 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
 
     public void setCallback(RecentsCallback callback) {
         mCallback = callback;
+    }
+
+    public int getRecentsCount() {
+        return mLinearLayout.getChildCount();
     }
 
     @Override
