@@ -119,26 +119,23 @@ public class NamelessUtils {
      * @return The blurred bitmap
      */
     public static Bitmap blurBitmap(final Context context, final Bitmap bmp, final int radius) {
-        Bitmap out = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.ARGB_8888);
-        final RenderScript rs = RenderScript.create(context);
+        Bitmap out = Bitmap.createBitmap(bmp);
+        RenderScript rs = RenderScript.create(context);
 
-        final Allocation input = Allocation.createFromBitmap(
+        Allocation input = Allocation.createFromBitmap(
                 rs, bmp, Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
-        final Allocation output = Allocation.createTyped(rs, input.getType());
+        Allocation output = Allocation.createTyped(rs, input.getType());
 
-        final ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
-        script.setRadius(radius);
+        ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
         script.setInput(input);
+        script.setRadius(radius);
         script.forEach(output);
 
         output.copyTo(out);
 
-        script.destroy();
         output.destroy();
         input.destroy();
-        bmp.recycle();
         rs.destroy();
-
         return out;
     }
 
@@ -152,11 +149,7 @@ public class NamelessUtils {
     public static Bitmap rotateBmp(final Bitmap bmp, final int degrees) {
         final Matrix m = new Matrix();
         m.postRotate(degrees);
-
-        final Bitmap out = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), m, true);
-        bmp.recycle();
-
-        return out;
+        return Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), m, true);
     }
 
 }
