@@ -1685,7 +1685,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         if (um == null) {
             Throwable t = new Throwable();
             t.fillInStackTrace();
-            Log.e(TAG, "user service is null.", t);
+            if (DEBUG) Log.e(TAG, "user service is null.", t);
             return;
         }
 
@@ -1694,7 +1694,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         if (users == null) {
             Throwable t = new Throwable();
             t.fillInStackTrace();
-            Log.e(TAG, "list of users is null.", t);
+            if (DEBUG) Log.e(TAG, "list of users is null.", t);
             return;
         }
 
@@ -1702,7 +1702,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         if (multiUserView == null) {
             Throwable t = new Throwable();
             t.fillInStackTrace();
-            Log.e(TAG, "can't find user_selector in layout.", t);
+            if (DEBUG) Log.e(TAG, "can't find user_selector in layout.", t);
             return;
         }
 
