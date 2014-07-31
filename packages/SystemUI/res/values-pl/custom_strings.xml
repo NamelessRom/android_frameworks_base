@@ -27,14 +27,6 @@
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> używane</string>
   <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> używane*</string>
   <string name="service_started_by_app">Usługa włączona przez aplikację</string>
-  <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g>
-proces i <xliff:g id="numservices">%2$d</xliff:g> usługa</string>
-  <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g>
-procesy i <xliff:g id="numservices">%2$d</xliff:g> usługi</string>
-  <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g>
-proces i <xliff:g id="numservices">%2$d</xliff:g> usługa</string>
-  <string name="running_processes_item_description_p_p"><xliff:g id="numprocess">%1$d</xliff:g>
-procesy i <xliff:g id="numservices">%2$d</xliff:g> usługi</string>
   <string name="running_process_item_user_label">Użytkownik: <xliff:g id="USER_NAME">%1$s</xliff:g></string>
   <string name="onthego_notif_ticker">Tryb On-The-Go aktywowany</string>
   <string name="onthego_notif_title">Tryb On-The-Go jest aktywny</string>

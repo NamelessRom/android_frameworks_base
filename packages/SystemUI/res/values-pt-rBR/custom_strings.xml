@@ -28,10 +28,11 @@
   <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> usada*</string>
   <string name="service_started_by_app">Iniciado pela aplicação.</string>
   <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g>
-processo e <xliff:g id="numservices">%2$d</xliff:g> serviço</string>
+        processo e <xliff:g id="numservices">%2$d</xliff:g> serviço</string>
   <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g>
-processo e <xliff:g id="numservices">%2$d</xliff:g> serviços</string>
-  <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g> processos e <xliff:g id="numservices">%2$d</xliff:g> serviço</string>
+        processo e <xliff:g id="numservices">%2$d</xliff:g> serviços</string>
+  <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g>
+        processos e <xliff:g id="numservices">%2$d</xliff:g> serviço</string>
   <string name="running_processes_item_description_p_p"><xliff:g id="numprocess">%1$d</xliff:g>processos e <xliff:g id="numservices">%2$d</xliff:g> serviços</string>
   <string name="running_process_item_user_label">Usuário: <xliff:g id="user_name">%1$s</xliff:g></string>
   <string name="onthego_notif_ticker">On-The-Go ativado</string>

@@ -28,7 +28,7 @@
   <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> verwendet*</string>
   <string name="service_started_by_app">Gestartet von Anwendung.</string>
   <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g> Prozess und <xliff:g id="numservices">%2$d</xliff:g>Dienst</string>
-  <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g> Prozess und <xliff:g id="numservices">%2$d</xliff:g>Dienste</string>
+  <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g> Prozesse und <xliff:g id="numservices">%2$d</xliff:g>Dienste</string>
   <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g> Prozesse und <xliff:g id="numservices">%2$d</xliff:g>Dienst</string>
   <string name="running_processes_item_description_p_p"><xliff:g id="numprocess">%1$d</xliff:g> Prozesse und <xliff:g id="numservices">%2$d</xliff:g>Dienste</string>
   <string name="running_process_item_user_label">Benutzer: <xliff:g id="user_name">%1$s</xliff:g></string>

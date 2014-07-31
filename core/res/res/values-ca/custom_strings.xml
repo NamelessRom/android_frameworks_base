@@ -24,8 +24,8 @@
   <string name="animation_fade">Esvaïment</string>
   <string name="animation_slide_right">Lliscar a la dreta</string>
   <string name="animation_slide_left">Lliscar a l\'esquerra</string>
-  <string name="animation_slide_right_no_fade">Lliscar a la dreta (sense Esvaïment)</string>
-  <string name="animation_slide_left_no_fade">Lliscar a l\'esquerra (sense Esvaïment)</string>
+  <string name="animation_slide_right_no_fade">Lliscar a la dreta (Sense esvaïment)</string>
+  <string name="animation_slide_left_no_fade">Lliscar a l\'esquerra (Sense esvaïment)</string>
   <string name="animation_slide_up">Lliscar des de baix</string>
   <string name="animation_slide_down">Lliscar des de dalt</string>
   <string name="animation_translucent">Translúcid</string>

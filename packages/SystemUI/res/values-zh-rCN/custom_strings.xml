@@ -27,10 +27,6 @@
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> 已用</string>
   <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> 已用*</string>
   <string name="service_started_by_app">由应用程序启动。</string>
-  <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g> 进程和 <xliff:g id="numservices">%2$d</xliff:g> 服务</string>
-  <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g> 进程和 <xliff:g id="numservices">%2$d</xliff:g> 服务</string>
-  <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g> 进程和 <xliff:g id="numservices">%2$d</xliff:g> 服务</string>
-  <string name="running_processes_item_description_p_p"><xliff:g id="numprocess">%1$d</xliff:g> 进程和 <xliff:g id="numservices">%2$d</xliff:g> 服务</string>
   <string name="running_process_item_user_label">用户： <xliff:g id="user_name">%1$s</xliff:g></string>
   <string name="onthego_notif_ticker">On-The-Go已激活</string>
   <string name="onthego_notif_title">On-The-Go正在运行</string>

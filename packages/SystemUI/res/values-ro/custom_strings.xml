@@ -27,10 +27,6 @@
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> folosite</string>
   <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> folosite*</string>
   <string name="service_started_by_app">Pornite de app.</string>
-  <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g> proces și <xliff:g id="numservices">%2$d</xliff:g> serviciu</string>
-  <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g> proces și <xliff:g id="numservices">%2$d</xliff:g> servicii</string>
-  <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g> procese și <xliff:g id="numservices">%2$d</xliff:g> serviciu</string>
-  <string name="running_processes_item_description_p_p"><xliff:g id="numprocess">%1$d</xliff:g> procese și <xliff:g id="numservices">%2$d</xliff:g> servicii</string>
   <string name="running_process_item_user_label">Utilizator: <xliff:g id="user_name">%1$s</xliff:g></string>
   <string name="onthego_notif_ticker">On-The-Go activat</string>
   <string name="onthego_notif_title">On-The-Go este activ</string>
