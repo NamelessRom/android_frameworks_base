@@ -3813,6 +3813,13 @@ public final class Settings {
 
         /**
          *
+         * Whether to scramble a pin unlock layout
+         * @hide
+         */
+        public static final String LOCKSCREEN_PIN_SCRAMBLE_LAYOUT = "lockscreen_scramble_pin_layout";
+
+        /**
+         * Whether to use the custom quick unlock screen control
          * @hide
          */
         public static final String ANIMATION_IME_EXIT = "animation_ime_exit";
