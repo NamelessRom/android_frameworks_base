@@ -86,7 +86,14 @@ import org.namelessrom.devicecontrol.api.IRemoteService;
 public class RecentsPanelView extends RelativeLayout implements OnItemClickListener,
         RecentsCallback, StatusBarPanel, Animator.AnimatorListener {
     static final String TAG = "RecentsPanelView";
+<<<<<<< HEAD
     static final boolean DEBUG = PhoneStatusBar.DEBUG;
+=======
+    static final boolean DEBUG = PhoneStatusBar.DEBUG || false;
+    private static final String  ANDROID_SETTINGS = "com.android.settings";
+    private static final String ANDROID_PROTECTED_APPS =
+            "com.android.settings.applications.ProtectedAppsActivity";
+>>>>>>> 93f3a22... Access ProtectedAppsActivity from SystemUI Recents page if any components are protected.
     private PopupMenu mPopup;
     private View mRecentsScrim;
     private View mRecentsNoApps;
@@ -108,6 +115,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     private boolean mFitThumbnailToXY;
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
+<<<<<<< HEAD
 
     private LinearLayout mRecentsBar;
     private LinearColorBar mRamUsageBar;
@@ -143,6 +151,10 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     public static interface OnRecentsPanelVisibilityChangedListener {
         public void onRecentsPanelVisibilityChanged(boolean visible);
     }
+=======
+    private ImageView mClearRecents;
+    private ImageView mProtectedApps;
+>>>>>>> 93f3a22... Access ProtectedAppsActivity from SystemUI Recents page if any components are protected.
 
     public static interface RecentsScrollView {
         public int numItemsInOneScreenful();
@@ -437,7 +449,12 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                     && (mRecentTaskDescriptions.size() == 0);
             mRecentsNoApps.setAlpha(1f);
             mRecentsNoApps.setVisibility(noApps ? View.VISIBLE : View.INVISIBLE);
+<<<<<<< HEAD
 
+=======
+            mClearRecents.setVisibility(noApps ? View.GONE : View.VISIBLE);
+            mProtectedApps.setVisibility(noProtectedApps() ? View.GONE : View.VISIBLE);
+>>>>>>> 93f3a22... Access ProtectedAppsActivity from SystemUI Recents page if any components are protected.
             onAnimationEnd(null);
             setFocusable(true);
             setFocusableInTouchMode(true);
@@ -452,8 +469,19 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         }
     }
 
+<<<<<<< HEAD
     @Override
     protected void onAttachedToWindow() {
+=======
+    private boolean noProtectedApps() {
+        String protectedComponents = Settings.Secure.getString(mContext.getContentResolver(),
+                Settings.Secure.PROTECTED_COMPONENTS);
+        protectedComponents = protectedComponents == null ? "" : protectedComponents;
+        return (protectedComponents.equals(""));
+    }
+
+    protected void onAttachedToWindow () {
+>>>>>>> 93f3a22... Access ProtectedAppsActivity from SystemUI Recents page if any components are protected.
         super.onAttachedToWindow();
         if (!mAttached) {
             mAttached = true;
@@ -593,6 +621,22 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                             mClearAllRecents.setVisibility(View.VISIBLE);
                         }
                     }, delay);
+                }
+            });
+        }
+        mProtectedApps = (ImageView) findViewById(R.id.protected_apps);
+        if (mProtectedApps != null){
+            mProtectedApps.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                    // Launch protected components
+                    Intent intent = new Intent();
+                    intent.setClassName(ANDROID_SETTINGS, ANDROID_PROTECTED_APPS);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                    mContext.startActivityAsUser(intent, null,
+                        new UserHandle(UserHandle.USER_CURRENT));
                 }
             });
         }
@@ -1105,6 +1149,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
 
             mRamUsageBar.setRatios(((float) totalMem - (float) availMem) / (float) totalMem, 0, 0);
         }
+<<<<<<< HEAD
     };
 
     public void updateSettings() {
@@ -1115,6 +1160,14 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         recentsBarEnabled = Settings.Nameless.getBoolean(mContext.getContentResolver(),
                 Settings.Nameless.RECENTS_BAR, true);
     }
+=======
+        if (mProtectedApps != null) {
+            MarginLayoutParams lp = (MarginLayoutParams) mProtectedApps.getLayoutParams();
+            lp.topMargin = insets.top;
+            lp.rightMargin = insets.right;
+            mProtectedApps.setLayoutParams(lp);
+        }
+>>>>>>> 93f3a22... Access ProtectedAppsActivity from SystemUI Recents page if any components are protected.
 
     private void updateView() {
         if (mRecentsBar != null) {
