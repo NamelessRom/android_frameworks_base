@@ -17,4 +17,35 @@
  * limitations under the License.
  */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="screenrecord_notif_title">A képernyő felvételre került</string>
+  <string name="screenrecord_notif_stop">Állj</string>
+  <string name="screenrecord_notif_pointer">Egérmutató ki-be kapcsolása</string>
+  <string name="screenrecord_notif_error">Nem lehet a képernyőfelvételt elindítani</string>
+  <string name="memory">Memória</string>
+  <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> szabad</string>
+  <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> foglalt</string>
+  <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> foglalt*</string>
+  <string name="service_started_by_app">Alkalmazás által elindítva.</string>
+  <string name="running_processes_item_description_s_s"><xliff:g id="numprocess">%1$d</xliff:g>
+        folyamat és <xliff:g id="numservices">%2$d</xliff:g> szolgáltatás</string>
+  <string name="running_processes_item_description_s_p"><xliff:g id="numprocess">%1$d</xliff:g>
+        folyamat és <xliff:g id="numservices">%2$d</xliff:g> szolgáltatás</string>
+  <string name="running_processes_item_description_p_s"><xliff:g id="numprocess">%1$d</xliff:g>
+        folyamat és <xliff:g id="numservices">%2$d</xliff:g> szolgáltatás</string>
+  <string name="running_processes_item_description_p_p"><xliff:g id="numprocess">%1$d</xliff:g>
+        folyamat és <xliff:g id="numservices">%2$d</xliff:g> szolgáltatás</string>
+  <string name="running_process_item_user_label">Felhasználó: <xliff:g id="user_name">%1$s</xliff:g></string>
+  <string name="onthego_notif_ticker">On-The-Go aktiválva</string>
+  <string name="onthego_notif_title">On-The-Go aktív</string>
+  <string name="onthego_notif_stop">Állj</string>
+  <string name="onthego_notif_options">Beállítások</string>
+  <string name="onthego_notif_error">Nem lehet elindítani az On-The-Go</string>
+  <string name="onthego_notif_restart">Indítsa újra az On-The-Go</string>
+  <string name="onthego_notif_camera_changed">Kamera mód megváltozott</string>
+  <string name="onthego_transparency">Átlátszóság</string>
+  <string name="onthego_front_camera">Első kamera használata</string>
+  <string name="onthego_service_toggle">Automatikusan indítsa újra a szolgáltatást</string>
+  <string name="quick_settings_onthego_back">Hátsó Kamera</string>
+  <string name="quick_settings_onthego_front">Első kamera</string>
+</resources>
