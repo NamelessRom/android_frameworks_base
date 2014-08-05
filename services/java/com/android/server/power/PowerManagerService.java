@@ -1261,7 +1261,11 @@ public final class PowerManagerService extends IPowerManager.Stub
                 }
             }
         };
-        runWithProximityCheck(r);
+        if (checkProximity) {
+            runWithProximityCheck(r);
+        } else {
+            r.run();
+        }
     }
 
     private void runWithProximityCheck(Runnable r) {
