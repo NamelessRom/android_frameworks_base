@@ -16,9 +16,11 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Configuration;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -27,6 +29,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.PorterDuff.Mode;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
@@ -54,6 +57,8 @@ public class NotificationPanelView extends PanelView {
     private static final float STATUS_BAR_SWIPE_VERTICAL_MAX_PERCENTAGE = 0.025f;
     private static final float STATUS_BAR_SWIPE_MOVE_PERCENTAGE = 0.2f;
 
+    private static final Handler mHandler = new Handler();
+
     Drawable mHandleBar;
     Drawable mBackgroundDrawable;
     Drawable mBackgroundDrawableLandscape;
@@ -70,8 +75,45 @@ public class NotificationPanelView extends PanelView {
     private boolean mTrackingSwipe;
     private boolean mSwipeTriggered;
 
+    private int mQuickPulldownMode = 0;
+    private int mSmartPulldownMode = 0;
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            final ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_QUICK_PULLDOWN), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_SMART_PULLDOWN), false, this);
+
+            updateSettings();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+
+    }
+
+    private void updateSettings() {
+        final ContentResolver resolver = mContext.getContentResolver();
+
+        mQuickPulldownMode = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.QS_QUICK_PULLDOWN, 0);
+        mSmartPulldownMode = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.QS_SMART_PULLDOWN, 0);
+    }
+
     public NotificationPanelView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        final SettingsObserver observer = new SettingsObserver(mHandler);
+        observer.observe();
     }
 
     public void setStatusBar(PhoneStatusBar bar) {
@@ -158,21 +200,17 @@ public class NotificationPanelView extends PanelView {
                         // Pointer is at the handle portion of the view?
                         mGestureStartY > getHeight() - mHandleBarHeight - getPaddingBottom();
                     mOkToFlip = getExpandedHeight() == 0;
-                    int quickPulldownMode = Settings.System.getInt(getContext().getContentResolver(),
-                            Settings.System.QS_QUICK_PULLDOWN, 0);
-                    int smartPulldownMode = Settings.System.getInt(getContext().getContentResolver(),
-                            Settings.System.QS_SMART_PULLDOWN, 0);
-                    if (smartPulldownMode == 1 && !mStatusBar.hasClearableNotifications()) {
+                    if (mSmartPulldownMode == 1 && !mStatusBar.hasClearableNotifications()) {
                         flip = true;
-                    } else if (smartPulldownMode == 2 && !mStatusBar.hasVisibleNotifications()) {
+                    } else if (mSmartPulldownMode == 2 && !mStatusBar.hasVisibleNotifications()) {
                         flip = true;
-                    } else if (quickPulldownMode == 1 &&
+                    } else if (mQuickPulldownMode == 1 &&
                             mGestureStartX > getWidth() * (1.0f - STATUS_BAR_SETTINGS_RIGHT_PERCENTAGE)) {
                         flip = true;
-                    } else if (quickPulldownMode == 2 &&
+                    } else if (mQuickPulldownMode == 2 &&
                             mGestureStartX < getWidth() * (1.0f - STATUS_BAR_SETTINGS_LEFT_PERCENTAGE)) {
                         flip = true;
-                    } else if (quickPulldownMode == 3 &&
+                    } else if (mQuickPulldownMode == 3 &&
                             mGestureStartX > getWidth() * (1.0f - STATUS_BAR_SETTINGS_LEFT_PERCENTAGE) &&
                             mGestureStartX < getWidth() * (1.0f - STATUS_BAR_SETTINGS_RIGHT_PERCENTAGE)) {
                         flip = true;
