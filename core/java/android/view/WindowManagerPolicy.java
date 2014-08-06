@@ -140,6 +140,17 @@ public interface WindowManagerPolicy {
     public final static String EXTRA_LID_STATE = "state";
 
     /**
+     * Sticky broadcast of S-Pen state.
+     */
+    public final static String ACTION_SPEN = "android.intent.action.SPEN";
+
+    /**
+     * Extra in {@link #ACTION_SPEN} indicating the state: true if
+     * S-Pen is plugged out (in users hand), false if not.
+     */
+    public final static String EXTRA_SPEN_PLUGGED_STATE = "state";
+
+    /**
      * Interface to the Window Manager state associated with a particular
      * window.  You can hold on to an instance of this interface from the call
      * to prepareAddWindow() until removeWindow().
@@ -966,6 +977,13 @@ public interface WindowManagerPolicy {
      * @param lidOpen True if the lid is now open.
      */
     public void notifyLidSwitchChanged(long whenNanos, boolean lidOpen);
+
+    /**
+     * Tell the policy that the spen has changed state.
+     * @param whenNanos The time when the change occurred in uptime nanoseconds.
+     * @param sPenOn True if the pen is now open.
+     */
+    public void notifySPenSwitchChanged(long whenNanos, boolean sPenOn);
     
     /**
      * Tell the policy if anyone is requesting that keyguard not come on.
