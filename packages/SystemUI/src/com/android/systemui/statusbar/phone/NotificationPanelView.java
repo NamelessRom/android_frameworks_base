@@ -51,8 +51,9 @@ import java.io.File;
 public class NotificationPanelView extends PanelView {
     public static final boolean DEBUG_GESTURES = false;
 
-    private static final float STATUS_BAR_SETTINGS_LEFT_PERCENTAGE = 0.8f;
-    private static final float STATUS_BAR_SETTINGS_RIGHT_PERCENTAGE = 0.2f;
+    private static final float STATUS_BAR_LEFT_PERCENTAGE = 0.7f;
+    private static final float STATUS_BAR_RIGHT_PERCENTAGE = 0.3f;
+
     private static final float STATUS_BAR_SWIPE_TRIGGER_PERCENTAGE = 0.05f;
     private static final float STATUS_BAR_SWIPE_VERTICAL_MAX_PERCENTAGE = 0.025f;
     private static final float STATUS_BAR_SWIPE_MOVE_PERCENTAGE = 0.2f;
@@ -210,19 +211,13 @@ public class NotificationPanelView extends PanelView {
                             // is the pointer at the handle portion of the view?
                             mGestureStartY > getHeight() - mHandleBarHeight - getPaddingBottom());
                     mOkToFlip = getExpandedHeight() == 0;
-                    if (mSmartPulldownMode == 1 && !mStatusBar.hasClearableNotifications()) {
-                        flip = true;
-                    } else if (mSmartPulldownMode == 2 && !mStatusBar.hasVisibleNotifications()) {
-                        flip = true;
-                    } else if (mQuickPulldownMode == 1 &&
-                            mGestureStartX > getWidth() * (1.0f - STATUS_BAR_SETTINGS_RIGHT_PERCENTAGE)) {
-                        flip = true;
-                    } else if (mQuickPulldownMode == 2 &&
-                            mGestureStartX < getWidth() * (1.0f - STATUS_BAR_SETTINGS_LEFT_PERCENTAGE)) {
-                        flip = true;
-                    } else if (mQuickPulldownMode == 3 &&
-                            mGestureStartX > getWidth() * (1.0f - STATUS_BAR_SETTINGS_LEFT_PERCENTAGE) &&
-                            mGestureStartX < getWidth() * (1.0f - STATUS_BAR_SETTINGS_RIGHT_PERCENTAGE)) {
+                    final float left = getWidth() * (1.0f - STATUS_BAR_LEFT_PERCENTAGE);
+                    final float right = getWidth() * (1.0f - STATUS_BAR_RIGHT_PERCENTAGE);
+                    if (mQuickPulldownMode == 1 && mGestureStartX > right ||
+                            mQuickPulldownMode == 2 && mGestureStartX < left ||
+                            mQuickPulldownMode == 3 && mGestureStartX > left && mGestureStartX < right ||
+                            mSmartPulldownMode == 1 && !mStatusBar.hasClearableNotifications() ||
+                            mSmartPulldownMode == 2 && !mStatusBar.hasVisibleNotifications()) {
                         flip = true;
                     }
                     break;
