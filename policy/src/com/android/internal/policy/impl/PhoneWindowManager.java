@@ -191,6 +191,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_IN_APP_SEARCH = 5;
     private static final int KEY_ACTION_LAUNCH_CAMERA = 6;
     private static final int KEY_ACTION_LAST_APP = 7;
+    private static final int KEY_ACTION_IMMERSIVE_MODE = 8;
     private static final int KEY_ACTION_BACK = 7;
     private static final int KEY_ACTION_HOME = 8;
 
@@ -1208,6 +1209,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KEY_ACTION_LAST_APP:
                 toggleLastApp();
+                break;
+            case KEY_ACTION_IMMERSIVE_MODE:
+                toggleImmersiveMode();
                 break;
             default:
                 break;
@@ -3329,6 +3333,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 Log.w("Recent", "Unable to launch recent task", e);
             }
         }
+    }
+
+    private void toggleImmersiveMode() {
+        boolean on = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.EXPANDED_DESKTOP_STATE, 0, UserHandle.USER_CURRENT) == 1;
+        Settings.System.putIntForUser(mContext.getContentResolver(),
+                Settings.System.EXPANDED_DESKTOP_STATE, on ? 0 : 1, UserHandle.USER_CURRENT);
     }
 
     /**
