@@ -16,6 +16,8 @@
 
 package android.app;
 
+import static android.provider.Settings.System.SCREEN_OFF_TIMEOUT;
+
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Parcel;
@@ -81,6 +83,8 @@ public final class Profile implements Parcelable, Comparable {
 
     private int mExpandedDesktopMode = ExpandedDesktopMode.DEFAULT;
 
+    private int mScreenTimeout = ScreenTimeout.DEFAULT;
+
     /** @hide */
     public static class LockMode {
         public static final int DEFAULT = 0;
@@ -93,6 +97,12 @@ public final class Profile implements Parcelable, Comparable {
         public static final int DEFAULT = 0;
         public static final int ENABLE = 1;
         public static final int DISABLE = 2;
+    }
+
+    /** @hide */
+    public static class ScreenTimeout {
+        public static final int DEFAULT = 0;
+        public static final int THIRTY_MIN = 1800000;
     }
 
     /** @hide */
@@ -360,6 +370,7 @@ public final class Profile implements Parcelable, Comparable {
         dest.writeInt(mScreenLockMode);
         dest.writeMap(mTriggers);
         dest.writeInt(mExpandedDesktopMode);
+        dest.writeInt(mScreenTimeout);
     }
 
     /** @hide */
@@ -394,6 +405,7 @@ public final class Profile implements Parcelable, Comparable {
         mScreenLockMode = in.readInt();
         in.readMap(mTriggers, null);
         mExpandedDesktopMode = in.readInt();
+        mScreenTimeout = in.readInt();
     }
 
     public String getName() {
@@ -495,6 +507,20 @@ public final class Profile implements Parcelable, Comparable {
         mDirty = true;
     }
 
+    public int getScreenTimeout() {
+        return mScreenTimeout;
+    }
+
+    public void setScreenTimeout(int screenTimeout) {
+        if (screenTimeout < ScreenTimeout.DEFAULT
+                || screenTimeout > ScreenTimeout.THIRTY_MIN) {
+            mScreenTimeout = ScreenTimeout.DEFAULT;
+        } else {
+            mScreenTimeout = screenTimeout;
+        }
+        mDirty = true;
+    }
+
     public AirplaneModeSettings getAirplaneMode() {
         return mAirplaneMode;
     }
@@ -570,6 +596,10 @@ public final class Profile implements Parcelable, Comparable {
         builder.append("<expanded-desktop-mode>");
         builder.append(mExpandedDesktopMode);
         builder.append("</expanded-desktop-mode>\n");
+
+        builder.append("<screen-timeout>");
+        builder.append(mScreenTimeout);
+        builder.append("</screen-timeout>\n");
 
         mAirplaneMode.getXmlString(builder, context);
 
@@ -705,6 +735,9 @@ public final class Profile implements Parcelable, Comparable {
                 if (name.equals("expanded-desktop-mode")) {
                     profile.setExpandedDesktopMode(Integer.valueOf(xpp.nextText()));
                 }
+                if (name.equals("screen-timeout")) {
+                    profile.setScreenTimeout(Integer.valueOf(xpp.nextText()));
+                }
                 if (name.equals("profileGroup")) {
                     ProfileGroup pg = ProfileGroup.fromXml(xpp, context);
                     profile.addProfileGroup(pg);
@@ -760,6 +793,17 @@ public final class Profile implements Parcelable, Comparable {
                     Settings.System.EXPANDED_DESKTOP_STATE,
                     mExpandedDesktopMode == ExpandedDesktopMode.ENABLE ? 1 : 0,
                     UserHandle.USER_CURRENT);
+        }
+
+        // Set screen timeout
+        if (mScreenTimeout != ScreenTimeout.DEFAULT) {
+            try {
+                Settings.System.putIntForUser(context.getContentResolver(),
+                        Settings.System.SCREEN_OFF_TIMEOUT, mScreenTimeout,
+                        UserHandle.USER_CURRENT);
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "could not persist screen timeout setting", e);
+            }
         }
     }
 
