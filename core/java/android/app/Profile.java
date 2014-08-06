@@ -734,9 +734,13 @@ public final class Profile implements Parcelable, Comparable {
     public void doSelect(Context context) {
         // Set stream volumes
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int mediaVolume = am.getStreamVolume(am.STREAM_MUSIC);
         for (StreamSettings sd : streams.values()) {
             if (sd.isOverride()) {
                 am.setStreamVolume(sd.getStreamId(), sd.getValue(), 0);
+            }
+            if (sd.getStreamId() == am.STREAM_MUSIC && am.isMusicActive()) {
+                am.setStreamVolume(am.STREAM_MUSIC, mediaVolume, 0);
             }
         }
         // Set connections
