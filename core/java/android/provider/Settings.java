@@ -4128,6 +4128,12 @@ public final class Settings {
         public static final String POWER_MENU_MOBILE_DATA_ENABLED = "power_menu_mobile_data_enabled";
 
         /**
+         * Show WiFi in Power Menu
+         * @hide
+         */
+        public static final String POWER_MENU_WIFI_ENABLED = "power_menu_wifi_enabled";
+
+        /**
          * Enable Stylus Gestures
          *
          * @hide
