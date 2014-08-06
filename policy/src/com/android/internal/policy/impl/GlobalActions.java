@@ -395,7 +395,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                     }
 
                     public boolean showDuringKeyguard() {
-                        return false;
+                        return true;
                     }
 
                     public boolean showBeforeProvisioning() {
@@ -673,7 +673,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                         dialog.cancel();
                     }
                 }).create();
-        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_DIALOG);
+        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
         dialog.show();
     }
 
