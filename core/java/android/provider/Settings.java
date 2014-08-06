@@ -210,7 +210,6 @@ public final class Settings {
 
     /**
      * Activity Action: Show settings to allow configuration of Wi-Fi.
-
      * <p>
      * In some cases, a matching Activity may not exist, so ensure you
      * safeguard against this.
@@ -218,7 +217,6 @@ public final class Settings {
      * Input: Nothing.
      * <p>
      * Output: Nothing.
-
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
     public static final String ACTION_WIFI_SETTINGS =
@@ -1290,6 +1288,12 @@ public final class Settings {
          * @hide
          */
         public static final String NON_INTRUSIVE_UI = "non_intrusive_ui";
+
+        /**
+         * Whether to allow swiping anywhere to switch to notifications / quicksettings
+         * @hide
+         */
+        public static final String QS_SWIPE_ANYWHERE = "qs_swipe_anywhere";
 
     }
 

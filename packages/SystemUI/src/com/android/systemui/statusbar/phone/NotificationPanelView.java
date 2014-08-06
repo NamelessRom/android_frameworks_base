@@ -78,6 +78,8 @@ public class NotificationPanelView extends PanelView {
     private int mQuickPulldownMode = 0;
     private int mSmartPulldownMode = 0;
 
+    private boolean mSwipeAnywhere = false;
+
     class SettingsObserver extends ContentObserver {
         SettingsObserver(Handler handler) {
             super(handler);
@@ -85,10 +87,13 @@ public class NotificationPanelView extends PanelView {
 
         void observe() {
             final ContentResolver resolver = mContext.getContentResolver();
+
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QS_QUICK_PULLDOWN), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.QS_SMART_PULLDOWN), false, this);
+            resolver.registerContentObserver(Settings.Nameless.getUriFor(
+                    Settings.Nameless.QS_SWIPE_ANYWHERE), false, this);
 
             updateSettings();
         }
@@ -103,10 +108,13 @@ public class NotificationPanelView extends PanelView {
     private void updateSettings() {
         final ContentResolver resolver = mContext.getContentResolver();
 
-        mQuickPulldownMode = Settings.System.getInt(getContext().getContentResolver(),
+        mQuickPulldownMode = Settings.System.getInt(resolver,
                 Settings.System.QS_QUICK_PULLDOWN, 0);
-        mSmartPulldownMode = Settings.System.getInt(getContext().getContentResolver(),
+        mSmartPulldownMode = Settings.System.getInt(resolver,
                 Settings.System.QS_SMART_PULLDOWN, 0);
+
+        mSwipeAnywhere = Settings.Nameless.getBoolean(resolver,
+                Settings.Nameless.QS_SWIPE_ANYWHERE, false);
     }
 
     public NotificationPanelView(Context context, AttributeSet attrs) {
@@ -197,8 +205,10 @@ public class NotificationPanelView extends PanelView {
                     mGestureStartX = event.getX(0);
                     mGestureStartY = event.getY(0);
                     mTrackingSwipe = isFullyExpanded() &&
-                        // Pointer is at the handle portion of the view?
-                        mGestureStartY > getHeight() - mHandleBarHeight - getPaddingBottom();
+                        (mSwipeAnywhere ||
+                            // If swipe anywhere is not allowed,
+                            // is the pointer at the handle portion of the view?
+                            mGestureStartY > getHeight() - mHandleBarHeight - getPaddingBottom());
                     mOkToFlip = getExpandedHeight() == 0;
                     if (mSmartPulldownMode == 1 && !mStatusBar.hasClearableNotifications()) {
                         flip = true;
