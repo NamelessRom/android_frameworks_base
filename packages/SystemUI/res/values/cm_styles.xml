@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2012-2014 The CyanogenMod Project
+     Copyright (C) 2014 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
      limitations under the License.
 -->
 <resources>
-    <dimen name="wifi_combo_margin_end">-6dp</dimen>
-    <!-- Network stats text size -->
-    <dimen name="network_stats_text_size">8dp</dimen>
+    <style name="TextAppearance.StatusBar.NetworkStats"
+        parent="@*android:style/TextAppearance.StatusBar">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">@dimen/network_stats_text_size</item>
+        <item name="android:textColor">@color/status_bar_network_stats_color</item>
+    </style>
 </resources>
