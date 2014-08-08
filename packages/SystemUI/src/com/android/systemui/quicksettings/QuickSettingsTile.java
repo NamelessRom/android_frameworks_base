@@ -101,6 +101,7 @@ public class QuickSettingsTile implements OnClickListener {
         mTileTextPadding = container.getTileTextPadding();
         mTile = (QuickSettingsTileView) inflater.inflate(
                 R.layout.quick_settings_tile, container, false);
+        mTile.setTile(this);
         mTile.setContent(mTileLayout, inflater);
         mContainer = container;
         mContainer.addView(mTile);
