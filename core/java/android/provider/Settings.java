@@ -1295,6 +1295,12 @@ public final class Settings {
          */
         public static final String QS_SWIPE_ANYWHERE = "qs_swipe_anywhere";
 
+        /**
+         * Whether the smart cover is activated or not
+         * @hide
+         */
+        public static final String SMART_COVER_ACTIVATED = "smart_cover_activated";
+
     }
 
     /**

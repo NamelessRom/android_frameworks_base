@@ -115,6 +115,7 @@ public class KeyguardViewManager {
             sendToSleep(mContext);
         };
     };
+    private boolean mSmartCoverActivated;
 
     private ViewManagerHost mKeyguardHost;
     private KeyguardHostView mKeyguardView;
@@ -178,6 +179,8 @@ public class KeyguardViewManager {
                     Settings.System.LOCKSCREEN_NOTIFICATIONS), false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.Nameless.getUriFor(
                     Settings.Nameless.LOCKSCREEN_SEE_THROUGH), false, this);
+            resolver.registerContentObserver(Settings.Nameless.getUriFor(
+                    Settings.Nameless.SMART_COVER_ACTIVATED), false, this);
 
             updateSettings();
         }
@@ -202,9 +205,12 @@ public class KeyguardViewManager {
             mNotificationViewManager.unregisterListeners();
             mNotificationViewManager = null;
         }
-        mSeeThrough = Settings.Nameless.getInt(mContext.getContentResolver(),
-                Settings.Nameless.LOCKSCREEN_SEE_THROUGH, 0) == 1;
+        mSeeThrough = Settings.Nameless.getBooleanForUser(mContext.getContentResolver(),
+                Settings.Nameless.LOCKSCREEN_SEE_THROUGH, false, UserHandle.USER_CURRENT);
         if(!mSeeThrough) mBlurredImage = null;
+
+        mSmartCoverActivated = Settings.Nameless.getBooleanForUser(mContext.getContentResolver(),
+                Settings.Nameless.SMART_COVER_ACTIVATED, false, UserHandle.USER_CURRENT);
     }
 
     /**
@@ -1046,6 +1052,11 @@ public class KeyguardViewManager {
             return;
         }
 
+        // return if smart cover is disabled by the user
+        if (!mSmartCoverActivated) {
+            return;
+        }
+
         KeyguardUpdateMonitor updateMonitor = KeyguardUpdateMonitor.getInstance(mContext);
         if (!updateMonitor.isDeviceProvisioned() || !updateMonitor.hasBootCompleted()) {
             // don't start the cover if the device hasn't booted, or completed
@@ -1068,6 +1079,11 @@ public class KeyguardViewManager {
             return;
         }
 
+        // return if smart cover is disabled by the user
+        if (!mSmartCoverActivated) {
+            return;
+        }
+
         KeyguardUpdateMonitor updateMonitor = KeyguardUpdateMonitor.getInstance(mContext);
         if (!updateMonitor.isDeviceProvisioned() || !updateMonitor.hasBootCompleted()) {
             return;
@@ -1087,6 +1103,9 @@ public class KeyguardViewManager {
     private void resetSmartCoverState() {
         if(DEBUG) Log.e(TAG, "resetSmartCoverState()");
         if(mSmartCoverCoords == null) return;
+
+        // return if smart cover is disabled by the user
+        if (!mSmartCoverActivated) return;
 
         if(DEBUG) Log.e(TAG, "resetCoverRunnable run()");
         mHandler.removeCallbacks(mSmartCoverTimeout);
