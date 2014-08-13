@@ -233,8 +233,14 @@ public class KeyguardViewManager {
         mContext.registerReceiver(mBroadcastReceiver,
                 new IntentFilter(Intent.ACTION_KEYGUARD_WALLPAPER_CHANGED),
                 android.Manifest.permission.CONTROL_KEYGUARD, null);
+     if (SystemProperties.get('ro.oppo.device', find7s)) {
+        mSmartCoverCoords = mContext.getResources().getIntArray(
+                com.android.internal.R.array.config_smartCoverWindowCoords2);
+     } else {
         mSmartCoverCoords = mContext.getResources().getIntArray(
                 com.android.internal.R.array.config_smartCoverWindowCoords);
+     }
+
         if(mSmartCoverCoords.length != 4) {
             // make sure there are exactly 4 dimensions provided, or ignore the values
             mSmartCoverCoords = null;
