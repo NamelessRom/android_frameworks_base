@@ -503,10 +503,4 @@ public class IWindowManagerImpl implements IWindowManager {
     public boolean hasMenuKeyEnabled() {
         return true;
     }
-
-    /* @hide */
-    @Override
-    public int getSystemUIVisibility() {
-        return 0;
-    }
 }
