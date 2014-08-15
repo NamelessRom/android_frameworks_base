@@ -83,7 +83,6 @@ import com.android.systemui.RecentsComponent;
 import com.android.systemui.SearchPanelView;
 import com.android.systemui.SystemUI;
 import com.android.systemui.cm.SpamMessageProvider;
-import com.android.systemui.slimrecent.RecentController;
 import com.android.systemui.statusbar.NotificationData.Entry;
 import com.android.systemui.statusbar.phone.KeyguardTouchDelegate;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
@@ -185,8 +184,6 @@ public abstract class BaseStatusBar extends SystemUI implements
     private int mAutoCollapseBehaviour;
 
     private RecentsComponent mRecents;
-    private RecentController mNewRecents;
-    private boolean mUseNewRecents = false;
 
     private ArrayList<String> mDndList;
     private ArrayList<String> mBlacklist;
@@ -232,8 +229,6 @@ public abstract class BaseStatusBar extends SystemUI implements
                     Settings.System.EXPANDED_DESKTOP_STATE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.EXPANDED_DESKTOP_STYLE), false, this);
-            resolver.registerContentObserver(Settings.Nameless.getUriFor(
-                    Settings.Nameless.NEW_RECENTS_SCREEN), false, this);
             update();
         }
 
@@ -243,7 +238,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
 
         private void update() {
-            final ContentResolver resolver = mContext.getContentResolver();
+            ContentResolver resolver = mContext.getContentResolver();
             mAutoCollapseBehaviour = Settings.System.getIntForUser(resolver,
                     Settings.System.STATUS_BAR_COLLAPSE_ON_DISMISS,
                     Settings.System.STATUS_BAR_COLLAPSE_IF_NO_CLEARABLE, UserHandle.USER_CURRENT);
@@ -254,10 +249,6 @@ public abstract class BaseStatusBar extends SystemUI implements
                         Settings.System.EXPANDED_DESKTOP_STYLE, 0, UserHandle.USER_CURRENT);
             }
 
-            mUseNewRecents = Settings.Nameless.getBooleanForUser(resolver,
-                    Settings.Nameless.NEW_RECENTS_SCREEN, false, UserHandle.USER_CURRENT);
-            createRecents();
-
             final String dndString = Settings.System.getString(resolver,
                     Settings.System.HEADS_UP_CUSTOM_VALUES);
             final String blackString = Settings.System.getString(resolver,
@@ -265,7 +256,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             splitAndAddToArrayList(mDndList, dndString, "\\|");
             splitAndAddToArrayList(mBlacklist, blackString, "\\|");
         }
-    }
+    };
 
     private SettingsObserver mSettingsObserver = new SettingsObserver(mHandler);
 
@@ -335,7 +326,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
 
-        createRecents();
+        mRecents = getComponent(RecentsComponent.class);
 
         mLocale = mContext.getResources().getConfiguration().locale;
         mLayoutDirection = TextUtils.getLayoutDirectionFromLocale(mLocale);
@@ -404,16 +395,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_USER_SWITCHED);
         mContext.registerReceiver(mBroadcastReceiver, filter);
-    }
-
-    private void createRecents() {
-        if (mUseNewRecents) {
-            mNewRecents = new RecentController(mContext);
-            mRecents = null;
-        } else {
-            mNewRecents = null;
-            mRecents = getComponent(RecentsComponent.class);
-        }
     }
 
     public void userSwitched(int newUserId) {
@@ -712,17 +693,11 @@ public abstract class BaseStatusBar extends SystemUI implements
             mRecents.toggleRecents(mDisplay, mLayoutDirection, getStatusBarView(),
                     mExpandedDesktopStyle);
         }
-        if (mNewRecents != null) {
-            mNewRecents.toggleRecents(mDisplay, mLayoutDirection, getStatusBarView());
-        }
     }
 
     protected void preloadRecentTasksList() {
         if (mRecents != null) {
             mRecents.preloadRecentTasksList();
-        }
-        if (mNewRecents != null) {
-            mNewRecents.preloadRecentTasksList();
         }
     }
 
@@ -730,23 +705,11 @@ public abstract class BaseStatusBar extends SystemUI implements
         if (mRecents != null) {
             mRecents.cancelPreloadingRecentTasksList();
         }
-        if (mNewRecents != null) {
-            mNewRecents.cancelPreloadingRecentTasksList();
-        }
     }
 
     protected void closeRecents() {
         if (mRecents != null) {
             mRecents.closeRecents();
-        }
-        if (mNewRecents != null) {
-            mNewRecents.closeRecents();
-        }
-    }
-
-    protected void rebuildRecentsScreen() {
-        if (mNewRecents != null) {
-            mNewRecents.rebuildRecentsScreen();
         }
     }
 
