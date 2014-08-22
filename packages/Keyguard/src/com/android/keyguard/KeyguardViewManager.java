@@ -275,7 +275,7 @@ public class KeyguardViewManager {
     private boolean shouldEnableScreenRotation() {
         final ContentResolver resolver = mContext.getContentResolver();
         boolean enableLockScreenRotation = Settings.System.getBooleanForUser(resolver,
-                Settings.System.LOCKSCREEN_ROTATION, true, UserHandle.USER_CURRENT);
+                Settings.System.LOCKSCREEN_ROTATION, false, UserHandle.USER_CURRENT);
         return SystemProperties.getBoolean("lockscreen.rot_override",false)
                 || enableLockScreenRotation;
     }
