@@ -16,7 +16,7 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="app_name">අගුළු තිරය</string>
+  <string name="app_name">CM අගුළු තිරය</string>
   <string name="keyguard_discharging">විසර්ජනය වෙමින්, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
   <plurals name="missed_calls">
     <item quantity="one">%d මගහැරුණු ඇමතුමක්</item>
