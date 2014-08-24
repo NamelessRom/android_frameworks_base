@@ -15,7 +15,7 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Lockscreen</string>
+    <string name="app_name">CM Lockscreen</string>
     <string name="keyguard_discharging">Discharging, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
     <string name="keyguard_battery_percent" translatable="false"><xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
     <plurals
