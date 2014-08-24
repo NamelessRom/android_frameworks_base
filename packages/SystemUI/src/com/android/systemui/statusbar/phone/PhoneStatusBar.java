@@ -56,7 +56,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
@@ -332,7 +331,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private boolean mRecreating = false;
     private StatusHeaderMachine mStatusHeaderMachine;
     private Runnable mStatusHeaderUpdater;
-    private ImageView mStatusHeaderImage;
 
     private boolean mBrightnessControl;
     private boolean mAnimatingFlip = false;
@@ -793,7 +791,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mNotificationPanelHeader = mStatusBarWindow.findViewById(R.id.header);
 
         mStatusHeaderMachine = new StatusHeaderMachine(mContext);
-        mStatusHeaderImage = (ImageView) mNotificationPanelHeader.findViewById(R.id.header_background_image);
         updateCustomHeaderStatus();
 
         mClearButton = mStatusBarWindow.findViewById(R.id.clear_all_button);
@@ -1090,10 +1087,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
                     public void run() {
                         Drawable next = mStatusHeaderMachine.getCurrent();
-                        Log.i(TAG, "Updating status bar header background");
+                        if (next != mPrevious) {
+                            Log.i(TAG, "Updating status bar header background");
 
-                        setNotificationPanelHeaderBackground(next);
-                        mPrevious = next;
+                            setNotificationPanelHeaderBackground(next);
+                            mPrevious = next;
+                        }
 
                         // Check every hour. As postDelayed isn't holding a wakelock, it will basically
                         // only check when the CPU is on. Thus, not consuming battery overnight.
@@ -1116,18 +1115,24 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private void setNotificationPanelHeaderBackground(final Drawable dw) {
         Drawable[] arrayDrawable = new Drawable[2];
 
-        // Transition animation
-        arrayDrawable[0] = mStatusHeaderImage.getDrawable();
+        if (dw instanceof BitmapDrawable) {
+            BitmapDrawable bdw = (BitmapDrawable) dw;
+            bdw.setGravity(Gravity.TOP);
+        }
+
+        if (!(dw instanceof BitmapDrawable) &&
+             !(mNotificationPanelHeader.getBackground() instanceof BitmapDrawable) &&
+             !(mNotificationPanelHeader.getBackground() instanceof TransitionDrawable)) {
+            return;
+        }
+
+        arrayDrawable[0] = mNotificationPanelHeader.getBackground();
         arrayDrawable[1] = dw;
 
-        if (arrayDrawable[0] != null) {
-            TransitionDrawable transitionDrawable = new TransitionDrawable(arrayDrawable);
-            transitionDrawable.setCrossFadeEnabled(true);
-            mStatusHeaderImage.setImageDrawable(transitionDrawable);
-            transitionDrawable.startTransition(1000);
-        } else {
-            mStatusHeaderImage.setImageDrawable(dw);
-        }
+        TransitionDrawable transitionDrawable = new TransitionDrawable(arrayDrawable);
+        transitionDrawable.setCrossFadeEnabled(true);
+        mNotificationPanelHeader.setBackgroundDrawable(transitionDrawable);
+        transitionDrawable.startTransition(1000);
     }
 
     @Override
