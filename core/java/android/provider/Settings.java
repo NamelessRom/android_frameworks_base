@@ -4316,7 +4316,8 @@ public final class Settings {
          * 4 - Voice search
          * 5 - In-app search
          * 6 - Launch Camera
-         * 7 - Immersive mode
+         * 7 - Last app
+         * 8 - Immersive mode
          * @hide
          */
         public static final String KEY_HOME_LONG_PRESS_ACTION = "key_home_long_press_action";
