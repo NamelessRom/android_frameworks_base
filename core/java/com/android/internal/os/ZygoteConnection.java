@@ -123,26 +123,7 @@ class ZygoteConnection {
      * method in child process
      */
     void run() throws ZygoteInit.MethodAndArgsCaller {
-
-        int loopCount = ZygoteInit.GC_LOOP_COUNT;
-
         while (true) {
-            /*
-             * Call gc() before we block in readArgumentList().
-             * It's work that has to be done anyway, and it's better
-             * to avoid making every child do it.  It will also
-             * madvise() any free memory as a side-effect.
-             *
-             * Don't call it every time, because walking the entire
-             * heap is a lot of overhead to free a few hundred bytes.
-             */
-            if (loopCount <= 0) {
-                ZygoteInit.gc();
-                loopCount = ZygoteInit.GC_LOOP_COUNT;
-            } else {
-                loopCount--;
-            }
-
             if (runOnce()) {
                 break;
             }
