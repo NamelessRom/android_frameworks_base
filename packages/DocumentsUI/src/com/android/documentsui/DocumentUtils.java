@@ -26,7 +26,7 @@ public class DocumentUtils {
     }
 
     public boolean isLocalDocument(String url) {
-        return (url != null && !url.startsWith("http://") && !url.startsWith("http://"));
+        return (url != null && !url.startsWith("http://") && !url.startsWith("https://"));
     }
 
     // Override of RootInfo.isExternalStorage accepting a URI
