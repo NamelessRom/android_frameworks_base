@@ -21,7 +21,6 @@ package com.android.server.power;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -71,7 +70,7 @@ public final class ShutdownThread extends Thread {
     private static final int SHUTDOWN_VIBRATE_MS = 500;
 
     // state tracking
-    private static Object sIsStartedGuard = new Object();
+    private static final Object sIsStartedGuard = new Object();
     private static boolean sIsStarted = false;
 
     private static boolean mReboot;
@@ -172,55 +171,92 @@ public final class ShutdownThread extends Thread {
                 boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
 
                 // See if the advanced reboot menu is enabled (only if primary user) and check the keyguard state
-                boolean advancedReboot = isPrimary ? advancedRebootEnabled(context) : false;
+                boolean advancedReboot = isPrimary && advancedRebootEnabled(context);
                 KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
                 boolean locked = km.inKeyguardRestrictedInputMode() && km.isKeyguardSecure();
 
                 if (advancedReboot && !locked) {
                     // Include options in power menu for rebooting into recovery or bootloader
-                    sConfirmDialog = new AlertDialog.Builder(context)
-                            .setTitle(titleResourceId)
-                            .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (which < 0)
-                                        return;
+                    final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+                    dialogBuilder.setTitle(titleResourceId);
 
-                                    String actions[] = context.getResources().getStringArray(com.android.internal.R.array.shutdown_reboot_actions);
+                    final boolean isOneClick = Settings.Nameless.getBoolean(context.getContentResolver(),
+                            Settings.Nameless.POWER_MENU_REBOOT_ONECLICK, false);
 
-                                    if (actions != null && which < actions.length) {
-                                        mRebootReason = actions[which];
-                                        mRebootSoft = actions[which].equals(SOFT_REBOOT);
-                                    }
+                    if (isOneClick) {
+                        dialogBuilder.setItems(com.android.internal.R.array.shutdown_reboot_options, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which < 0)
+                                    return;
+
+                                String actions[] = context.getResources().getStringArray(com.android.internal.R.array.shutdown_reboot_actions);
+
+                                if (actions != null && which < actions.length) {
+                                    mRebootReason = actions[which];
+                                    mRebootSoft = actions[which].equals(SOFT_REBOOT);
                                 }
-                            })
-                            .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (mRebootSoft) {
-                                        mRebootSoft = false;
-                                        try {
-                                            final IActivityManager am =
-                                                    ActivityManagerNative.asInterface(ServiceManager.checkService("activity"));
-                                            if (am != null) {
-                                                am.restart();
-                                            }
-                                        } catch (RemoteException e) {
-                                            Log.e(TAG, "failure trying to perform soft reboot", e);
-                                        }
-                                    } else {
-                                        mReboot = true;
-                                        beginShutdownSequence(context);
-                                    }
-                                }
-                            })
-                            .setNegativeButton(com.android.internal.R.string.no, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mReboot = false;
+
+                                if (mRebootSoft) {
                                     mRebootSoft = false;
-                                    dialog.cancel();
+                                    try {
+                                        final IActivityManager am =
+                                                ActivityManagerNative.asInterface(ServiceManager.checkService("activity"));
+                                        if (am != null) {
+                                            am.restart();
+                                        }
+                                    } catch (RemoteException e) {
+                                        Log.e(TAG, "failure trying to perform soft reboot", e);
+                                    }
+                                } else {
+                                    mReboot = true;
+                                    beginShutdownSequence(context);
                                 }
-                            })
-                            .create();
-                            sConfirmDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                            }
+                        });
+                    } else {
+                        dialogBuilder
+                                .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (which < 0)
+                                            return;
+
+                                        String actions[] = context.getResources().getStringArray(om.android.internal.R.array.shutdown_reboot_actions);
+
+                                        if (actions != null && which < actions.length) {
+                                            mRebootReason = actions[which];
+                                            mRebootSoft = actions[which].equals(SOFT_REBOOT);
+                                        }
+                                    }
+                                })
+                                .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (mRebootSoft) {
+                                            mRebootSoft = false;
+                                            try {
+                                                final IActivityManager am =
+                                                        ActivityManagerNative.asInterface(ServiceManager.checkService("activity"));
+                                                if (am != null) {
+                                                    am.restart();
+                                                }
+                                            } catch (RemoteException e) {
+                                                Log.e(TAG, "failure trying to perform soft reboot", e);
+                                            }
+                                        } else {
+                                            mReboot = true;
+                                            beginShutdownSequence(context);
+                                        }
+                                    }
+                                })
+                                .setNegativeButton(com.android.internal.R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mReboot = false;
+                                        mRebootSoft = false;
+                                        dialog.cancel();
+                                    }
+                                });
+                    }
+                    sConfirmDialog = dialogBuilder.create();
+                    sConfirmDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
                                 public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
                                     if (keyCode == KeyEvent.KEYCODE_BACK) {
                                         mReboot = false;
