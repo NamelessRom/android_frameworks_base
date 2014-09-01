@@ -1294,6 +1294,13 @@ public final class Settings {
          */
         public static final String SMART_COVER_ACTIVATED = "smart_cover_activated";
 
+        /**
+         * Whether the reboot submenu at the power menu should trigger actions with a
+         * single click or with confirmation
+         * @hide
+         */
+        public static final String POWER_MENU_REBOOT_ONECLICK = "power_menu_reboot_oneclick";
+
     }
 
     /**
