@@ -2627,7 +2627,11 @@ class ActivityManagerProxy implements IActivityManager
         reply.readException();
         Bitmap bm = null;
         if (reply.readInt() != 0) {
-            bm = Bitmap.CREATOR.createFromParcel(reply);
+            try {
+                bm = Bitmap.CREATOR.createFromParcel(reply);
+            } catch (OutOfMemoryError oome) {
+                // pass through to properly recycle and return null
+            }
         }
         data.recycle();
         reply.recycle();
