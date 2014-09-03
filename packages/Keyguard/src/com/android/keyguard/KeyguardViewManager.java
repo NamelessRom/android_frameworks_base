@@ -17,6 +17,14 @@
 package com.android.keyguard;
 
 import android.animation.Animator;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.TransitionDrawable;
+
+import com.android.internal.policy.IKeyguardShowCallback;
+import com.android.internal.widget.LockPatternUtils;
+
 import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
@@ -74,6 +82,8 @@ import com.android.internal.util.nameless.constants.FlashLightConstants;
 import com.android.internal.policy.IKeyguardShowCallback;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.util.nameless.NamelessUtils;
+
+import com.android.internal.util.cm.TorchConstants;
 
 /**
  * Manages creating, showing, hiding and resetting the keyguard.  Calls back
@@ -578,7 +588,7 @@ public class KeyguardViewManager {
 
     private static boolean runAction(Context context, String uri) {
         if ("FLASHLIGHT".equals(uri)) {
-            context.sendBroadcast(new Intent(FlashLightConstants.ACTION_TOGGLE_STATE));
+            context.sendBroadcast(new Intent(TorchConstants.ACTION_TOGGLE_STATE));
             return true;
         } else if ("NEXT".equals(uri)) {
             sendMediaButtonEvent(context, KeyEvent.KEYCODE_MEDIA_NEXT);
