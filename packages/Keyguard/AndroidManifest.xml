@@ -40,7 +40,6 @@
     <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
     <uses-permission android:name="android.permission.ACCESS_KEYGUARD_SECURE_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_NOTIFICATION_LISTENER" />
-    <uses-permission android:name="org.namelessrom.flashlight.TOGGLE_TORCH" />
 
     <!-- Smart Cover permissions -->
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
