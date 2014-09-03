@@ -92,9 +92,6 @@
     <!-- WallpaperManager -->
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
-    <!-- NamelessRom Additions -->
-    <uses-permission android:name="org.namelessrom.flashlight.TOGGLE_TORCH" />
-
     <!-- Device Control -->
     <uses-permission android:name="org.namelessrom.devicecontrol.API" />
 

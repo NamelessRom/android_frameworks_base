@@ -75,6 +75,8 @@ import com.android.internal.policy.IKeyguardShowCallback;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.util.nameless.NamelessUtils;
 
+import com.android.internal.util.cm.TorchConstants;
+
 /**
  * Manages creating, showing, hiding and resetting the keyguard.  Calls back
  * via {@link KeyguardViewMediator.ViewMediatorCallback} to poke
@@ -578,7 +580,7 @@ public class KeyguardViewManager {
 
     private static boolean runAction(Context context, String uri) {
         if ("FLASHLIGHT".equals(uri)) {
-            context.sendBroadcast(new Intent(FlashLightConstants.ACTION_TOGGLE_STATE));
+            context.sendBroadcast(new Intent(TorchConstants.ACTION_TOGGLE_STATE));
             return true;
         } else if ("NEXT".equals(uri)) {
             sendMediaButtonEvent(context, KeyEvent.KEYCODE_MEDIA_NEXT);
