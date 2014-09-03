@@ -19,7 +19,6 @@
 
 package com.android.internal.util.nameless;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
