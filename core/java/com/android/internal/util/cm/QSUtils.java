@@ -19,8 +19,6 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.android.internal.telephony.PhoneConstants;
-import com.android.internal.util.nameless.NamelessUtils;
-import com.android.internal.util.nameless.constants.FlashLightConstants;
 
 public class QSUtils {
         public static boolean deviceSupportsImeSwitcher(Context ctx) {
@@ -87,7 +85,7 @@ public class QSUtils {
         }
 
         public static boolean deviceSupportsTorch(Context context) {
-            return NamelessUtils.isPackageInstalled(context, FlashLightConstants.APP_PACKAGE_NAME);
+            return context.getResources().getBoolean(com.android.internal.R.bool.config_enableTorch);
         }
 
         public static boolean adbEnabled(ContentResolver resolver) {
