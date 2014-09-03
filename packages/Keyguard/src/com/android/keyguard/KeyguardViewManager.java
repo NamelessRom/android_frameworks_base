@@ -70,7 +70,6 @@ import android.view.WindowManagerPolicy.WindowManagerFuncs;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.android.internal.util.nameless.constants.FlashLightConstants;
 import com.android.internal.policy.IKeyguardShowCallback;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.util.nameless.NamelessUtils;
