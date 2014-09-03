@@ -45,8 +45,7 @@ import android.widget.LinearLayout;
 
 import com.android.internal.telephony.IccCardConstants.State;
 import com.android.internal.util.cm.LockscreenTargetUtils;
-import com.android.internal.util.nameless.NamelessUtils;
-import com.android.internal.util.nameless.constants.FlashLightConstants;
+import com.android.internal.util.cm.TorchConstants;
 import com.android.internal.view.RotationPolicy;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.multiwaveview.GlowPadView;
@@ -234,10 +233,9 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         mBouncerFrame = bouncerFrameView.getBackground();
 
         mGlowTorchRunning = false;
-        mGlowTorch = (Settings.System.getIntForUser(
-                mContext.getContentResolver(), Settings.System.LOCKSCREEN_GLOWPAD_TORCH, 0,
-                UserHandle.USER_CURRENT) == 1)
-                && NamelessUtils.isPackageInstalled(mContext, FlashLightConstants.APP_PACKAGE_NAME);
+        mGlowTorch = Settings.System.getBooleanForUser(
+                mContext.getContentResolver(), Settings.System.LOCKSCREEN_GLOWPAD_TORCH,
+                false, UserHandle.USER_CURRENT);
     }
 
     public void setCarrierArea(View carrierArea) {
@@ -470,7 +468,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             // Don't mess with torch if we didn't start it
             if (mGlowTorchRunning) {
                 mGlowTorchRunning = false;
-                Intent intent = new Intent(FlashLightConstants.ACTION_TOGGLE_STATE);
+                Intent intent = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
                 mContext.sendBroadcastAsUser(
                         intent, new UserHandle(UserHandle.USER_CURRENT));
                 // Restore user rotation policy
@@ -485,7 +483,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             mUserRotation = RotationPolicy.isRotationLocked(mContext);
             // Lock device so user doesn't accidentally rotate and lose torch
             RotationPolicy.setRotationLock(mContext, true);
-            Intent intent = new Intent(FlashLightConstants.ACTION_TOGGLE_STATE);
+            Intent intent = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
             mContext.sendBroadcastAsUser(
                     intent, new UserHandle(UserHandle.USER_CURRENT));
         }
@@ -526,7 +524,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         KeyguardUpdateMonitor.getInstance(getContext()).registerCallback(mUpdateCallback);
         if (mGlowTorch) {
             mContext.registerReceiver(mTorchReceiver,
-                    new IntentFilter(FlashLightConstants.ACTION_STATE_CHANGED));
+                    new IntentFilter(TorchConstants.ACTION_STATE_CHANGED));
         }
     }
 
@@ -577,7 +575,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     private final BroadcastReceiver mTorchReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final String state = intent.getStringExtra(FlashLightConstants.EXTRA_CURRENT_STATE);
+            final String state = intent.getStringExtra(TorchConstants.EXTRA_CURRENT_STATE);
             mGlowTorchRunning = ((state != null) && (state.equals("1")));
         }
     };
