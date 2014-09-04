@@ -189,8 +189,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_LAUNCH_CAMERA = 6;
     private static final int KEY_ACTION_LAST_APP = 7;
     private static final int KEY_ACTION_IMMERSIVE_MODE = 8;
-    private static final int KEY_ACTION_BACK = 9;
-    private static final int KEY_ACTION_HOME = 10;
+    private static final int KEY_ACTION_SCREEN_OFF = 9;
+    private static final int KEY_ACTION_BACK = KEY_ACTION_SCREEN_OFF + 1;
+    private static final int KEY_ACTION_HOME = KEY_ACTION_BACK + 1;
 
     // Masks for checking presence of hardware keys.
     // Must match values in core/res/res/values/config.xml
@@ -1209,6 +1210,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KEY_ACTION_IMMERSIVE_MODE:
                 toggleImmersiveMode();
+                break;
+            case KEY_ACTION_SCREEN_OFF:
+                NamelessActions.turnScreenOff(mContext);
                 break;
             default:
                 break;

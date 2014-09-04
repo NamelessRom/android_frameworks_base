@@ -22,6 +22,7 @@ package com.android.internal.util.nameless;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.PowerManager;
 
 public class NamelessActions {
 
@@ -58,6 +59,11 @@ public class NamelessActions {
         startIntent.setComponent(cn);
         startIntent.setAction("start");
         context.startService(startIntent);
+    }
+
+    public static void turnScreenOff(final Context context) {
+        final PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        pm.goToSleep(System.currentTimeMillis());
     }
 
 }
