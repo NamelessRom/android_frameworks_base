@@ -3617,12 +3617,6 @@ public final class Settings {
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
         /**
-         * Disable FC Notifications
-         * @hide
-         */
-        public static final String DISABLE_FC_NOTIFICATIONS = "disable_fc_notifications";
-
-        /**
          * Whether to show the IME switcher in the status bar
          * @hide
          */

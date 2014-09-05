@@ -1132,17 +1132,10 @@ public final class ActivityManagerService extends ActivityManagerNative
                             res.set(0);
                         }
                     } else if (mShowDialogs && !mSleeping && !mShuttingDown) {
-                        if (Settings.System.getInt(mContext.getContentResolver(),
-                                     Settings.System.DISABLE_FC_NOTIFICATIONS, 0) != 1) {
-                            Dialog d = new AppErrorDialog(getUiContext(),
-                                    ActivityManagerService.this, res, proc);
-                            d.show();
-                            proc.crashDialog = d;
-                        } else {
-                            if (res != null) {
-                                res.set(0);
-                            }
-                        }
+                        Dialog d = new AppErrorDialog(getUiContext(),
+                                ActivityManagerService.this, res, proc);
+                        d.show();
+                        proc.crashDialog = d;
                     } else {
                         // The device is asleep, so just pretend that the user
                         // saw a crash dialog and hit "force quit".
