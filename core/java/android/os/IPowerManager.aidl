@@ -60,8 +60,5 @@ interface IPowerManager
 
     void setKeyboardLight(boolean on, int key);
 
-    // blocked wakelock support
-    String getSeenWakeLocks();
-
-	void wakeUpWithProximityCheck(long time);
+    void wakeUpWithProximityCheck(long time);
 }

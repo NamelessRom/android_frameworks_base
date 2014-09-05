@@ -3492,18 +3492,6 @@ public final class Settings {
         public static final String EXPANDED_SCREENTIMEOUT_MODE = "expanded_screentimeout_mode";
 
         /**
-         * Enable blocking wakelock
-         * @hide
-         */
-        public static final String WAKELOCK_BLOCKING_ENABLED = "wakelock_blocking_enabled";
-
-        /**
-         * List of wakelock blocks selected
-         * @hide
-         */
-        public static final String WAKELOCK_BLOCKING_LIST = "wakelock_blocking_list";
-
-        /**
         * Notification Power Widget - Custom Ring Mode
         * @hide
         */
