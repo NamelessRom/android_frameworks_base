@@ -78,6 +78,7 @@ import android.service.gesture.EdgeGestureManager;
 import com.android.internal.os.DeviceKeyHandler;
 
 import com.android.internal.util.cm.ActionUtils;
+import com.android.internal.util.cm.TorchConstants;
 import com.android.internal.util.nameless.NamelessActions;
 import dalvik.system.DexClassLoader;
 
@@ -190,7 +191,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private static final int KEY_ACTION_LAST_APP = 7;
     private static final int KEY_ACTION_IMMERSIVE_MODE = 8;
     private static final int KEY_ACTION_SCREEN_OFF = 9;
-    private static final int KEY_ACTION_BACK = KEY_ACTION_SCREEN_OFF + 1;
+    private static final int KEY_ACTION_TOGGLE_TORCH = 10;
+    private static final int KEY_ACTION_BACK = KEY_ACTION_TOGGLE_TORCH + 1;
     private static final int KEY_ACTION_HOME = KEY_ACTION_BACK + 1;
 
     // Masks for checking presence of hardware keys.
@@ -1213,6 +1215,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             case KEY_ACTION_SCREEN_OFF:
                 NamelessActions.turnScreenOff(mContext);
+                break;
+            case KEY_ACTION_TOGGLE_TORCH:
+                final Intent torchIntent = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
+                mContext.sendBroadcastAsUser(torchIntent, UserHandle.CURRENT_OR_SELF);
                 break;
             default:
                 break;
