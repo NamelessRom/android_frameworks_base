@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.os.UserHandle;
 
 public class NamelessActions {
 
@@ -54,12 +55,11 @@ public class NamelessActions {
     }
 
     private static void actionScreenRecord(final Context context) {
-        final ComponentName cn = new ComponentName("com.android.systemui",
-                "com.android.systemui.nameless.screenrecord.ScreenRecordService");
+        final ComponentName cn = new ComponentName("org.namelessrom.screencast",
+                "org.namelessrom.screencast.MainActivity");
         final Intent startIntent = new Intent();
         startIntent.setComponent(cn);
-        startIntent.setAction("start");
-        context.startService(startIntent);
+        context.startActivityAsUser(startIntent, UserHandle.CURRENT_OR_SELF);
     }
 
     public static void turnScreenOff(final Context context) {

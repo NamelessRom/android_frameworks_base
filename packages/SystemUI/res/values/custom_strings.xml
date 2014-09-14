@@ -17,17 +17,6 @@
  */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- Screenrecord notification title -->
-    <string name="screenrecord_notif_title">Screen is being recorded</string>
-
-    <!-- Screenrecord notification action: Stop -->
-    <string name="screenrecord_notif_stop">Stop</string>
-
-    <!-- Screenrecord notification action: Toggle pointer -->
-    <string name="screenrecord_notif_pointer">Toggle pointer</string>
-
-    <!-- Screen record notification error title -->
-    <string name="screenrecord_notif_error">Unable to record screen</string>
 
     <!--  RamBar -->
     <string name="memory">RAM</string>
