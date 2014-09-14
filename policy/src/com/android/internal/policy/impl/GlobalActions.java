@@ -79,6 +79,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.internal.util.nameless.NamelessActions;
+import com.android.internal.util.nameless.NamelessUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,7 +174,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 com.android.internal.R.bool.config_useFixedVolume);
 
         mShowScreenRecord = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_enableScreenrecordChord);
+                com.android.internal.R.bool.config_enableScreenrecordChord)
+                && NamelessUtils.isPackageInstalled(mContext, "org.namelessrom.screencast");
 
         // set the initial status of airplane mode toggle
         mAirplaneState = getUpdatedAirplaneToggleState();
