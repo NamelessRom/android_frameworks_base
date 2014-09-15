@@ -2047,4 +2047,8 @@
   <!-- Theme install failure notification -->
   <java-symbol type="string" name="theme_install_error_title" />
   <java-symbol type="string" name="theme_install_error_message" />
+
+  <!-- Wifi tethering-->
+  <java-symbol type="plurals" name="tethered_clients_connected" />
+  <java-symbol type="xml" name="vendors" />
 </resources>
