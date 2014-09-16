@@ -1416,6 +1416,8 @@ class MountService extends IMountService.Stub
                             com.android.internal.R.styleable.Storage_mtpReserve, 0);
                     boolean allowMassStorage = a.getBoolean(
                             com.android.internal.R.styleable.Storage_allowMassStorage, false);
+                    boolean allowMtp = a.getBoolean(
+                            com.android.internal.R.styleable.Storage_allowMtp, true);
                     // resource parser does not support longs, so XML value is in megabytes
                     long maxFileSize = a.getInt(
                             com.android.internal.R.styleable.Storage_maxFileSize, 0) * 1024L * 1024L;
@@ -1424,13 +1426,13 @@ class MountService extends IMountService.Stub
                             " primary: " + primary + " removable: " + removable +
                             " emulated: " + emulated +  " mtpReserve: " + mtpReserve +
                             " allowMassStorage: " + allowMassStorage +
-                            " maxFileSize: " + maxFileSize);
+                            " maxFileSize: " + maxFileSize + " allowMtp: " + allowMtp);
 
                     if (emulated) {
                         // For devices with emulated storage, we create separate
                         // volumes for each known user.
                         mEmulatedTemplate = new StorageVolume(null, descriptionId, true, false,
-                                true, mtpReserve, false, maxFileSize, null);
+                                true, mtpReserve, false, maxFileSize, null, allowMtp);
 
                         final UserManagerService userManager = UserManagerService.getInstance();
                         for (UserInfo user : userManager.getUsers(false)) {
@@ -1443,7 +1445,7 @@ class MountService extends IMountService.Stub
                         } else {
                             final StorageVolume volume = new StorageVolume(new File(path),
                                     descriptionId, primary, removable, emulated, mtpReserve,
-                                    allowMassStorage, maxFileSize, null);
+                                    allowMassStorage, maxFileSize, null, allowMtp);
                             addVolumeLocked(volume);
 
                             // Until we hear otherwise, treat as unmounted
