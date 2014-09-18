@@ -1295,6 +1295,18 @@ public final class Settings {
          */
         public static final String POWER_MENU_REBOOT_ONECLICK = "power_menu_reboot_oneclick";
 
+        /**
+         * Allows to show the background activity back the lockscreen
+         * @hide
+         */
+        public static final String LOCKSCREEN_SEE_THROUGH = "lockscreen_see_through";
+
+        /**
+         * Radius of the blur lockscreen background
+         * @hide
+         */
+        public static final String LOCKSCREEN_BLUR_RADIUS = "lockscreen_blur_radius";
+
     }
 
     /**
