@@ -1,2 +1,0 @@
-include ':core', ':packages:DocumentsUI', ':packages:Keyguard', ':packages:SystemUI', ':policy',
-        ':services'

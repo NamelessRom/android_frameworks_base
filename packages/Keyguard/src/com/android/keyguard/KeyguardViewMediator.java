@@ -38,9 +38,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-
 import android.database.ContentObserver;
-import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -604,10 +602,6 @@ public class KeyguardViewMediator {
         if (soundPath == null || mUnlockSoundId == 0) {
             Log.w(TAG, "failed to load unlock sound from " + soundPath);
         }
-    }
-
-    public void setBackgroundBitmap(final Bitmap bmp) {
-        mKeyguardViewManager.setBackgroundBitmap(bmp);
     }
 
     /**
