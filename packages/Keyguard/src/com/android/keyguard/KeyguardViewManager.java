@@ -720,7 +720,7 @@ public class KeyguardViewManager {
             mIsCoverflow = false;
             setCustomBackground(mBlurredImage);
         } else {
-            updateShowWallpaper(mKeyguardHost.shouldShowWallpaper());
+            updateShowWallpaper(false);
         }
 
         updateUserActivityTimeoutInWindowLayoutParams();
