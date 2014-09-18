@@ -69,6 +69,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -100,8 +101,6 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     private long mWindowAnimationStartTime;
     private boolean mCallUiHiddenBeforeNextReload;
 
-    private LinearColorBar mRamUsageBar;
-
     private RecentTasksLoader mRecentTasksLoader;
     private ArrayList<TaskDescription> mRecentTaskDescriptions;
     private TaskDescriptionAdapter mListAdapter;
@@ -110,8 +109,11 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     private int mRecentItemLayoutId;
     private boolean mHighEndGfx;
 
+    private LinearLayout mRecentsBar;
+    private LinearColorBar mRamUsageBar;
     private ImageView mClearAllRecents;
 
+    private boolean recentsBarEnabled;
     private boolean canUseRamBar;
     private boolean ramBarEnabled;
     private boolean ramBarIncludeCached;
@@ -467,6 +469,9 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.RAM_USAGE_BAR_CACHED),
                     false, mObserver);
+            resolver.registerContentObserver(
+                    Settings.Nameless.getUriFor(Settings.Nameless.RECENTS_BAR),
+                    false, mObserver);
             updateSettings();
             updateView();
         }
@@ -571,6 +576,8 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
 
         mRecentsScrim = findViewById(R.id.recents_bg_protect);
         mRecentsNoApps = findViewById(R.id.recents_no_apps);
+
+        mRecentsBar = (LinearLayout) findViewById(R.id.recents_bottom_bar);
 
         mClearAllRecents = (ImageView) findViewById(R.id.recents_clear);
         if (mClearAllRecents != null) {
@@ -1090,9 +1097,14 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                 Settings.System.RAM_USAGE_BAR, true);
         ramBarIncludeCached = Settings.System.getBoolean(mContext.getContentResolver(),
                 Settings.System.RAM_USAGE_BAR_CACHED, false);
+        recentsBarEnabled = Settings.Nameless.getBoolean(mContext.getContentResolver(),
+                Settings.Nameless.RECENTS_BAR, true);
     }
 
     private void updateView() {
+        if (mRecentsBar != null) {
+            mRecentsBar.setVisibility((recentsBarEnabled) ? View.VISIBLE : View.GONE);
+        }
         if (mRamUsageBar != null) {
             mRamUsageBar.setVisibility((ramBarEnabled && canUseRamBar) ? View.VISIBLE : View.GONE);
         }

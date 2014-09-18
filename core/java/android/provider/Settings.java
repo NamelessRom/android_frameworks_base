@@ -1307,6 +1307,12 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_BLUR_RADIUS = "lockscreen_blur_radius";
 
+        /**
+         * Whether the recents bottom bar should be shown or not
+         * @hide
+         */
+        public static final String RECENTS_BAR = "recents_bar";
+
     }
 
     /**
