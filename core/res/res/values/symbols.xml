@@ -2044,4 +2044,7 @@
   <!-- USB OTG Notification -->
   <java-symbol type="string" name="usb_storage_notification_manage_message" />
 
+  <!-- Theme install failure notification -->
+  <java-symbol type="string" name="theme_install_error_title" />
+  <java-symbol type="string" name="theme_install_error_message" />
 </resources>
