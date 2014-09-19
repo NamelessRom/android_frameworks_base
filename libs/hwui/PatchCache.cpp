@@ -128,12 +128,9 @@ void PatchCache::removeDeferred(Res_png_9patch* patch) {
             break;
         }
     }
+    LOG_ALWAYS_FATAL_IF(patch == NULL);
 
-    if (patch == NULL) {
-        ALOGE("9-patch is already garbage, skipping");
-    } else {
-        mGarbage.push(patch);
-    }
+    mGarbage.push(patch);
 }
 
 void PatchCache::clearGarbage() {
