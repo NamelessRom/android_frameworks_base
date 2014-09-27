@@ -936,6 +936,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         if (Settings.Secure.getInt(cr, Settings.Secure.DEVELOPMENT_SHORTCUT, 0) == 0) {
             popup.getMenu().findItem(R.id.recent_force_stop).setVisible(false);
             popup.getMenu().findItem(R.id.recent_wipe_app).setVisible(false);
+            popup.getMenu().findItem(R.id.recent_uninstall).setVisible(false);
         } else {
             if (viewHolder != null) {
                 final TaskDescription ad = viewHolder.taskDescription;
@@ -949,7 +950,9 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                           == ApplicationInfo.FLAG_SYSTEM
                           || mDpm.packageHasActiveAdmins(ad.packageName)) {
                         popup.getMenu()
-                        .findItem(R.id.notification_inspect_item_wipe_app).setEnabled(false);
+                        .findItem(R.id.recent_wipe_app).setEnabled(false);
+                        popup.getMenu()
+                        .findItem(R.id.recent_uninstall).setEnabled(false);
                     } else {
                         Log.d(TAG, "Not a 'special' application");
                     }
@@ -1001,6 +1004,18 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
                                 getSystemService(Context.ACTIVITY_SERVICE);
                         am.clearApplicationUserData(ad.packageName,
                                 new FakeClearUserDataObserver());
+                        ((ViewGroup) mRecentsContainer).removeViewInLayout(selectedView);
+                    } else {
+                        throw new IllegalStateException("Oops, no tag on view " + selectedView);
+                    }
+                } else if (item.getItemId() == R.id.recent_uninstall) {
+                    ViewHolder viewHolder = (ViewHolder) selectedView.getTag();
+                    if (viewHolder != null) {
+                        final TaskDescription ad = viewHolder.taskDescription;
+                        Uri packageURI = Uri.parse("package:"+ad.packageName);
+                        Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageURI);
+                        uninstallIntent.putExtra(Intent.EXTRA_UNINSTALL_ALL_USERS, true);
+                        mContext.startActivity(uninstallIntent);
                         ((ViewGroup) mRecentsContainer).removeViewInLayout(selectedView);
                     } else {
                         throw new IllegalStateException("Oops, no tag on view " + selectedView);
