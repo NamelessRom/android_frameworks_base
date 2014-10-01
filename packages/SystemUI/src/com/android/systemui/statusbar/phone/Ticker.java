@@ -41,7 +41,7 @@ public abstract class Ticker {
 
     private Context mContext;
     private Handler mHandler = new Handler();
-    private ArrayList<Segment> mSegments = new ArrayList();
+    private final ArrayList<Segment> mSegments = new ArrayList<Segment>();
     private TextPaint mPaint;
     private View mTickerView;
     private ImageSwitcher mIconSwitcher;
