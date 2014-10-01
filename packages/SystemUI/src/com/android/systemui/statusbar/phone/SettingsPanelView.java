@@ -214,7 +214,7 @@ public class SettingsPanelView extends PanelView {
             }
         } else {
             File f = new File(Uri.parse(notifiBack).getPath());
-            if (f !=  null) {
+            if (f.exists()) {
                 Bitmap backgroundBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
                 mBackgroundDrawable =
                     new BitmapDrawable(getContext().getResources(), backgroundBitmap);

@@ -556,8 +556,8 @@ public class DessertCaseView extends FrameLayout {
         protected void onLayout (boolean changed, int left, int top, int right, int bottom) {
             final float w = right-left;
             final float h = bottom-top;
-            final int w2 = (int) (w / mView.SCALE / 2);
-            final int h2 = (int) (h / mView.SCALE / 2);
+            final int w2 = (int) (w / DessertCaseView.SCALE / 2);
+            final int h2 = (int) (h / DessertCaseView.SCALE / 2);
             final int cx = (int) (left + w * 0.5f);
             final int cy = (int) (top + h * 0.5f);
             mView.layout(cx - w2, cy - h2, cx + w2, cy + h2);
