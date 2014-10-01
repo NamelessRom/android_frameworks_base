@@ -16,10 +16,8 @@
 
 package com.android.systemui.statusbar.policy;
 
-import android.app.Notification;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -28,7 +26,6 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import com.android.systemui.ExpandHelper;
 import com.android.systemui.R;
@@ -40,8 +37,6 @@ public class HeadsUpNotificationView extends FrameLayout implements SwipeHelper.
     private static final String TAG = "HeadsUpNotificationView";
     private static final boolean DEBUG = false;
     private static final boolean SPEW = DEBUG;
-
-    Rect mTmpRect = new Rect();
 
     private final int mTouchSensitivityDelay;
     private SwipeHelper mSwipeHelper;

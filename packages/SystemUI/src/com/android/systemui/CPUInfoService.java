@@ -298,7 +298,7 @@ public class CPUInfoService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                         WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 PixelFormat.TRANSLUCENT);
-        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.gravity = Gravity.START | Gravity.TOP;
         params.setTitle("CPU Info");
 
         mCurCPUThread = new CurCPUThread(mView.getHandler());
