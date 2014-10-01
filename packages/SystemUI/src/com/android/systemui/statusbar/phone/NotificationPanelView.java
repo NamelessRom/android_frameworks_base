@@ -379,8 +379,8 @@ public class NotificationPanelView extends PanelView {
             } catch(NumberFormatException e) {
             }
         } else {
-            File f = new File(Uri.parse(notifiBack).getPath());
-            if (f !=  null) {
+            final File f = new File(Uri.parse(notifiBack).getPath());
+            if (f.exists()) {
                 Bitmap backgroundBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
                 mBackgroundDrawable =
                     new BitmapDrawable(mContext.getResources(), backgroundBitmap);
@@ -398,8 +398,8 @@ public class NotificationPanelView extends PanelView {
 
         mBackgroundDrawableLandscape = null;
         if (notifiBack != null) {
-            File f = new File(Uri.parse(notifiBack).getPath());
-            if (f !=  null) {
+            final File f = new File(Uri.parse(notifiBack).getPath());
+            if (f.exists()) {
                 Bitmap backgroundBitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
                 mBackgroundDrawableLandscape =
                     new BitmapDrawable(mContext.getResources(), backgroundBitmap);
