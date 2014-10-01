@@ -10,7 +10,6 @@ import android.database.ContentObserver;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.TrafficStats;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -55,6 +54,9 @@ public class NetworkTraffic extends TextView {
     private boolean mEnabled;
     private boolean mWasConnectionAvailable;
 
+    private boolean mAutoHide;
+    private int     mAutoHideThreshold;
+
     private long totalRxBytes;
     private long totalTxBytes;
     private long lastUpdateTime;
@@ -87,6 +89,14 @@ public class NetworkTraffic extends TextView {
             final long newTotalTxBytes = TrafficStats.getTotalTxBytes();
             long rxData = newTotalRxBytes - totalRxBytes;
             long txData = newTotalTxBytes - totalTxBytes;
+
+            if (shouldHide(rxData, txData, timeDelta)) {
+                setText("");
+                setVisibility(View.GONE);
+                return;
+            } else {
+                setVisibility(View.VISIBLE);
+            }
 
             // If bit/s convert from Bytes to bits
             final String symbol;
@@ -158,8 +168,16 @@ public class NetworkTraffic extends TextView {
 
         public void observe() {
             final ContentResolver resolver = mContext.getContentResolver();
-            final Uri uri = Settings.System.getUriFor(Settings.System.NETWORK_TRAFFIC_STATE);
-            resolver.registerContentObserver(uri, false, this, UserHandle.USER_ALL);
+
+            resolver.registerContentObserver(Settings.System
+                            .getUriFor(Settings.System.NETWORK_TRAFFIC_STATE), false,
+                    this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System
+                            .getUriFor(Settings.System.NETWORK_TRAFFIC_AUTOHIDE), false,
+                    this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System
+                            .getUriFor(Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD), false,
+                    this, UserHandle.USER_ALL);
 
             updateSettings();
         }
@@ -273,11 +291,17 @@ public class NetworkTraffic extends TextView {
 
     private void updateSettings() {
         final ContentResolver resolver = mContext.getContentResolver();
+
+        mAutoHide = Settings.System.getBooleanForUser(resolver,
+                Settings.System.NETWORK_TRAFFIC_AUTOHIDE,
+                false, UserHandle.USER_CURRENT);
+
+        mAutoHideThreshold = Settings.System.getIntForUser(resolver,
+                Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD,
+                10, UserHandle.USER_CURRENT);
+
         mState = Settings.System.getIntForUser(resolver, Settings.System.NETWORK_TRAFFIC_STATE,
                 0, UserHandle.USER_CURRENT);
-
-        // reset the was connection available state
-        mWasConnectionAvailable = false;
 
         if (isSet(mState, MASK_UNIT)) {
             KB = KILOBYTE;
@@ -297,6 +321,9 @@ public class NetworkTraffic extends TextView {
 
         // if the indicator is enabled, update the view, else hide it
         if (mEnabled) {
+            // reset the was connection available state
+            mWasConnectionAvailable = false;
+
             registerReceivers();
             update();
         } else {
@@ -332,5 +359,17 @@ public class NetworkTraffic extends TextView {
             intTrafficDrawable = 0;
         }
         setCompoundDrawablesWithIntrinsicBounds(0, 0, intTrafficDrawable, 0);
+    }
+
+    private boolean shouldHide(final long rxData, final long txData, final long timeDelta) {
+        final long speedTxKB = (long) (txData / (timeDelta / 1000f)) / KILOBYTE;
+        final long speedRxKB = (long) (rxData / (timeDelta / 1000f)) / KILOBYTE;
+        return mAutoHide &&
+                ((mState == MASK_DOWN && speedRxKB <= mAutoHideThreshold)
+                        || (mState == MASK_UP && speedTxKB <= mAutoHideThreshold)
+                        || (mState == MASK_UP + MASK_DOWN
+                        && speedRxKB <= mAutoHideThreshold
+                        && speedTxKB <= mAutoHideThreshold));
+
     }
 }
