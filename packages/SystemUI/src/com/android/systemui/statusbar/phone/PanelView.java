@@ -38,7 +38,7 @@ public class PanelView extends FrameLayout {
     public static final boolean DEBUG = PanelBar.DEBUG;
     public static final String TAG = PanelView.class.getSimpleName();
 
-    public static final boolean DEBUG_NAN = true; // http://b/7686690
+    public static final boolean DEBUG_NAN = false; // http://b/7686690
 
     private final void logf(String fmt, Object... args) {
         Log.v(TAG, (mViewName != null ? (mViewName + ": ") : "") + String.format(fmt, args));
@@ -119,8 +119,7 @@ public class PanelView extends FrameLayout {
             int i = 0;
             float totalweight = 0f;
             float weight = 10f;
-            for (final Iterator<MotionEventCopy> iter = mEventBuf.iterator();
-                    iter.hasNext();) {
+            for (final Iterator<MotionEventCopy> iter = mEventBuf.iterator(); iter.hasNext();) {
                 final MotionEventCopy event = iter.next();
                 if (last != null) {
                     final float dt = (float) (event.t - last.t) / timebase;

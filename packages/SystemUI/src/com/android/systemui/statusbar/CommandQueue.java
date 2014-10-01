@@ -64,9 +64,9 @@ public class CommandQueue extends IStatusBar.Stub {
     public static final int FLAG_EXCLUDE_INPUT_METHODS_PANEL = 1 << 3;
     public static final int FLAG_EXCLUDE_COMPAT_MODE_PANEL = 1 << 4;
 
-    private StatusBarIconList mList;
-    private Callbacks mCallbacks;
-    private Handler mHandler = new H();
+    private final StatusBarIconList mList;
+    private final Callbacks mCallbacks;
+    private final Handler mHandler = new H();
 
     private class NotificationQueueEntry {
         IBinder key;

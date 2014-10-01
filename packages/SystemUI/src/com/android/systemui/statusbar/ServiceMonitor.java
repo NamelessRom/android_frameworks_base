@@ -270,7 +270,8 @@ public class ServiceMonitor {
 
     private static String bundleToString(Bundle bundle) {
         if (bundle == null) return null;
-        StringBuilder sb = new StringBuilder('{');
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
         for (String key : bundle.keySet()) {
             if (sb.length() > 1) sb.append(',');
             Object v = bundle.get(key);

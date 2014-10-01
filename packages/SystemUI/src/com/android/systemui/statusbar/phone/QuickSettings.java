@@ -209,6 +209,7 @@ class QuickSettings {
             throw new RuntimeException(e);
         } catch (RemoteException e) {
             Log.e(TAG, "Couldn't get user info", e);
+            return;
         }
         final int userId = userInfo.id;
         final String userName = userInfo.name;
