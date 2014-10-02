@@ -18,10 +18,6 @@
  */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="screenrecord_notif_title">Bildschirm wird aufgezeichnet</string>
-  <string name="screenrecord_notif_stop">Stop</string>
-  <string name="screenrecord_notif_pointer">Zeiger einblenden</string>
-  <string name="screenrecord_notif_error">Bildschirm kann nicht aufgezeichnet werden</string>
   <string name="memory">RAM</string>
   <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> verfügbar</string>
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> verwendet</string>
@@ -44,4 +40,5 @@
   <string name="onthego_service_toggle">Dienst automatisch neu starten</string>
   <string name="quick_settings_onthego_back">Rückkamera</string>
   <string name="quick_settings_onthego_front">Frontkamera</string>
+  <string name="status_bar_recent_lock_item_title">App in Liste sperren</string>
 </resources>

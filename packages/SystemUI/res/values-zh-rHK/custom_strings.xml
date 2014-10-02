@@ -18,9 +18,6 @@
  */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="screenrecord_notif_title">正在錄製螢幕影片</string>
-  <string name="screenrecord_notif_stop">停止</string>
-  <string name="screenrecord_notif_error">無法錄製螢幕影片。</string>
   <string name="onthego_notif_stop">停止</string>
   <string name="onthego_notif_options">選項</string>
   <string name="onthego_notif_error">無法啟動On-The-Go</string>
