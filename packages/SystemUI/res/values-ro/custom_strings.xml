@@ -18,10 +18,6 @@
  */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="screenrecord_notif_title">Display-ul este înregistrat</string>
-  <string name="screenrecord_notif_stop">Oprire</string>
-  <string name="screenrecord_notif_pointer">Comutare indicator</string>
-  <string name="screenrecord_notif_error">Înregistrare ecran nereușită</string>
   <string name="memory">RAM</string>
   <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> libere</string>
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> folosite</string>
@@ -48,4 +44,5 @@
   <string name="onthego_service_toggle">Repornire automată a serviciului</string>
   <string name="quick_settings_onthego_back">Camera din spate</string>
   <string name="quick_settings_onthego_front">Cameră frontală</string>
+  <string name="status_bar_recent_lock_item_title">Blocare aplicație în listă</string>
 </resources>

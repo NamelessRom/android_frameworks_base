@@ -18,10 +18,6 @@
  */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="screenrecord_notif_title">Ekran jest nagrywany</string>
-  <string name="screenrecord_notif_stop">Zatrzymaj</string>
-  <string name="screenrecord_notif_pointer">Przełącz wskaźnik</string>
-  <string name="screenrecord_notif_error">Nie można nagrać ekranu</string>
   <string name="memory">RAM</string>
   <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> wolne</string>
   <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> używane</string>
