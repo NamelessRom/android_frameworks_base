@@ -3,9 +3,6 @@
 <!--
 /* //device/apps/common/assets/res/any/strings.xml
 **
-** Copyright (c) 2013, The Linux Foundation. All rights reserved.
-** Not a Contribution.
-**
 ** Copyright 2006, The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,16 +46,24 @@
   <string name="enablePin">Feeler. Aktivéier d\'SIM-/RUIM-Spär.</string>
   <string name="imei">IMEI</string>
   <string name="meid">MEID</string>
+  <string name="CfMmi">Gespréich-Weiderleedung</string>
   <string name="CwMmi">Gespréich pauséiert</string>
   <string name="BaMmi">Uruffspär</string>
   <string name="PwdMmi">Passwuert-Ännerung</string>
   <string name="PinMmi">PIN-Ännerung</string>
+  <string name="CnipMmi">Ruffnummer disponibel</string>
+  <string name="CnirMmi">Rufnummer begrenzt</string>
+  <string name="RuacMmi">Refus vun onerwënschten Uriff</string>
+  <string name="CndMmi">Iwwermëttlung fir Ruffnummeren</string>
   <string name="DndMmi">Net stéieren</string>
   <string name="RestrictedChangedTitle">Begrenzten Zougrëff geännert</string>
   <string name="RestrictedOnData">Dateservice ass gespaart.</string>
   <string name="RestrictedOnEmergency">Noutruff ass gespaart.</string>
+  <string name="RestrictedOnNormal">Sproochservice ass gespaart.</string>
   <string name="RestrictedOnAllVoice">All Stëmmservicer si gespaart.</string>
   <string name="RestrictedOnSms">SMS-Service ass gespaart.</string>
+  <string name="RestrictedOnVoiceSms">Sprooch-/SMS-Servicer si gespaart.</string>
+  <string name="RestrictedOnAll">Alle Sprooch-/Date-/SMS-Servicer si gespaart.</string>
   <string name="serviceClassVoice">Stëmm</string>
   <string name="serviceClassData">Daten</string>
   <string name="serviceClassFAX">FAX</string>
@@ -264,6 +269,7 @@ Kontaktéier däi Provider fir eng aner SIM-Kaart ze kréien.</string>
   <string name="lockscreen_transport_stop_description">Stopp-Knäppchen</string>
   <string name="emergency_calls_only" msgid="2485604591272668370">Nëmmen Noutriff</string>
   <string name="lockscreen_sim_puk_locked_message">SIM-Kaart ass PUK-gespaart.</string>
+  <string name="lockscreen_sim_locked_message">D\'SIM-Kaart ass gespaart.</string>
   <string name="lockscreen_sim_unlock_progress_dialog_message">D\'SIM-Kaart gëtt entspaart\u2026</string>
   <string name="lockscreen_too_many_failed_attempts_countdown">Probéier nach eng Kéier a(n) <xliff:g id="number">%d</xliff:g> Sekonnen.</string>
   <string name="lockscreen_glogin_forgot_pattern">Kont-Entspärung</string>
@@ -477,6 +483,7 @@ Kontaktéier däi Provider fir eng aner SIM-Kaart ze kréien.</string>
   <string name="data_usage_3g_limit_title">2G- an 3G-Daten deaktivéiert</string>
   <string name="data_usage_4g_limit_title">4G-Daten deaktivéiert</string>
   <string name="data_usage_mobile_limit_title">Mobil Daten deaktivéiert</string>
+  <string name="data_usage_wifi_limit_title">WLAN-Daten deaktivéiert</string>
   <string name="list_delimeter">", "</string>
   <string name="activity_resolver_use_always">Ëmmer</string>
   <string name="default_audio_route_name" product="default">Telefon</string>
@@ -501,6 +508,7 @@ Kontaktéier däi Provider fir eng aner SIM-Kaart ze kréien.</string>
   <string name="kg_password_instructions">Passwuert aginn</string>
   <string name="kg_enter_confirm_pin_hint">Bestäteg de gewënschte PIN-Code</string>
   <string name="kg_invalid_sim_pin_hint">Tipp e PIN deen tëscht 4 an 8 Zifferen huet.</string>
+  <string name="kg_invalid_sim_puk_hint">De PUK-Code misst 8 oder méi Zifferen hunn.</string>
   <string name="kg_login_instructions">Fir z\'entspären, mell dech mat dengem Google-Kont un.</string>
   <string name="kg_login_submit_button">Aloggen</string>
   <string name="kg_login_invalid_input">Ongëltege Benotzernumm oder Passwuert.</string>
