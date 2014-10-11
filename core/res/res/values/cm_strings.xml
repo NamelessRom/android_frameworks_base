@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2012-2014 The CyanogenMod Project
+     Copyright (c) 2013, The Linux Foundation. All rights reserved.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -42,20 +43,6 @@
     <string name="global_actions_expanded_desktop_mode_on_status">Enabled</string>
     <!-- status message in phone options dialog for when expand desktop mode is off -->
     <string name="global_actions_expanded_desktop_mode_off_status">Disabled</string>
-
-    <!-- label for item that toggle mobile data -->
-    <string name="global_actions_toggle_mobile_data">Mobile data</string>
-    <!-- status message in phone options dialog for when mobile data is on -->
-    <string name="global_actions_mobile_data_on_status">Mobile data is ON</string>
-    <!-- status message in phone options dialog for when mobile data is off -->
-    <string name="global_actions_mobile_data_off_status">Mobile data is OFF</string>
-
-    <!-- label for item that toggle wifi -->
-    <string name="global_actions_toggle_wifi">WiFi</string>
-    <!-- status message in phone options dialog for when wifi is on -->
-    <string name="global_actions_wifi_on_status">WiFi is ON</string>
-    <!-- status message in phone options dialog for when wifi is off -->
-    <string name="global_actions_wifi_off_status">WiFi is OFF</string>
 
     <!-- Button to reboot the phone, within the Phone Options dialog -->
     <string name="reboot_system" product="tablet">Reboot tablet</string>
@@ -122,6 +109,11 @@
 
     <!-- The item label for the no profile selection item. -->
     <string name="profile_none">None</string>
+
+    <!-- Performance profile modes -->
+    <string name="perf_profile_pwrsv">Power save</string>
+    <string name="perf_profile_bal">Balanced</string>
+    <string name="perf_profile_perf">Performance</string>
 
     <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
     <string name="permlab_interceptSmsSent">intercept outgoing SMS</string>
@@ -242,6 +234,58 @@
 
     <!-- USB OTG notification message -->
     <string name="usb_storage_notification_manage_message">Tap to manage</string>
+
+    <!-- SD card storage notification -->
+    <string name="sd_ext_media_checking_notification_title">Preparing SD card\u2026</string>
+    <string name="sd_ext_media_checking_notification_message">Checking SD card for errors\u2026</string>
+    <string name="sd_ext_media_nofs_notification_title">Blank SD card</string>
+    <string name="sd_ext_media_nofs_notification_message">SD card is blank or has unsupported filesystem.</string>
+    <string name="sd_ext_media_unmountable_notification_title">Damaged SD card</string>
+    <string name="sd_ext_media_unmountable_notification_message">SD card is damaged. Try reformatting it.</string>
+    <string name="sd_ext_media_badremoval_notification_title">SD card unexpectedly removed</string>
+    <string name="sd_ext_media_badremoval_notification_message">Unmount SD card before removing to avoid data loss.</string>
+    <string name="sd_ext_media_safe_unmount_notification_title">SD card safe to remove</string>
+    <string name="sd_ext_media_safe_unmount_notification_message">You can safely remove SD card.</string>
+    <string name="sd_ext_media_nomedia_notification_title">Removed SD card</string>
+    <string name="sd_ext_media_nomedia_notification_message">SD card removed. Insert a new one.</string>
+
+    <!-- USB storage notification -->
+    <string name="usb_ext_media_checking_notification_title">Preparing USB storage\u2026</string>
+    <string name="usb_ext_media_checking_notification_message">Checking USB storage for errors\u2026</string>
+    <string name="usb_ext_media_nofs_notification_title">Blank USB storage</string>
+    <string name="usb_ext_media_nofs_notification_message">USB storage is blank or has unsupported filesystem.</string>
+    <string name="usb_ext_media_unmountable_notification_title">Damaged USB storage</string>
+    <string name="usb_ext_media_unmountable_notification_message">USB storage is damaged. Try reformatting it.</string>
+    <string name="usb_ext_media_badremoval_notification_title">USB storage unexpectedly removed</string>
+    <string name="usb_ext_media_badremoval_notification_message">Unmount USB storage before removing to avoid data loss.</string>
+    <string name="usb_ext_media_safe_unmount_notification_title">USB storage safe to remove</string>
+    <string name="usb_ext_media_safe_unmount_notification_message">You can safely remove USB storage.</string>
+    <string name="usb_ext_media_nomedia_notification_title">Removed USB storage</string>
+    <string name="usb_ext_media_nomedia_notification_message">USB storage removed. Insert new media.</string>
+
+    <!-- Text for progress dialog while formatting SD card [CHAR LIMIT=NONE] -->
+    <string name="progress_nomediapresent" product="default">No removable media present\u2026</string>
+
+    <!-- Shown in the lock screen when there is SIM card IO error. -->
+    <string name="lockscreen_sim_error_message_short">Invalid card.</string>
+
+    <!-- Shown in the lock screen to tell the user that phone is in airplane mode-->
+    <string name="lockscreen_airplane_mode_on">Airplane mode</string>
+
+    <!-- Shown in the lock screen to tell the user that their SIM/RUIM is locked and they must unlock it. -->
+    <string name="lockscreen_sim_locked_message_cm">SIM/RUIM card is locked.</string>
+
+    <!-- Displayed when a SIM PIN/PUK is entered incorrectly. -->
+    <string name="pinpuk_attempts">\nAttempts remaining:</string>
+
+    <!-- Displayed when the USSD/SS request is modified by STK CC to a
+         different request. This will be displayed in a toast. -->
+    <string name="stk_cc_ussd_to_dial">USSD request is modified to DIAL request.</string>
+    <string name="stk_cc_ussd_to_ss">USSD request is modified to SS request.</string>
+    <string name="stk_cc_ussd_to_ussd">USSD request is modified to new USSD request.</string>
+    <string name="stk_cc_ss_to_dial">SS request is modified to DIAL request.</string>
+    <string name="stk_cc_ss_to_ussd">SS request is modified to USSD request.</string>
+    <string name="stk_cc_ss_to_ss">SS request is modified to new SS request.</string>
 
     <!-- Theme installation error notification -->
     <string name="theme_install_error_title">Failed to install theme</string>
