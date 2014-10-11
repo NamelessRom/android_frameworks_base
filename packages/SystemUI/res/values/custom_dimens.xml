@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Network traffic monitor single-line text size -->
+    <dimen name="net_traffic_single_text_size">12dp</dimen>
+
+    <!-- Network traffic monitor multi-line text size -->
+    <dimen name="net_traffic_multi_text_size">9dp</dimen>
+
+    <!-- Quick Settings tile geometry: width and height (ribbon mode) -->
+    <dimen name="qs_ribbon_width_min">40dp</dimen>
+    <dimen name="qs_ribbon_width_max">128dp</dimen>
+    <dimen name="qs_ribbon_width_big">64dp</dimen>
+    <dimen name="qs_ribbon_height_small">40dp</dimen>
+    <dimen name="qs_ribbon_height_big">64dp</dimen>
+    <!-- Quick Settings tile geometry: interior margin, above and below icon (ribbon mode) -->
+    <dimen name="qs_tile_ribbon_icon_margin_small">4dp</dimen>
+    <dimen name="qs_tile_ribbon_icon_margin_big">16dp</dimen>
+</resources>
