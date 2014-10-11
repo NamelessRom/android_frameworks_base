@@ -16,25 +16,10 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="app_name">شاشة قفل CM</string>
+  <string name="app_name">شاشة القفل</string>
   <string name="keyguard_discharging">تفريغ, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
-  <plurals name="missed_calls">
-    <item quantity="zero">%d مكالمات لم يرد عليها</item>
-    <item quantity="one">%d مكالمات لم يرد عليها</item>
-    <item quantity="two">%d مكالمات لم يرد عليها</item>
-    <item quantity="few">%d مكالمات لم يرد عليها</item>
-    <item quantity="many">%d مكالمات لم يرد عليها</item>
-    <item quantity="other">%d مكالمات لم يرد عليها</item>
-  </plurals>
-  <plurals name="unread_messages">
-    <item quantity="zero">%d رسائل غير مقروءة</item>
-    <item quantity="one">%d رسائل غير مقروءة</item>
-    <item quantity="two">%d رسائل غير مقروءة</item>
-    <item quantity="few">%d رسائل غير مقروءة</item>
-    <item quantity="many">%d رسائل غير مقروءة</item>
-    <item quantity="other">%d رسائل غير مقروءة</item>
-  </plurals>
   <string name="missed_call">مكالمة فائتة</string>
   <string name="message_from">رسالة من</string>
   <string name="message_from_person">رسالة من %1$s</string>
+  <string name="full_wday_month_day_no_year">EEEEdMMMM</string>
 </resources>
