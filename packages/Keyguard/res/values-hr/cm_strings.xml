@@ -16,19 +16,6 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="app_name">CM Zaključavanje zaslona</string>
+  <string name="app_name">Zaslon zaključavanja</string>
   <string name="keyguard_discharging">Pražnjenje, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
-  <plurals name="missed_calls">
-    <item quantity="one">%d propušten poziv</item>
-    <item quantity="few">%d propuštena poziva</item>
-    <item quantity="other">%d propuštenih poziva</item>
-  </plurals>
-  <plurals name="unread_messages">
-    <item quantity="one">%d nepročitana poruka</item>
-    <item quantity="few">%d nepročitane poruke</item>
-    <item quantity="other">%d nepročitanih poruka</item>
-  </plurals>
-  <string name="missed_call">propušten poziv</string>
-  <string name="message_from">poruka od</string>
-  <string name="message_from_person">poruka od %1$s</string>
 </resources>
