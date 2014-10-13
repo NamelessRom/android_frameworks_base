@@ -17,4 +17,28 @@
  * limitations under the License.
  */
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"/>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="memory">Оперативна Пам\'ять</string>
+  <string name="service_background_processes"><xliff:g id="memory">%1$s</xliff:g> вільно</string>
+  <string name="service_foreground_processes"><xliff:g id="memory">%1$s</xliff:g> використовується</string>
+  <string name="service_foreground_processes_cached"><xliff:g id="memory">%1$s</xliff:g> використовується*</string>
+  <string name="service_started_by_app">Запущено програмою.</string>
+  <string name="running_processes_item_description_s_s">Процесів: <xliff:g id="NUMPROCESS">%1$d</xliff:g>, служб: <xliff:g id="NUMSERVICES">%2$d</xliff:g></string>
+  <string name="running_processes_item_description_s_p">Процесів: <xliff:g id="NUMPROCESS">%1$d</xliff:g>, служб: <xliff:g id="NUMSERVICES">%2$d</xliff:g></string>
+  <string name="running_processes_item_description_p_s">Процесів: <xliff:g id="NUMPROCESS">%1$d</xliff:g>, служб: <xliff:g id="NUMSERVICES">%2$d</xliff:g></string>
+  <string name="running_processes_item_description_p_p">Процесів: <xliff:g id="NUMPROCESS">%1$d</xliff:g>, служб: <xliff:g id="NUMSERVICES">%2$d</xliff:g></string>
+  <string name="running_process_item_user_label">Користувач: <xliff:g id="USERNAME">%1$s</xliff:g></string>
+  <string name="onthego_notif_ticker">On-The-Go запущений</string>
+  <string name="onthego_notif_title">On-The-Go ввімкнений</string>
+  <string name="onthego_notif_stop">Зупинити</string>
+  <string name="onthego_notif_options">Налаштування</string>
+  <string name="onthego_notif_error">Не вдається запустити On-The-Go</string>
+  <string name="onthego_notif_restart">Перезавантажити On-The-Go</string>
+  <string name="onthego_notif_camera_changed">Змінений режим камери</string>
+  <string name="onthego_transparency">Прозорість</string>
+  <string name="onthego_front_camera">Використовувати передню камеру</string>
+  <string name="onthego_service_toggle">Автоматично перезавантажити сервіс</string>
+  <string name="quick_settings_onthego_back">Задня Камера</string>
+  <string name="quick_settings_onthego_front">Передня Камера</string>
+  <string name="status_bar_recent_lock_item_title">Блокування програми у списку</string>
+</resources>

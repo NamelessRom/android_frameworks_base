@@ -35,4 +35,10 @@
   <string name="animation_grow_shrink_left">Crește în (Stânga)</string>
   <string name="animation_grow_shrink_right">Crește în (Dreapta)</string>
   <string name="animation_random">Aleatoriu</string>
+  <string name="global_actions_toggle_wifi">Wi-Fi</string>
+  <string name="global_actions_wifi_on_status">Wi-Fi este pornit</string>
+  <string name="global_actions_wifi_off_status">Wi-Fi este oprit</string>
+  <string name="global_actions_toggle_mobile_data">Date mobile</string>
+  <string name="global_actions_mobile_data_on_status">Datele mobile sunt pornite</string>
+  <string name="global_actions_mobile_data_off_status">Datele mobile sunt oprite</string>
 </resources>

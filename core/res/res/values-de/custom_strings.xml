@@ -35,4 +35,10 @@
   <string name="animation_grow_shrink_left">Wachsen nach (Links)</string>
   <string name="animation_grow_shrink_right">Wachsen nach (Rechts)</string>
   <string name="animation_random">Zufällig</string>
+  <string name="global_actions_toggle_wifi">WLAN</string>
+  <string name="global_actions_wifi_on_status">WLAN ist EIN</string>
+  <string name="global_actions_wifi_off_status">WLAN ist AUS</string>
+  <string name="global_actions_toggle_mobile_data">Mobile Daten</string>
+  <string name="global_actions_mobile_data_on_status">Mobile Daten sind EIN</string>
+  <string name="global_actions_mobile_data_off_status">Mobile Daten sind AUS</string>
 </resources>
