@@ -276,9 +276,11 @@ public class ZygoteInit {
             float defaultUtilization = runtime.getTargetHeapUtilization();
             runtime.setTargetHeapUtilization(0.8f);
 
+            InputStreamReader isr = null;
+            BufferedReader br = null;
             try {
-                BufferedReader br
-                    = new BufferedReader(new InputStreamReader(is), 256);
+                isr = new InputStreamReader(is);
+                br = new BufferedReader(isr, 256);
 
                 int count = 0;
                 String line;
@@ -316,6 +318,9 @@ public class ZygoteInit {
             } catch (IOException e) {
                 Log.e(TAG, "Error reading " + PRELOADED_CLASSES + ".", e);
             } finally {
+                if (br != null) try { br.close(); } catch (Exception ignored) { }
+                if (isr != null) try { isr.close(); } catch (Exception ignored) { }
+
                 IoUtils.closeQuietly(is);
                 // Restore default.
                 runtime.setTargetHeapUtilization(defaultUtilization);
