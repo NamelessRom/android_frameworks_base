@@ -4587,6 +4587,13 @@ public final class Settings {
          */
         public static final String DIALKEY_PADDING = "dialkey_padding";
 
+        /**
+        * Whether to enable ticker animation
+        *
+        * @hide
+        */
+        public static final String TICKER_ENABLED = "ticker_enabled";
+
          /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.

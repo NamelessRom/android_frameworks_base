@@ -318,6 +318,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     int mTrackingPosition; // the position of the top of the tracking view.
 
     // ticker
+    private boolean mTickerEnabled;
     private Ticker mTicker;
     private View mTickerView;
     private boolean mTicking;
@@ -433,6 +434,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVBAR_LEFT_IN_LANDSCAPE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TICKER_ENABLED),
+                    false, this, UserHandle.USER_ALL)
             updateSettings();
         }
 
@@ -2937,6 +2941,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         // no ticking in lights-out mode
         if (!areLightsOn()) return;
 
+        // user has ticker disabled
+        if (!mTickerEnabled) return;
+
         // no ticking in Setup
         if (!isDeviceProvisioned()) return;
 
@@ -3463,6 +3470,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.NAVBAR_LEFT_IN_LANDSCAPE, 0) == 1;
             mNavigationBarView.setLeftInLandscape(navLeftInLandscape);
         }
+
+        mTickerEnabled = Settings.System.getBooleanForUser(resolver,
+                Settings.System.TICKER_ENABLED, 1, UserHandle.USER_CURRENT);
 
         mClockEnabled = Settings.System.getIntForUser(resolver,
                 Settings.System.STATUS_BAR_CLOCK, 1, mCurrentUserId) != 0;
