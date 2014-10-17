@@ -7768,7 +7768,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
                 // Make sure that the user who owns this provider is started.  If not,
                 // we don't want to allow it to run.
-                if (mStartedUsers.get(userId) == null) {
+                if (!isUserRunningLocked(userId, false)) {
                     Slog.w(TAG, "Unable to launch app "
                             + cpi.applicationInfo.packageName + "/"
                             + cpi.applicationInfo.uid + " for provider "
@@ -13460,7 +13460,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
         // Make sure that the user who is receiving this broadcast is started.
         // If not, we will just skip it.
-        if (userId != UserHandle.USER_ALL && mStartedUsers.get(userId) == null) {
+        if (userId != UserHandle.USER_ALL && !isUserRunningLocked(userId, false)) {
             if (callingUid != Process.SYSTEM_UID || (intent.getFlags()
                     & Intent.FLAG_RECEIVER_BOOT_UPGRADE) == 0) {
                 Slog.w(TAG, "Skipping broadcast of " + intent
