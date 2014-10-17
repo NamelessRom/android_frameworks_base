@@ -3976,6 +3976,13 @@ public final class Settings {
         public static final String LOCKSCREEN_NOTIFICATIONS_FORCE_EXPANDED_VIEW = "lockscreen_notifications_force_expanded_view";
 
         /**
+        * Whether to enable ticker animation
+        *
+        * @hide
+        */
+       public static final String TICKER_ENABLED = "ticker_enabled";
+
+        /**
          * Wakes the device when a new notifications is received
          * @hide
          */
