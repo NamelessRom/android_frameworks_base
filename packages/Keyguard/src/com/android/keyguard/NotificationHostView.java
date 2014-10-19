@@ -25,8 +25,9 @@ import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.*;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
@@ -42,7 +43,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.view.WindowManager;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RemoteViews;
+import android.widget.ScrollView;
 
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.keyguard.KeyguardViewMediator.ViewMediatorCallback;
@@ -121,7 +126,7 @@ public class NotificationHostView extends FrameLayout {
         @Override
         public boolean dispatchTouchEvent(MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                NotificationView v = hostView.getViewByPoint((int)event.getX(), (int)event.getY());
+                NotificationView v = hostView.getViewByPoint((int) event.getX(), (int) event.getY());
                 touchAllowed = (v != null);
             }
             if (touchAllowed) {
@@ -154,13 +159,13 @@ public class NotificationHostView extends FrameLayout {
         public ViewPropertyAnimator animateChild() {
             final ViewPropertyAnimator animation = getChildAt(0).animate();
             animation.withEndAction(new Runnable() {
-               public void run() {
-                   animations--;
-                   if (animations == 0 && onAnimationEnd != null){
-                       onAnimationEnd.run();
-                       onAnimationEnd = null;
-                   }
-               }
+                public void run() {
+                    animations--;
+                    if (animations == 0 && onAnimationEnd != null) {
+                        onAnimationEnd.run();
+                        onAnimationEnd = null;
+                    }
+                }
             });
             animation.withStartAction(new Runnable() {
                 public void run() {
@@ -455,10 +460,9 @@ public class NotificationHostView extends FrameLayout {
         remoteView.setBackgroundColor(0x00FFFFFF & NotificationViewManager.config.notificationColor);
         remoteView.setAlpha(1f);
 
-        View v = remoteView.findViewById(android.R.id.icon);
+        final View v = remoteView.findViewById(android.R.id.icon);
         if (v instanceof ImageView) {
-            ImageView icon = (ImageView)v;
-            icon.setBackgroundColor(0);
+            v.setBackgroundColor(0);
         }
         remoteView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -497,7 +501,7 @@ public class NotificationHostView extends FrameLayout {
                     oldView.statusBarNotification = sbn;
                 }
             };
-            if (showNotification && !oldView.shown && showNotification && !oldView.pointerDown) showNotification(sbn);
+            if (showNotification && !oldView.shown && !oldView.pointerDown) showNotification(sbn);
             oldView.runOnAnimationEnd(replaceView);
             return;
         }
@@ -528,7 +532,10 @@ public class NotificationHostView extends FrameLayout {
     }
 
     public void removeNotification(final StatusBarNotification sbn, boolean dismiss) {
-        mNotificationsToRemove.add(mNotifications.get(describeNotification(sbn)));
+        if (sbn == null) return;
+        final NotificationView notificationView = mNotifications.get(describeNotification(sbn));
+        if (notificationView == null) return;
+        mNotificationsToRemove.add(notificationView);
         Message msg = new Message();
         msg.what = MSG_NOTIFICATION_REMOVE;
         msg.arg1 = dismiss ? 1 : 0;
@@ -538,7 +545,7 @@ public class NotificationHostView extends FrameLayout {
     private void handleRemoveNotification(final boolean dismiss) {
         final NotificationView v = mNotificationsToRemove.poll();
         final StatusBarNotification sbn = v.statusBarNotification;
-        if (mNotifications.containsKey(describeNotification(sbn)) && sbn != null) {
+        if (sbn != null && mNotifications.containsKey(describeNotification(sbn))) {
             Log.d(TAG, "Remove: " + describeNotification(v.statusBarNotification));
             v.cancelAnimations();
             mNotifications.remove(describeNotification(sbn));
@@ -582,7 +589,7 @@ public class NotificationHostView extends FrameLayout {
     }
 
     private void dismiss(StatusBarNotification sbn) {
-        if (sbn.isClearable()) {
+        if (sbn != null && sbn.isClearable()) {
             INotificationManager nm = INotificationManager.Stub.asInterface(
                     ServiceManager.getService(Context.NOTIFICATION_SERVICE));
             try {
@@ -651,7 +658,7 @@ public class NotificationHostView extends FrameLayout {
     }
 
     private void setButtonDrawable() {
-        IStatusBarService statusBar = null;
+        IStatusBarService statusBar;
         try {
             statusBar = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
