@@ -35,4 +35,10 @@
   <string name="animation_grow_shrink_left">Powiększenie (z lewej)</string>
   <string name="animation_grow_shrink_right">Powiększenie (z prawej)</string>
   <string name="animation_random">Losowo</string>
+  <string name="global_actions_toggle_wifi">Wi-Fi</string>
+  <string name="global_actions_wifi_on_status">Wi-Fi jest włączone</string>
+  <string name="global_actions_wifi_off_status">Wi-Fi jest wyłączone</string>
+  <string name="global_actions_toggle_mobile_data">Dane sieci komórkowej</string>
+  <string name="global_actions_mobile_data_on_status">Dane sieci komórkowej są włączone</string>
+  <string name="global_actions_mobile_data_off_status">Dane sieci komórkowej są wyłączone</string>
 </resources>
