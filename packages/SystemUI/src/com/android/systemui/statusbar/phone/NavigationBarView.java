@@ -16,9 +16,12 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.LayoutTransition;
 import android.animation.LayoutTransition.TransitionListener;
 import android.animation.ObjectAnimator;
+import android.animation.ArgbEvaluator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.app.ActivityManagerNative;
@@ -36,6 +39,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -70,6 +74,7 @@ import com.android.systemui.statusbar.policy.KeyButtonView;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class NavigationBarView extends LinearLayout {
     final static boolean DEBUG = false;
@@ -104,6 +109,7 @@ public class NavigationBarView extends LinearLayout {
     int mDisabledFlags = 0;
     int mNavigationIconHints = 0;
 
+<<<<<<< HEAD
     boolean mWasNotifsButtonVisible = false;
 
     private Drawable mBackIcon, mBackLandIcon, mBackAltIcon, mBackAltLandIcon;
@@ -114,6 +120,13 @@ public class NavigationBarView extends LinearLayout {
     private Drawable mRecentAltIcon, mRecentAltLandIcon;
 
     private Drawable mHomeIcon, mHomeLandIcon;
+=======
+    private int mPreviousOverrideIconColor = 0;
+    private int mOverrideIconColor = 0;
+    private Drawable mBackIcon, mBackLandIcon, mBackAltIcon, mBackAltLandIcon,
+            mRecentIcon, mRecentLandIcon, mRecentAltIcon, mRecentAltLandIcon,
+            mHomeIcon, mHomeLandIcon;
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
 
     private DelegateViewHelper mDelegateHelper;
     private DeadZone mDeadZone;
@@ -142,6 +155,8 @@ public class NavigationBarView extends LinearLayout {
     private final NavTransitionListener mTransitionListener = new NavTransitionListener();
 
     private Resources mThemedResources;
+
+    private final int mDSBDuration;
 
     private class NavTransitionListener implements TransitionListener {
         private boolean mBackTransitioning;
@@ -273,6 +288,7 @@ public class NavigationBarView extends LinearLayout {
         mCameraDisabledByDpm = isCameraDisabledByDpm();
         watchForDevicePolicyChanges();
 
+<<<<<<< HEAD
         mNavBarReceiver = new NavBarReceiver();
         mContext.registerReceiverAsUser(mNavBarReceiver, UserHandle.ALL,
                 new IntentFilter(NAVBAR_EDIT_ACTION), null, null);
@@ -287,6 +303,62 @@ public class NavigationBarView extends LinearLayout {
         mHasCmKeyguard = keyguardMetadata != null &&
                 keyguardMetadata.getBoolean("com.cyanogenmod.keyguard", false);
      }
+=======
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public Animator onUpdateNavigationBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                mPreviousOverrideIconColor = previousIconColor;
+                mOverrideIconColor = iconColor;
+
+                return generateButtonColorsAnimatorSet();
+            }
+
+        });
+    }
+
+    private AnimatorSet generateButtonColorsAnimatorSet() {
+        final ImageView[] buttons = new ImageView[] {
+            (ImageView) getRecentsButton(),
+            (ImageView) getMenuButton(),
+            (ImageView) getBackButton(),
+            (ImageView) getHomeButton(),
+            (ImageView) getSearchLight(),
+            (ImageView) getCameraButton()
+        };
+
+        final ArrayList<Animator> anims = new ArrayList<Animator>();
+
+        for (final ImageView button : buttons) {
+            if (button != null) {
+                if (mOverrideIconColor == 0) {
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            button.setColorFilter(null);
+                        }
+
+                    });
+                } else {
+                    anims.add(ObjectAnimator.ofObject(button, "colorFilter",
+                            new ArgbEvaluator(), mPreviousOverrideIconColor,
+                            mOverrideIconColor).setDuration(mDSBDuration));
+                }
+            }
+        }
+
+        if (anims.isEmpty()) {
+            return null;
+        } else {
+            final AnimatorSet animSet = new AnimatorSet();
+            animSet.playTogether(anims);
+            return animSet;
+        }
+    }
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
 
     private void watchForDevicePolicyChanges() {
         final IntentFilter filter = new IntentFilter();
@@ -342,6 +414,7 @@ public class NavigationBarView extends LinearLayout {
         return mCurrentView;
     }
 
+<<<<<<< HEAD
     public boolean isInEditMode() {
         return mInEditMode;
     }
@@ -395,16 +468,32 @@ public class NavigationBarView extends LinearLayout {
         } else {
             findView.setVisibility(visibility);
         }
+=======
+    public View getRecentsButton() {
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.recent_apps);
+    }
+
+    public View getMenuButton() {
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.menu);
+    }
+
+    public View getBackButton() {
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.back);
+    }
+
+    public View getHomeButton() {
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.home);
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
     }
 
     // for when home is disabled, but search isn't
     public View getSearchLight() {
-        return mCurrentView.findViewById(R.id.search_light);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.search_light);
     }
 
     // shown when keyguard is visible and camera is available
     public View getCameraButton() {
-        return mCurrentView.findViewById(R.id.camera_button);
+        return mCurrentView == null ? null : mCurrentView.findViewById(R.id.camera_button);
     }
 
     // used for lockscreen notifications
@@ -733,10 +822,26 @@ public class NavigationBarView extends LinearLayout {
         mObserver.observe();
     }
 
+<<<<<<< HEAD
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mObserver.unobserve();
+=======
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                final AnimatorSet animSet = generateButtonColorsAnimatorSet();
+                if (animSet != null) {
+                    animSet.start();
+                }
+            }
+
+        });
+
+        watchForAccessibilityChanges();
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
     }
 
     private void watchForAccessibilityChanges() {
@@ -830,10 +935,28 @@ public class NavigationBarView extends LinearLayout {
         }
 
         setNavigationIconHints(mNavigationIconHints, true);
+<<<<<<< HEAD
     }
 
     View findButton(NavbarEditor.ButtonInfo info) {
         return mCurrentView.findViewWithTag(info);
+=======
+        // Reset recents hints after reorienting
+        ((ImageView)getRecentsButton()).setImageDrawable(mVertical
+                ? mRecentLandIcon : mRecentIcon);
+
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                final AnimatorSet animSet = generateButtonColorsAnimatorSet();
+                if (animSet != null) {
+                    animSet.start();
+                }
+            }
+
+        });
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
     }
 
     @Override
@@ -983,6 +1106,7 @@ public class NavigationBarView extends LinearLayout {
         return null;
     }
 
+<<<<<<< HEAD
     private class SettingsObserver extends ContentObserver {
         private boolean mObserving = false;
 
@@ -1058,4 +1182,6 @@ public class NavigationBarView extends LinearLayout {
             applyModeBackground(-1, getMode(), false /*animate*/);
         }
     }
+=======
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
 }
