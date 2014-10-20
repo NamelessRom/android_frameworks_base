@@ -16,6 +16,9 @@
 
 package com.android.systemui.statusbar;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -24,9 +27,13 @@ import android.content.res.ThemeConfig;
 import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+<<<<<<< HEAD
 import android.graphics.Typeface;
+=======
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
 import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -39,6 +46,7 @@ import android.widget.ImageView;
 
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.systemui.R;
+import com.android.systemui.statusbar.phone.BarBackgroundUpdater;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -56,6 +64,11 @@ public class StatusBarIconView extends AnimatedImageView {
     private Notification mNotification;
     private boolean mShowNotificationCount;
     private GlobalSettingsObserver mObserver;
+
+    private final Handler mHandler;
+    private final int mDSBDuration;
+    private int mPreviousOverrideIconColor = 0;
+    private int mOverrideIconColor = 0;
 
     public StatusBarIconView(Context context, String slot, Notification notification) {
         super(context);
@@ -87,6 +100,45 @@ public class StatusBarIconView extends AnimatedImageView {
         }
 
         setScaleType(ImageView.ScaleType.CENTER);
+
+        mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(R.integer.dsb_transition_duration);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public ObjectAnimator onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                mPreviousOverrideIconColor = previousIconColor;
+                mOverrideIconColor = iconColor;
+
+                if (mOverrideIconColor == 0) {
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            setColorFilter(null);
+                        }
+
+                    });
+                    return null;
+                } else {
+                    final ObjectAnimator anim = ObjectAnimator.ofObject(StatusBarIconView.this,
+                            "colorFilter", new ArgbEvaluator(), mPreviousOverrideIconColor,
+                            mOverrideIconColor);
+                    anim.setDuration(mDSBDuration);
+                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                        @Override
+                        public void onAnimationUpdate(final ValueAnimator animator) {
+                            invalidate();
+                        }
+
+                    });
+                    return anim;
+                }
+            }
+
+        });
     }
 
     public StatusBarIconView(Context context, AttributeSet attrs) {
@@ -97,6 +149,46 @@ public class StatusBarIconView extends AnimatedImageView {
         final float scale = (float)imageBounds / (float)outerBounds;
         setScaleX(scale);
         setScaleY(scale);
+
+        mHandler = new Handler();
+        mDSBDuration = context.getResources().getInteger(com.android.systemui.R.integer
+                .dsb_transition_duration);
+        BarBackgroundUpdater.addListener(new BarBackgroundUpdater.UpdateListener(this) {
+
+            @Override
+            public ObjectAnimator onUpdateStatusBarIconColor(final int previousIconColor,
+                    final int iconColor) {
+                mPreviousOverrideIconColor = previousIconColor;
+                mOverrideIconColor = iconColor;
+
+                if (mOverrideIconColor == 0) {
+                    mHandler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            setColorFilter(null);
+                        }
+
+                    });
+                    return null;
+                } else {
+                    final ObjectAnimator anim = ObjectAnimator.ofObject(StatusBarIconView.this,
+                            "colorFilter", new ArgbEvaluator(), mPreviousOverrideIconColor,
+                            mOverrideIconColor);
+                    anim.setDuration(mDSBDuration);
+                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                        @Override
+                        public void onAnimationUpdate(final ValueAnimator animator) {
+                            invalidate();
+                        }
+
+                    });
+                    return anim;
+                }
+            }
+
+        });
     }
 
     private static boolean streq(String a, String b) {
@@ -162,6 +254,11 @@ public class StatusBarIconView extends AnimatedImageView {
     }
 
     private boolean updateDrawable(boolean withClear) {
+        if (mIcon == null) {
+            // we are not yet ready; just ignore
+            return false;
+        }
+
         Drawable drawable = getIcon(mIcon);
         if (drawable == null) {
             Log.w(TAG, "No icon for slot " + mSlot);
@@ -171,6 +268,24 @@ public class StatusBarIconView extends AnimatedImageView {
             setImageDrawable(null);
         }
         setImageDrawable(drawable);
+
+        if (mOverrideIconColor == 0) {
+            setColorFilter(null);
+        } else {
+            final ObjectAnimator anim = ObjectAnimator.ofObject(this, "colorFilter",
+                    new ArgbEvaluator(), mPreviousOverrideIconColor, mOverrideIconColor);
+            anim.setDuration(mDSBDuration);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(final ValueAnimator animation) {
+                    invalidate();
+                }
+
+            });
+            anim.start();
+        }
+
         return true;
     }
 
@@ -188,6 +303,10 @@ public class StatusBarIconView extends AnimatedImageView {
      */
     public static Drawable getIcon(Context context, StatusBarIcon icon) {
         Resources r = null;
+
+        if (icon == null) {
+            return null;
+        }
 
         if (icon.iconPackage != null) {
             try {
@@ -332,6 +451,7 @@ public class StatusBarIconView extends AnimatedImageView {
             + " notification=" + mNotification + ")";
     }
 
+<<<<<<< HEAD
     static class GlobalSettingsObserver extends ContentObserver {
         private static GlobalSettingsObserver sInstance;
         private ArrayList<StatusBarIconView> mIconViews = new ArrayList<StatusBarIconView>();
@@ -383,4 +503,6 @@ public class StatusBarIconView extends AnimatedImageView {
             }
         }
     }
+=======
+>>>>>>> 52bea55... Implement Dynamic System Bars [1/2]
 }
