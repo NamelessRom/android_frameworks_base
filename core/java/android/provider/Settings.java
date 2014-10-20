@@ -4567,6 +4567,50 @@ public final class Settings {
         public static final String WIFI_AUTO_CONNECT_TYPE = "wifi_auto_connect_type";
 
         /**
+         * Whether the status bar is set to be colored dynamically
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_STATUS_BAR_STATE = "dynamic_status_bar_state";
+
+        /**
+         * Whether the navigation bar is set to be colored dynamically
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_NAVIGATION_BAR_STATE = "dynamic_navigation_bar_state";
+
+        /**
+         * Whether the dynamic system bars are set to have a gradient overlay
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_SYSTEM_BARS_GRADIENT_STATE =
+                "dynamic_system_bars_gradient_state";
+
+        /**
+         * Whether the dynamic status bar is set to have a (darkening) filter overlay
+         * 0 = disabled (default)
+         * 1 = enabled
+         * @hide
+         */
+        public static final String DYNAMIC_STATUS_BAR_FILTER_STATE =
+                "dynamic_status_bar_filter_state";
+
+        /**
+         * The frequency of dynamic status bar updates
+         * less than 0 = update once each -N seconds
+         * 0 = update once each second
+         * more than 0 = update N times each second
+         * default value: 2
+         * @hide
+         */
+        public static final String EXPERIMENTAL_DSB_FREQUENCY = "experimental_dsb_frequency";
+
+        /**
          * Whether wifi settings will connect to access point automatically when
          * network from mobile network transform to Wifi network
          * 0 = automatically
