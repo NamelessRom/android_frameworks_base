@@ -144,6 +144,7 @@ public static final int EGL_OPENGL_API                     = 0x30A2;
 public static final int EGL_DRAW                           = 0x3059;
 public static final int EGL_READ                           = 0x305A;
 public static final int EGL_CORE_NATIVE_ENGINE             = 0x305B;
+public static final int EGL_CONTEXT_FROM_HWRENDER          = 0x4098;
 
     native private static void _nativeClassInit();
     static {

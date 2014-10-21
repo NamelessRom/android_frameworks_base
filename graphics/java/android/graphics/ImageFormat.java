@@ -146,6 +146,8 @@ public class ImageFormat {
      */
     public static final int NV21 = 0x11;
 
+    public static final int I420 = 0x12;
+
     /**
      * YCbCr format used for images, which uses YUYV (YUY2) encoding format.
      * This is an alternative format for camera preview images. Whether this
@@ -153,6 +155,8 @@ public class ImageFormat {
      * {@link android.hardware.Camera.Parameters#getSupportedPreviewFormats()}.
      */
     public static final int YUY2 = 0x14;
+ 
+    public static final int UYVY = 0x16;
 
     /**
      * Encoded formats. These are not necessarily supported by the hardware.
@@ -231,6 +235,10 @@ public class ImageFormat {
             case RGB_565:
                 return 16;
             case NV16:
+                return 16;
+            case I420:
+                return 12;
+            case UYVY:
                 return 16;
             case YUY2:
                 return 16;
