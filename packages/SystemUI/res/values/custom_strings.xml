@@ -57,4 +57,7 @@
 
     <!-- Recents menu -->
     <string name="status_bar_recent_lock_item_title">Lock app in list</string>
+
+    <!-- Allow hiding notification icons -->
+    <string name="status_bar_notification_hide_icon_packages">Hide app\'s notification icon(s)</string>
 </resources>
