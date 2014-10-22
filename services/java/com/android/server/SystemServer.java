@@ -240,7 +240,6 @@ class ServerThread {
         boolean disableSystemUI = SystemProperties.getBoolean("config.disable_systemui", false);
         boolean disableNonCoreServices = SystemProperties.getBoolean("config.disable_noncore", false);
         boolean disableNetwork = SystemProperties.getBoolean("config.disable_network", false);
-        boolean disableAtlas = SystemProperties.getBoolean("config.disable_atlas", false);
         boolean disableDock = SystemProperties.getBoolean("config.disable_dock", false);
 
         try {
@@ -886,7 +885,7 @@ class ServerThread {
                 }
             }
 
-            if (!disableNonCoreServices && !disableAtlas) {
+            if (!disableNonCoreServices) {
                 try {
                     Slog.i(TAG, "Assets Atlas Service");
                     atlas = new AssetAtlasService(context);
