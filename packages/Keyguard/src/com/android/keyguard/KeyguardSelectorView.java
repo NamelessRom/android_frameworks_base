@@ -22,17 +22,17 @@ import java.util.ArrayList;
 import android.animation.ObjectAnimator;
 import android.app.SearchManager;
 import android.app.admin.DevicePolicyManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -40,13 +40,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Slog;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.LinearLayout;
 
 import com.android.internal.telephony.IccCardConstants.State;
 import com.android.internal.util.cm.LockscreenTargetUtils;
-import com.android.internal.util.cm.TorchConstants;
-import com.android.internal.view.RotationPolicy;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.GlowPadView.OnTriggerListener;
@@ -67,17 +64,16 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     private boolean mIsBouncing;
     private boolean mCameraDisabled;
     private boolean mSearchDisabled;
-    private boolean mGlowTorch;
-    private boolean mGlowTorchRunning;
-    private boolean mUserRotation;
     private LockPatternUtils mLockPatternUtils;
     private SecurityMessageDisplay mSecurityMessageDisplay;
     private Drawable mBouncerFrame;
     private String[] mStoredTargets;
     private int mTaps;
     private int mTargetOffset;
-    private boolean mIsScreenLarge;
     private float mBatteryLevel;
+
+    private PowerManager mPm;
+    private boolean mTurnScreenOff;
 
     OnTriggerListener mOnTriggerListener = new OnTriggerListener() {
 
@@ -119,7 +115,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
 
                 if (LockscreenTargetUtils.EMPTY_TARGET.equals(targetUri)) {
                     mCallback.dismiss(false);
-                } else {
+                } else if (!TextUtils.isEmpty(targetUri)) {
                     try {
                         Intent intent = Intent.parseUri(targetUri, 0);
                         mActivityLauncher.launchActivity(intent, false, true, null, null);
@@ -134,13 +130,12 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
             if (!mIsBouncing) {
                 doTransition(mFadeView, 1.0f);
             }
-            killGlowpadTorch();
         }
 
         public void onGrabbed(View v, int handle) {
             mCallback.userActivity(0);
             doTransition(mFadeView, 0.0f);
-            startGlowpadTorch();
+            checkTurnScreenOff();
         }
 
         public void onGrabbedStateChange(View v, int handle) {
@@ -148,15 +143,7 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         }
 
         public void onTargetChange(View v, int target) {
-            if (target != -1) {
-                killGlowpadTorch();
-            } else {
-                if (mGlowTorch && mGlowTorchRunning) {
-                    // Keep screen alive extremely tiny
-                    // unintentional movement is logged
-                    mCallback.userActivity(0);
-                }
-            }
+
         }
 
         public void onFinishFinalAnimation() {
@@ -232,10 +219,12 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         View bouncerFrameView = findViewById(R.id.keyguard_selector_view_frame);
         mBouncerFrame = bouncerFrameView.getBackground();
 
-        mGlowTorchRunning = false;
-        mGlowTorch = Settings.System.getBooleanForUser(
-                mContext.getContentResolver(), Settings.System.LOCKSCREEN_GLOWPAD_TORCH,
+        mTurnScreenOff = Settings.System.getBooleanForUser(
+                mContext.getContentResolver(), Settings.System.DOUBLE_TAP_SLEEP_GESTURE,
                 false, UserHandle.USER_CURRENT);
+        if (mTurnScreenOff) {
+            mPm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+        }
     }
 
     public void setCarrierArea(View carrierArea) {
@@ -441,54 +430,6 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         mLockPatternUtils = utils;
     }
 
-    private void startGlowpadTorch() {
-        if (DEBUG) {
-            Log.v(TAG, "Start Glowpad Torch");
-        }
-        if (mGlowTorch) {
-            mHandler.removeCallbacks(checkDouble);
-            mHandler.removeCallbacks(checkLongPress);
-            if (mTaps > 0) {
-                mHandler.postDelayed(checkLongPress,
-                        ViewConfiguration.getLongPressTimeout());
-                mTaps = 0;
-            } else {
-                mTaps += 1;
-                mHandler.postDelayed(checkDouble, 400);
-            }
-        }
-    }
-
-    private void killGlowpadTorch() {
-        if (DEBUG) {
-            Log.v(TAG, "Kill Glowpad Torch");
-        }
-        if (mGlowTorch) {
-            mHandler.removeCallbacks(checkLongPress);
-            // Don't mess with torch if we didn't start it
-            if (mGlowTorchRunning) {
-                mGlowTorchRunning = false;
-                Intent intent = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
-                mContext.sendBroadcastAsUser(
-                        intent, new UserHandle(UserHandle.USER_CURRENT));
-                // Restore user rotation policy
-                RotationPolicy.setRotationLock(mContext, mUserRotation);
-            }
-        }
-    }
-
-    final Runnable checkLongPress = new Runnable () {
-        public void run() {
-            mGlowTorchRunning = true;
-            mUserRotation = RotationPolicy.isRotationLocked(mContext);
-            // Lock device so user doesn't accidentally rotate and lose torch
-            RotationPolicy.setRotationLock(mContext, true);
-            Intent intent = new Intent(TorchConstants.ACTION_TOGGLE_STATE);
-            mContext.sendBroadcastAsUser(
-                    intent, new UserHandle(UserHandle.USER_CURRENT));
-        }
-    };
-
     final Runnable checkDouble = new Runnable () {
         public void run() {
             mTaps = 0;
@@ -508,24 +449,11 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
     @Override
     public void onPause() {
         KeyguardUpdateMonitor.getInstance(getContext()).removeCallback(mUpdateCallback);
-        if (mGlowTorch) {
-            try {
-                mContext.unregisterReceiver(mTorchReceiver);
-            } catch (Exception e) {
-                if (DEBUG) {
-                    Log.e(TAG, "unregistering mTorchReceiver: " + e.getMessage());
-                }
-            }
-        }
     }
 
     @Override
     public void onResume(int reason) {
         KeyguardUpdateMonitor.getInstance(getContext()).registerCallback(mUpdateCallback);
-        if (mGlowTorch) {
-            mContext.registerReceiver(mTorchReceiver,
-                    new IntentFilter(TorchConstants.ACTION_STATE_CHANGED));
-        }
     }
 
     @Override
@@ -572,11 +500,18 @@ public class KeyguardSelectorView extends LinearLayout implements KeyguardSecuri
         }
     }
 
-    private final BroadcastReceiver mTorchReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String state = intent.getStringExtra(TorchConstants.EXTRA_CURRENT_STATE);
-            mGlowTorchRunning = ((state != null) && (state.equals("1")));
+    private void checkTurnScreenOff() {
+        if (!mTurnScreenOff) return;
+        mHandler.removeCallbacks(checkDouble);
+        if (mTaps > 0) {
+            if (mPm != null) {
+                mPm.goToSleep(SystemClock.uptimeMillis());
+            }
+            mTaps = 0;
+        } else {
+            mTaps += 1;
+            mHandler.postDelayed(checkDouble, 400);
         }
-    };
+    }
+
 }

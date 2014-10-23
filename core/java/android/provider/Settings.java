@@ -1214,13 +1214,6 @@ public final class Settings {
         }
 
         /**
-         * Enable or disable global crash reporting
-         *
-         * @hide
-         */
-        public static final String ENABLE_ACRA = "enable_acra";
-
-        /**
          * If On-The-Go should be displayed at the power menu.
          *
          * @hide
@@ -4452,13 +4445,6 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_USE_WIDGET_CONTAINER_CAROUSEL = "lockscreen_use_widget_container_carousel";
-
-        /**
-         * Whether double-tap and hold on the lock glowpad starts the torch
-         *
-         * @hide
-         */
-        public static final String LOCKSCREEN_GLOWPAD_TORCH = "lockscreen_glowpad_torch";
 
         /**
          * Whether to unlock the screen with the home key.  The value is boolean (1 or 0).
