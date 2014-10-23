@@ -79,6 +79,7 @@ import com.android.internal.os.DeviceKeyHandler;
 
 import com.android.internal.util.cm.ActionUtils;
 import com.android.internal.util.cm.TorchConstants;
+import com.android.internal.util.nameless.ActionConstants;
 import com.android.internal.util.nameless.NamelessActions;
 import dalvik.system.DexClassLoader;
 
@@ -1154,7 +1155,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private final Runnable mScreenrecordRunnable = new Runnable() {
         @Override
         public void run() {
-            NamelessActions.processAction(mContext, NamelessActions.ACTION_SCREEN_RECORD);
+            NamelessActions.processAction(mContext,
+                    ActionConstants.NamelessAction.ACTION_SCREEN_RECORD);
         }
     };
 

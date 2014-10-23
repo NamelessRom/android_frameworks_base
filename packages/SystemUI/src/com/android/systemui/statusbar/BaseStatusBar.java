@@ -36,6 +36,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.ThemeConfig;
 import android.database.ContentObserver;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -54,6 +55,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Slog;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.IWindowManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -83,6 +85,7 @@ import com.android.systemui.RecentsComponent;
 import com.android.systemui.SearchPanelView;
 import com.android.systemui.SystemUI;
 import com.android.systemui.cm.SpamMessageProvider;
+import com.android.systemui.nameless.GesturePanelView;
 import com.android.systemui.statusbar.NotificationData.Entry;
 import com.android.systemui.statusbar.phone.KeyguardTouchDelegate;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
@@ -108,7 +111,6 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected static final int MSG_HIDE_HEADS_UP = 1027;
     protected static final int MSG_ESCALATE_HEADS_UP = 1028;
 
-    protected static final boolean ENABLE_HEADS_UP = true;
     // scores above this threshold should be displayed in heads up mode.
     protected static final int INTERRUPTION_THRESHOLD = 1;
 
@@ -144,6 +146,9 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     // Search panel
     protected SearchPanelView mSearchPanelView;
+
+    // Gesture panel
+    protected GesturePanelView mGesturePanelView = null;
 
     protected PopupMenu mNotificationBlamePopup;
 
@@ -1165,7 +1170,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             try {
                 updateNotificationViews(oldEntry, notification);
 
-                if (ENABLE_HEADS_UP && mInterruptingNotificationEntry != null
+                if (mInterruptingNotificationEntry != null
                         && oldNotification == mInterruptingNotificationEntry.notification) {
                     if (!shouldInterrupt(notification)) {
                         if (DEBUG) Log.d(TAG, "no longer interrupts!");
@@ -1394,5 +1399,36 @@ public abstract class BaseStatusBar extends SystemUI implements
         final boolean hide = mContext.getSharedPreferences("hidden_statusbar_icon_packages", 0)
                 .getBoolean(iconPackage, false);
         return hide;
+    }
+
+    protected void addGesturePanelView() {
+        if (mGesturePanelView == null) {
+            mGesturePanelView = (GesturePanelView)View.inflate(
+                    mContext, R.layout.gesture_action_overlay, null);
+            mWindowManager.addView(mGesturePanelView, getGesturePanelViewLayoutParams());
+            mGesturePanelView.setStatusBar(this);
+            mGesturePanelView.switchToOpenState();
+        }
+    }
+
+    public void removeGesturePanelView() {
+        if (mGesturePanelView != null) {
+            mWindowManager.removeView(mGesturePanelView);
+            mGesturePanelView = null;
+        }
+    }
+
+    protected WindowManager.LayoutParams getGesturePanelViewLayoutParams() {
+        final boolean useGFX = ActivityManager.isHighEndGfx();
+        final WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_STATUS_BAR_SUB_PANEL,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                useGFX ? PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE);
+        if (useGFX) lp.flags |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
+        lp.gravity = Gravity.BOTTOM;
+        lp.setTitle("GesturePanelView");
+
+        return lp;
     }
 }
