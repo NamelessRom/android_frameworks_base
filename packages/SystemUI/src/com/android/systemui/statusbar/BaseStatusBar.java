@@ -36,6 +36,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.ThemeConfig;
 import android.database.ContentObserver;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -54,6 +55,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Slog;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.IWindowManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -83,9 +85,9 @@ import com.android.systemui.RecentsComponent;
 import com.android.systemui.SearchPanelView;
 import com.android.systemui.SystemUI;
 import com.android.systemui.cm.SpamMessageProvider;
+import com.android.systemui.nameless.gesturepanel.GesturePanel;
 import com.android.systemui.statusbar.NotificationData.Entry;
 import com.android.systemui.statusbar.phone.KeyguardTouchDelegate;
-import com.android.systemui.statusbar.phone.PhoneStatusBar;
 import com.android.systemui.statusbar.policy.NotificationRowLayout;
 
 import java.util.ArrayList;
@@ -108,7 +110,6 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected static final int MSG_HIDE_HEADS_UP = 1027;
     protected static final int MSG_ESCALATE_HEADS_UP = 1028;
 
-    protected static final boolean ENABLE_HEADS_UP = true;
     // scores above this threshold should be displayed in heads up mode.
     protected static final int INTERRUPTION_THRESHOLD = 1;
 
@@ -144,6 +145,9 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     // Search panel
     protected SearchPanelView mSearchPanelView;
+
+    // Gesture panel
+    protected GesturePanel mGesturePanel = null;
 
     protected PopupMenu mNotificationBlamePopup;
 
@@ -1165,7 +1169,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             try {
                 updateNotificationViews(oldEntry, notification);
 
-                if (ENABLE_HEADS_UP && mInterruptingNotificationEntry != null
+                if (mInterruptingNotificationEntry != null
                         && oldNotification == mInterruptingNotificationEntry.notification) {
                     if (!shouldInterrupt(notification)) {
                         if (DEBUG) Log.d(TAG, "no longer interrupts!");

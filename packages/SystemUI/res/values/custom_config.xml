@@ -2,4 +2,9 @@
 <resources>
     <integer name="quick_settings_onthego_dialog_short_timeout">3000</integer>
     <integer name="quick_settings_onthego_dialog_long_timeout">6000</integer>
+
+    <!-- Sensivity of triggering the gesture panel.
+         Must be minimum 1 and maximum 10 (See @EdgeServiceConstants.java).
+         Default for triggering is default sensivity -->
+    <integer name="gesture_panel_trigger_sensivity">5</integer>
 </resources>

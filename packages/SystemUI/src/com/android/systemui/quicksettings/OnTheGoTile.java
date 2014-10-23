@@ -27,6 +27,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 
+import com.android.internal.util.nameless.ActionConstants;
 import com.android.internal.util.nameless.NamelessActions;
 import com.android.internal.util.nameless.NamelessUtils;
 import com.android.systemui.R;
@@ -45,7 +46,8 @@ public class OnTheGoTile extends QuickSettingsTile {
         mOnClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NamelessActions.processAction(mContext, NamelessActions.ACTION_ONTHEGO_TOGGLE);
+                NamelessActions.processAction(mContext,
+                        ActionConstants.NamelessAction.ACTION_ONTHEGO_TOGGLE);
             }
         };
 
