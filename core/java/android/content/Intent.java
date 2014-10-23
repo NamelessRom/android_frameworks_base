@@ -2764,6 +2764,17 @@ public class Intent implements Parcelable, Cloneable {
 
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
+    // Nameless intent activity actions (see action variable).
+
+    /**
+     * GesturePanelView: Toggle the panel
+     * @hide
+     */
+    public static final String ACTION_TOGGLE_GESTURE_PANEL =
+            "nameless.intent.action.TOGGLE_GESTURE_PANEL";
+
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Standard intent categories (see addCategory()).
 
     /**
