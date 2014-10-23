@@ -60,4 +60,7 @@
 
     <!-- Allow hiding notification icons -->
     <string name="status_bar_notification_hide_icon_packages">Hide app\'s notification icon(s)</string>
+
+    <!-- Gesture panel -->
+    <string name="gesture_panel_add">Add</string>
 </resources>

@@ -78,13 +78,13 @@ import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.internal.util.nameless.ActionConstants;
 import com.android.internal.util.nameless.NamelessActions;
 import com.android.internal.util.nameless.NamelessUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 
 /**
  * Needed for takeScreenshot
@@ -95,7 +95,6 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-
 /**
  * Helper to show the global actions dialog.  Each item is an {@link Action} that
  * may show depending on whether the keyguard is showing, and whether the device
@@ -104,8 +103,6 @@ import android.os.RemoteException;
 class GlobalActions implements DialogInterface.OnDismissListener, DialogInterface.OnClickListener  {
 
     private static final String TAG = "GlobalActions";
-
-    private static final boolean SHOW_SILENT_TOGGLE = true;
 
     private final Context mContext;
     private final WindowManagerFuncs mWindowManagerFuncs;
@@ -170,7 +167,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mHasVibrator = vibrator != null && vibrator.hasVibrator();
 
-        mShowSilentToggle = SHOW_SILENT_TOGGLE && !mContext.getResources().getBoolean(
+        mShowSilentToggle = !mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_useFixedVolume);
 
         mShowScreenRecord = mContext.getResources().getBoolean(
@@ -490,7 +487,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
                             public void onPress() {
                                 NamelessActions.processAction(mContext,
-                                        NamelessActions.ACTION_SCREEN_RECORD);
+                                        ActionConstants.NamelessAction.ACTION_SCREEN_RECORD);
                             }
 
                             public boolean onLongPress() {
@@ -529,7 +526,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
                         public void onPress() {
                             NamelessActions.processAction(mContext,
-                                    NamelessActions.ACTION_ONTHEGO_TOGGLE);
+                                    ActionConstants.NamelessAction.ACTION_ONTHEGO_TOGGLE);
                         }
 
                         public boolean onLongPress() {
@@ -627,7 +624,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         }
 
         // last: silent mode
-        boolean showSoundMode = SHOW_SILENT_TOGGLE && Settings.System.getIntForUser(cr,
+        boolean showSoundMode = Settings.System.getIntForUser(cr,
                 Settings.System.POWER_MENU_SOUND_ENABLED, 1, UserHandle.USER_CURRENT) == 1;
         if (showSoundMode) {
             mItems.add(mSilentModeAction);
