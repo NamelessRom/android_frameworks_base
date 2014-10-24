@@ -73,7 +73,6 @@
   <java-symbol type="id" name="enter_pin_section" />
   <java-symbol type="id" name="expand_activities_button" />
   <java-symbol type="id" name="expand_button" />
-  <java-symbol type="id" name="expand_button_divider" />
   <java-symbol type="id" name="expires_on" />
   <java-symbol type="id" name="find_next" />
   <java-symbol type="id" name="find_prev" />

@@ -146,9 +146,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
     /** Contains the sliders and their touchable icons */
     private final ViewGroup mSliderGroup;
     /** The button that expands the dialog to show all sliders */
-    private final View mMoreButton;
-    /** Dummy divider icon that needs to vanish with the more button */
-    private final View mDivider;
+    private final ImageView mMoreButton;
 
     /** Currently active stream that shows up at the top of the list of sliders */
     private int mActiveStreamType = -1;
@@ -319,7 +317,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
         mPanel = (ViewGroup) mView.findViewById(R.id.visible_panel);
         mSliderGroup = (ViewGroup) mView.findViewById(R.id.slider_group);
         mMoreButton = (ImageView) mView.findViewById(R.id.expand_button);
-        mDivider = (ImageView) mView.findViewById(R.id.expand_button_divider);
 
         mDialog = new Dialog(context, R.style.Theme_Panel_Volume) {
             public boolean onTouchEvent(MotionEvent event) {
@@ -414,8 +411,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
         if (newStyle == mCurrentOverlayStyle) return;
         switch (newStyle) {
             case VOLUME_OVERLAY_SINGLE :
-                mMoreButton.setVisibility(View.GONE);
-                mDivider.setVisibility(View.GONE);
                 mShowCombinedVolumes = false;
                 if (mCurrentOverlayStyle != -1) {
                     reorderSliders(mActiveStreamType);
@@ -423,8 +418,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                 mCurrentOverlayStyle = VOLUME_OVERLAY_SINGLE;
                 break;
             case VOLUME_OVERLAY_EXPANDABLE :
-                mMoreButton.setVisibility(View.VISIBLE);
-                mDivider.setVisibility(View.VISIBLE);
                 mShowCombinedVolumes = true;
                 if (mCurrentOverlayStyle != -1) {
                     reorderSliders(mActiveStreamType);
@@ -432,8 +425,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                 mCurrentOverlayStyle = VOLUME_OVERLAY_EXPANDABLE;
                 break;
             case VOLUME_OVERLAY_EXPANDED :
-                mMoreButton.setVisibility(View.GONE);
-                mDivider.setVisibility(View.GONE);
                 mShowCombinedVolumes = true;
                 if (mCurrentOverlayStyle != -1) {
                     reorderSliders(mActiveStreamType);
@@ -588,7 +579,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
     }
 
     private boolean isExpanded() {
-        return mMoreButton.getVisibility() != View.VISIBLE;
+        return mSliderGroup.getChildAt(1).getVisibility() == View.VISIBLE;
     }
 
     private void expand() {
@@ -598,8 +589,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                 mSliderGroup.getChildAt(i).setVisibility(View.VISIBLE);
             }
         }
-        mMoreButton.setVisibility(View.GONE);
-        mDivider.setVisibility(View.GONE);
+        mMoreButton.setImageResource(R.drawable.ic_find_previous_holo_dark);
     }
 
     private void hideSlider(int mActiveStreamType) {
@@ -613,12 +603,11 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
     }
 
     private void collapse() {
-        mMoreButton.setVisibility(View.VISIBLE);
-        mDivider.setVisibility(View.VISIBLE);
         final int count = mSliderGroup.getChildCount();
         for (int i = 1; i < count; i++) {
             mSliderGroup.getChildAt(i).setVisibility(View.GONE);
         }
+        mMoreButton.setImageResource(R.drawable.ic_find_next_holo_dark);
     }
 
     public void updateStates() {
@@ -1197,7 +1186,11 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
             startRemoveTranslucentAnimation();
         }
         if (moreButton) {
-            expand();
+            if (isExpanded()) {
+                collapse();
+            } else {
+                expand();
+            }
         }
         resetTimeout();
     }
@@ -1207,7 +1200,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
 
         mPanel.getBackground().setAlpha(TRANSLUCENT_START_LEVEL);
         mMoreButton.setAlpha(TRANSLUCENT_START_LEVEL);
-        mDivider.setAlpha(TRANSLUCENT_START_LEVEL);
         mShouldRunDropTranslucentAnimation = true;
     }
 
@@ -1220,8 +1212,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                 mPanel.getBackground(), "alpha", mPanel.getBackground().getAlpha(), 255);
         Animator moreAlpha = ObjectAnimator.ofFloat(
                 mMoreButton, "alpha", mMoreButton.getAlpha(), 255);
-        Animator dividerAlpha = ObjectAnimator.ofFloat(
-                mDivider, "alpha", mDivider.getAlpha(), 255);
         set.setInterpolator(new AccelerateInterpolator());
         set.addListener(new AnimatorListener() {
             @Override
@@ -1240,7 +1230,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
             public void onAnimationCancel(Animator animation) {}
         });
         set.setDuration(TRANSLUCENT_TO_OPAQUE_DURATION);
-        set.playTogether(panelAlpha, moreAlpha, dividerAlpha);
+        set.playTogether(panelAlpha, moreAlpha);
         set.start();
     }
 }

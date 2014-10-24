@@ -65,4 +65,7 @@
     <java-symbol type="drawable" name="ic_lock_onthego" />
     <!-- Screen Record -->
     <java-symbol type="string" name="global_action_screenrecord" />
+    <!-- Volume Panel -->
+    <java-symbol type="drawable" name="ic_find_next_holo_dark" />
+    <java-symbol type="drawable" name="ic_find_previous_holo_dark" />
 </resources>
