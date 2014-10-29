@@ -753,17 +753,22 @@ public class ExifInterface {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void readExif(String inFileName) throws FileNotFoundException, IOException {
+    public void readExif(String inFileName) throws IOException {
         if (inFileName == null) {
             throw new IllegalArgumentException(NULL_ARGUMENT_STRING);
         }
+        final File file = new File(inFileName);
+        if (!file.exists()) {
+            throw new FileNotFoundException(String.format("%s does not exist", inFileName));
+        }
         InputStream is = null;
         try {
-            is = (InputStream) new BufferedInputStream(new FileInputStream(inFileName));
+            is = new BufferedInputStream(new FileInputStream(file));
             readExif(is);
         } catch (IOException e) {
-            closeSilently(is);
             throw e;
+        } finally {
+            closeSilently(is);
         }
         is.close();
     }
