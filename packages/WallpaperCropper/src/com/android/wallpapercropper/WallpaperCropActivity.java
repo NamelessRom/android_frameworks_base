@@ -336,7 +336,7 @@ public class WallpaperCropActivity extends Activity {
             }
         };
         cropTask.setOnEndRunnable(onEndCrop);
-        cropTask.setNoCrop(false);
+        cropTask.setNoCrop(true);
         cropTask.execute();
     }
 
