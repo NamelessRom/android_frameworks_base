@@ -26,6 +26,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -391,7 +392,10 @@ public class WallpaperManager {
             } catch (RemoteException e) {
                 // Ignore
             }
-            return null;
+            Log.w(TAG, "default wallpaper could not be recovered");
+            Bitmap blackBmp = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565);
+            blackBmp.setPixel(0, 0, Color.BLACK);
+            return(blackBmp);
         }
 
         public void clearKeyguardWallpaper() {
