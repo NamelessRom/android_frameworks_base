@@ -391,7 +391,10 @@ public class WallpaperManager {
             } catch (RemoteException e) {
                 // Ignore
             }
-            return null;
+            Log.w(TAG, "default wallpaper could not be recovered");
+            Bitmap blackBmp = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565);
+            blackBmp.setPixel(0, 0, context.getResources().getColor(android.R.color.black));
+            return(blackBmp);
         }
 
         public void clearKeyguardWallpaper() {
