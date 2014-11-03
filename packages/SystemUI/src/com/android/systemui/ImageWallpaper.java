@@ -391,8 +391,8 @@ public class ImageWallpaper extends WallpaperService {
             }
 
             // Center the scaled image
-            mScale = Math.max(1f, Math.max(dw / (float) mBackground.getWidth(),
-                    dh / (float) mBackground.getHeight()));
+            mScale = Math.max(dw / (float) mBackground.getWidth(),
+                    dh / (float) mBackground.getHeight());
             final int availw = dw - (int) (mBackground.getWidth() * mScale);
             final int availh = dh - (int) (mBackground.getHeight() * mScale);
             int xPixels = availw / 2;
