@@ -110,6 +110,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
     private boolean mHighEndGfx;
 
     private LinearLayout mRecentsBar;
+    private LinearLayout mRamUsageBarContainer;
     private LinearColorBar mRamUsageBar;
     private ImageView mClearAllRecents;
 
@@ -607,6 +608,7 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
             }
         }
 
+        mRamUsageBarContainer = (LinearLayout) findViewById(R.id.ram_usage_bar_container);
         mRamUsageBar = (LinearColorBar) findViewById(R.id.ram_usage_bar);
         mForegroundProcessText = (TextView) findViewById(R.id.foregroundText);
         mBackgroundProcessText = (TextView) findViewById(R.id.backgroundText);
@@ -1120,8 +1122,8 @@ public class RecentsPanelView extends RelativeLayout implements OnItemClickListe
         if (mRecentsBar != null) {
             mRecentsBar.setVisibility((recentsBarEnabled) ? View.VISIBLE : View.GONE);
         }
-        if (mRamUsageBar != null) {
-            mRamUsageBar.setVisibility((ramBarEnabled && canUseRamBar) ? View.VISIBLE : View.GONE);
+        if (mRamUsageBarContainer != null) {
+            mRamUsageBarContainer.setVisibility((ramBarEnabled && canUseRamBar) ? View.VISIBLE : View.GONE);
         }
     }
 
