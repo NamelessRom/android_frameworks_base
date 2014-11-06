@@ -304,6 +304,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     boolean mSafeMode;
     WindowState mStatusBar = null;
+    WindowState mHeadsUp = null;
     int mStatusBarHeight;
     WindowState mNavigationBar = null;
     boolean mHasNavigationBar = false;
@@ -2240,6 +2241,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 mContext.enforceCallingOrSelfPermission(
                         android.Manifest.permission.STATUS_BAR_SERVICE,
                         "PhoneWindowManager");
+                if (mHeadsUp != null) {
+                    if (mHeadsUp.isAlive()) {
+                        return WindowManagerGlobal.ADD_MULTIPLE_SINGLETON;
+                    }
+                }
+                mHeadsUp = win;
+                if (DEBUG) Slog.i(TAG, "HeadsUp Notification: " + mHeadsUp);
                 break;
             case TYPE_STATUS_BAR_SUB_PANEL:
                 mContext.enforceCallingOrSelfPermission(
@@ -2270,6 +2278,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         } if (mNavigationBar == win) {
             mNavigationBar = null;
             mNavigationBarController.setWindow(null);
+        } if (mHeadsUp == win) {
+            if (DEBUG) Slog.i(TAG, "Removing HeadsUp notfication: " + mHeadsUp);
+            mHeadsUp = null;
         }
     }
 
@@ -3402,12 +3413,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (!isKeyguardShowing) {
                 navTranslucent &= areTranslucentBarsAllowed();
             }
-
+            boolean headsUpVisible = false; // needed for the case when HeadsUpNotification is displayed.
+            if(mHeadsUp != null )
+                headsUpVisible = mHeadsUp.isVisibleLw();
             // When the navigation bar isn't visible, we put up a fake
             // input window to catch all touch events.  This way we can
             // detect when the user presses anywhere to bring back the nav
             // bar and ensure the application doesn't see the event.
-            if (navVisible || navAllowedHidden) {
+            // Fake window should not be displayed when HeadsUpNotificationView
+            // in the form of HighPriority notifications are displayed
+            if (navVisible || navAllowedHidden || headsUpVisible) {
                 if (mHideNavFakeWindow != null) {
                     mHideNavFakeWindow.dismiss();
                     mHideNavFakeWindow = null;
