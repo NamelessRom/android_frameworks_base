@@ -446,7 +446,7 @@ public class KeyguardViewManager {
             Bitmap bitmap = wm.getKeyguardBitmap();
             if (bitmap != null) {
                 // Recover memory
-                if (mUserBackground != null && mUserBackground instanceof BitmapDrawable) {
+                if (mUserBackground instanceof BitmapDrawable) {
                     ((BitmapDrawable)mUserBackground).getBitmap().recycle();
                 }
                 mUserBackground = new BitmapDrawable(mContext.getResources(), bitmap);
