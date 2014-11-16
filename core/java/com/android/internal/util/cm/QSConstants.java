@@ -35,6 +35,7 @@ public class QSConstants {
         public static final String TILE_ONTHEGO = "toggleOnTheGo";
         public static final String TILE_COMPASS = "toggleCompass";
         public static final String TILE_HEADS_UP = "toggleHeadsUp";
+        public static final String TILE_THEMES = "toggleThemes";
 
         public static final String TILE_DELIMITER = "|";
         public static ArrayList<String> TILES_DEFAULT = new ArrayList<String>();
