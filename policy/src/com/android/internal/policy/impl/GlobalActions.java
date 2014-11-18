@@ -28,6 +28,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.KeyguardManager;
 import android.app.Profile;
 import android.app.ProfileManager;
 import android.content.ActivityNotFoundException;
@@ -101,6 +102,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
      * see config.xml config_globalActionList */
     private static final String GLOBAL_ACTION_KEY_POWER = "power";
     private static final String GLOBAL_ACTION_KEY_REBOOT = "reboot";
+    private static final String GLOBAL_ACTION_KEY_REBOOT_RECOVERY = "reboot_recovery";
+    private static final String GLOBAL_ACTION_KEY_REBOOT_BOOTLOADER = "reboot_bootloader";
     private static final String GLOBAL_ACTION_KEY_AIRPLANE = "airplane";
     private static final String GLOBAL_ACTION_KEY_BUGREPORT = "bugreport";
     private static final String GLOBAL_ACTION_KEY_SILENT = "silent";
@@ -496,14 +499,16 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         @Override
         public void onPress() {
-            try {
-                IPowerManager pm = IPowerManager.Stub.asInterface(ServiceManager
-                        .getService(Context.POWER_SERVICE));
-                pm.reboot(true, null, false);
-            } catch (RemoteException e) {
-                Log.e(TAG, "PowerManager service died!", e);
-                return;
+            final KeyguardManager km =
+                    (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
+            final boolean locked = km.inKeyguardRestrictedInputMode() && km.isKeyguardSecure();
+
+            boolean showAdvancedReboot = false;
+            if (!locked) { // if we are not locked, show the advanced reboot, if set
+                showAdvancedReboot = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.POWER_MENU_ADVANCED_REBOOT, 0) == 1;
             }
+            mWindowManagerFuncs.reboot(true, showAdvancedReboot);
         }
     }
 
