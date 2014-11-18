@@ -2897,6 +2897,13 @@ public final class Settings {
         public static final String ADVANCED_REBOOT = "advanced_reboot";
 
         /**
+         * Whether the reboot submenu at the power menu should trigger actions with a
+         * single click or with a confirmation.
+         * @hide
+         */
+        public static final String ADVANCED_REBOOT_ONECLICK = "advanced_reboot_oneclick";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
