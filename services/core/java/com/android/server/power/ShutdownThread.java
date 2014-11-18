@@ -48,6 +48,7 @@ import com.android.internal.R;
 import com.android.internal.telephony.ITelephony;
 import com.android.server.pm.PackageManagerService;
 
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -156,15 +157,15 @@ public final class ShutdownThread extends Thread {
         sConfirmDialog = new AlertDialog.Builder(context)
                 .setTitle(mRebootSafeMode
                         ? com.android.internal.R.string.reboot_safemode_title
-                        : mReboot
-                                ? com.android.internal.R.string.reboot_title
-                                : com.android.internal.R.string.power_off)
+                        : mReboot ? com.android.internal.R.string.reboot_title
+                        : com.android.internal.R.string.power_off)
                 .setMessage(resourceId)
-                .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        beginShutdownSequence(context);
-                    }
-                    })
+                .setPositiveButton(com.android.internal.R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                beginShutdownSequence(context);
+                            }
+                        })
                 .setNegativeButton(com.android.internal.R.string.no, null)
                 .create();
         closer.dialog = sConfirmDialog;
@@ -181,49 +182,71 @@ public final class ShutdownThread extends Thread {
         if (sConfirmDialog != null) {
             sConfirmDialog.dismiss();
         }
-        sConfirmDialog = new AlertDialog.Builder(context)
-                .setTitle(com.android.internal.R.string.reboot_system)
-                .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (which < 0 || which > entries.length) {
-                                    return;
-                                }
 
-                                mRebootReason = entries[which];
-                            }
-                        })
-                .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (!TextUtils.equals(mRebootReason, SOFT_REBOOT)) {
-                                    reboot(context, mRebootReason, false);
-                                    return;
-                                }
+        final boolean instantTrigger = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.ADVANCED_REBOOT_ONECLICK, 0) == 1;
 
-                                try {
-                                    final IActivityManager am = ActivityManagerNative.asInterface(
-                                            ServiceManager.checkService("activity"));
-                                    if (am != null) {
-                                        am.restart();
-                                    }
-                                } catch (RemoteException e) {
-                                    Log.e(TAG, "failure trying to perform soft reboot", e);
-                                }
-                            }
-                        })
-                .setNegativeButton(com.android.internal.R.string.no,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                mRebootReason = null;
-                                dialogInterface.cancel();
-                            }
-                        })
-                .create();
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(com.android.internal.R.string.reboot_system);
+        if (instantTrigger) {
+            builder.setItems(com.android.internal.R.array.shutdown_reboot_options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int which) {
+                    if (which < 0 || which > entries.length) {
+                        return;
+                    }
+
+                    mRebootReason = entries[which];
+                    triggerReboot(context);
+                }
+            });
+        } else {
+            builder.setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which < 0 || which > entries.length) {
+                        return;
+                    }
+
+                    mRebootReason = entries[which];
+                }
+            });
+            builder.setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    triggerReboot(context);
+                }
+            });
+            builder.setNegativeButton(com.android.internal.R.string.no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    mRebootReason = null;
+                    dialogInterface.cancel();
+                }
+            });
+        }
+        sConfirmDialog = builder.create();
         closer.dialog = sConfirmDialog;
         sConfirmDialog.setOnDismissListener(closer);
         sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
         sConfirmDialog.show();
+    }
+
+    private static void triggerReboot(final Context context) {
+        if (!TextUtils.equals(mRebootReason, SOFT_REBOOT)) {
+            reboot(context, mRebootReason, false);
+            return;
+        }
+
+        try {
+            final IActivityManager am = ActivityManagerNative.asInterface(
+                    ServiceManager.checkService("activity"));
+            if (am != null) {
+                am.restart();
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "failure trying to perform soft reboot", e);
+        }
     }
 
     private static class CloseDialogReceiver extends BroadcastReceiver
