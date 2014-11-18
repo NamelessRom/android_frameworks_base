@@ -28,6 +28,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.KeyguardManager;
 import android.app.Profile;
 import android.app.ProfileManager;
 import android.content.ActivityNotFoundException;
@@ -496,14 +497,16 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         @Override
         public void onPress() {
-            try {
-                IPowerManager pm = IPowerManager.Stub.asInterface(ServiceManager
-                        .getService(Context.POWER_SERVICE));
-                pm.reboot(true, null, false);
-            } catch (RemoteException e) {
-                Log.e(TAG, "PowerManager service died!", e);
-                return;
+            final KeyguardManager km =
+                    (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
+            final boolean locked = km.inKeyguardRestrictedInputMode() && km.isKeyguardSecure();
+
+            boolean showAdvancedReboot = false;
+            if (!locked) { // if we are not locked, show the advanced reboot, if set
+                showAdvancedReboot = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.ADVANCED_REBOOT, 0) == 1;
             }
+            mWindowManagerFuncs.reboot(true, showAdvancedReboot);
         }
     }
 

@@ -44,12 +44,20 @@ import android.os.SystemVibrator;
 import android.os.storage.IMountService;
 import android.os.storage.IMountShutdownObserver;
 
+import com.android.internal.R;
 import com.android.internal.telephony.ITelephony;
 import com.android.server.pm.PackageManagerService;
 
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import dalvik.system.PathClassLoader;
 
 public final class ShutdownThread extends Thread {
@@ -71,6 +79,8 @@ public final class ShutdownThread extends Thread {
     private static boolean mReboot;
     private static boolean mRebootSafeMode;
     private static String mRebootReason;
+
+    public static final String SOFT_REBOOT = "soft_reboot";
 
     // Provides shutdown assurance in case the system_server is killed
     public static final String SHUTDOWN_ACTION_PROPERTY = "sys.shutdown.requested";
@@ -123,54 +133,98 @@ public final class ShutdownThread extends Thread {
             }
         }
 
-        boolean showRebootOption = false;
-        String[] defaultActions = context.getResources().getStringArray(
-                com.android.internal.R.array.config_globalActionsList);
-        for (int i = 0; i < defaultActions.length; i++) {
-            if (defaultActions[i].equals("reboot")) {
-                showRebootOption = true;
-                break;
-            }
+        if (!confirm) {
+            beginShutdownSequence(context);
+            return;
         }
+
         final int longPressBehavior = context.getResources().getInteger(
                         com.android.internal.R.integer.config_longPressOnPowerBehavior);
         int resourceId = mRebootSafeMode
                 ? com.android.internal.R.string.reboot_safemode_confirm
+                : mReboot ? com.android.internal.R.string.reboot_confirm
                 : (longPressBehavior == 2
                         ? com.android.internal.R.string.shutdown_confirm_question
                         : com.android.internal.R.string.shutdown_confirm);
-        if (showRebootOption && !mRebootSafeMode) {
-            resourceId = com.android.internal.R.string.reboot_confirm;
-        }
 
         Log.d(TAG, "Notifying thread to start shutdown longPressBehavior=" + longPressBehavior);
 
-        if (confirm) {
-            final CloseDialogReceiver closer = new CloseDialogReceiver(context);
-            if (sConfirmDialog != null) {
-                sConfirmDialog.dismiss();
-            }
-            sConfirmDialog = new AlertDialog.Builder(context)
-                    .setTitle(mRebootSafeMode
-                            ? com.android.internal.R.string.reboot_safemode_title
-                            : showRebootOption
-                                    ? com.android.internal.R.string.reboot_title
-                                    : com.android.internal.R.string.power_off)
-                    .setMessage(resourceId)
-                    .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            beginShutdownSequence(context);
-                        }
-                    })
-                    .setNegativeButton(com.android.internal.R.string.no, null)
-                    .create();
-            closer.dialog = sConfirmDialog;
-            sConfirmDialog.setOnDismissListener(closer);
-            sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-            sConfirmDialog.show();
-        } else {
-            beginShutdownSequence(context);
+        final CloseDialogReceiver closer = new CloseDialogReceiver(context);
+        if (sConfirmDialog != null) {
+            sConfirmDialog.dismiss();
         }
+        sConfirmDialog = new AlertDialog.Builder(context)
+                .setTitle(mRebootSafeMode
+                        ? com.android.internal.R.string.reboot_safemode_title
+                        : mReboot
+                                ? com.android.internal.R.string.reboot_title
+                                : com.android.internal.R.string.power_off)
+                .setMessage(resourceId)
+                .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        beginShutdownSequence(context);
+                    }
+                    })
+                .setNegativeButton(com.android.internal.R.string.no, null)
+                .create();
+        closer.dialog = sConfirmDialog;
+        sConfirmDialog.setOnDismissListener(closer);
+        sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        sConfirmDialog.show();
+    }
+
+    static void showAdvancedReboot(final Context context) {
+        final String[] entries = context.getResources().getStringArray(
+                com.android.internal.R.array.shutdown_reboot_actions);
+
+        final CloseDialogReceiver closer = new CloseDialogReceiver(context);
+        if (sConfirmDialog != null) {
+            sConfirmDialog.dismiss();
+        }
+        sConfirmDialog = new AlertDialog.Builder(context)
+                .setTitle(com.android.internal.R.string.reboot_system)
+                .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which < 0 || which > entries.length) {
+                                    return;
+                                }
+
+                                mRebootReason = entries[which];
+                            }
+                        })
+                .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (!TextUtils.equals(mRebootReason, SOFT_REBOOT)) {
+                                    reboot(context, mRebootReason, false);
+                                    return;
+                                }
+
+                                try {
+                                    final IActivityManager am = ActivityManagerNative.asInterface(
+                                            ServiceManager.checkService("activity"));
+                                    if (am != null) {
+                                        am.restart();
+                                    }
+                                } catch (RemoteException e) {
+                                    Log.e(TAG, "failure trying to perform soft reboot", e);
+                                }
+                            }
+                        })
+                .setNegativeButton(com.android.internal.R.string.no,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                mRebootReason = null;
+                                dialogInterface.cancel();
+                            }
+                        })
+                .create();
+        closer.dialog = sConfirmDialog;
+        sConfirmDialog.setOnDismissListener(closer);
+        sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        sConfirmDialog.show();
     }
 
     private static class CloseDialogReceiver extends BroadcastReceiver
@@ -208,6 +262,23 @@ public final class ShutdownThread extends Thread {
         mRebootSafeMode = false;
         mRebootReason = reason;
         shutdownInner(context, confirm);
+    }
+
+    /**
+     * Shows a dialog with different options to choose from, depending on the configuration.
+     * Must be called from a Looper thread in which its UI is shown.
+     *
+     * @param context Context used to display the shutdown progress dialog.
+     * @param confirm true if user confirmation is needed before shutting down.
+     * @param advanced true if options should be shown, else acts like a normal reboot.
+     */
+    public static void rebootAdvanced(final Context context, boolean confirm, boolean advanced) {
+        if (!advanced) {
+            reboot(context, null, confirm);
+            return;
+        }
+
+        showAdvancedReboot(context);
     }
 
     /**
