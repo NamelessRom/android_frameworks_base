@@ -118,8 +118,6 @@ public class LightsService {
                 mColor = color;
                 mMode = mode;
 
-                mFlashing = (mode != LIGHT_FLASH_NONE);
-
                 mOnMS = onMS;
                 mOffMS = offMS;
                 setLight_native(mNativePointer, mId, color, mode, onMS, offMS, brightnessMode);
