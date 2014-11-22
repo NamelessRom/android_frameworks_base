@@ -17,13 +17,18 @@
 package com.android.systemui.statusbar.phone;
 
 import android.content.Context;
-import android.content.res.Resources;
+import android.database.ContentObserver;
+import android.os.Handler;
+import android.os.UserHandle;
 import android.util.AttributeSet;
 import android.util.EventLog;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.GestureDetector;
+import android.os.PowerManager;
+import android.provider.Settings;
 
 import com.android.systemui.EventLogTags;
 import com.android.systemui.R;
@@ -31,7 +36,7 @@ import com.android.systemui.R;
 public class PhoneStatusBarView extends PanelBar {
     private static final String TAG = "PhoneStatusBarView";
     private static final boolean DEBUG = PhoneStatusBar.DEBUG;
-    private static final boolean DEBUG_GESTURES = true;
+    private static final boolean DEBUG_GESTURES = false;
 
     PhoneStatusBar mBar;
 
@@ -40,11 +45,58 @@ public class PhoneStatusBarView extends PanelBar {
     private final PhoneStatusBarTransitions mBarTransitions;
     private ScrimController mScrimController;
 
+    private boolean mLongPressSleep;
+    private GestureDetector mGestureDetector;
+
+    PowerManager mPm;
+
+    private class SettingsObserver extends ContentObserver {
+        public SettingsObserver(final Handler handler) {
+            super(handler);
+        }
+
+        public void observe() {
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.LONG_PRESS_SLEEP_GESTURE), false, this, UserHandle.USER_ALL);
+
+            onChange(false);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+
+            mLongPressSleep = Settings.System.getIntForUser(getContext().getContentResolver(),
+                    Settings.System.LONG_PRESS_SLEEP_GESTURE, 0, UserHandle.USER_CURRENT) == 1;
+        }
+    }
+
     public PhoneStatusBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        Resources res = getContext().getResources();
         mBarTransitions = new PhoneStatusBarTransitions(this);
+        mPm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+
+        mGestureDetector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public void onLongPress(MotionEvent e) {
+                super.onLongPress(e);
+                if (DEBUG) Log.d(TAG, "onLongPress");
+                if (mPm != null) {
+                    mPm.goToSleep(e.getEventTime());
+                } else if (DEBUG) {
+                    Log.d(TAG, "PowerManager is null");
+                }
+            }
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+        });
+
+        final SettingsObserver settingsObserver = new SettingsObserver(new Handler());
+        settingsObserver.observe();
     }
 
     public BarTransitions getBarTransitions() {
@@ -139,6 +191,10 @@ public class PhoneStatusBarView extends PanelBar {
                         event.getActionMasked(), (int) event.getX(), (int) event.getY(),
                         barConsumedEvent ? 1 : 0);
             }
+        }
+
+        if (mLongPressSleep) {
+            mGestureDetector.onTouchEvent(event);
         }
 
         return barConsumedEvent || super.onTouchEvent(event);
