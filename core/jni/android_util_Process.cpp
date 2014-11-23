@@ -287,8 +287,7 @@ static void android_os_Process_setCanSelfBackground(JNIEnv* env, jobject clazz, 
 void android_os_Process_setThreadScheduler(JNIEnv* env, jclass clazz,
                                               jint tid, jint policy, jint pri)
 {
-// linux has sched_setscheduler(), others don't.
-#if defined(__linux__)
+#ifdef HAVE_SCHED_SETSCHEDULER
     struct sched_param param;
     param.sched_priority = pri;
     int rc = sched_setscheduler(tid, policy, &param);
