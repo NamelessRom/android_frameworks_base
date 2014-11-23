@@ -155,6 +155,7 @@ public final class SystemServer {
     private SystemServiceManager mSystemServiceManager;
 
     // TODO: remove all of these references by improving dependency resolution and boot phases
+    private Installer mInstaller;
     private PowerManagerService mPowerManagerService;
     private AlarmManagerService mAlarmManagerService;
     private ActivityManagerService mActivityManagerService;
@@ -317,13 +318,12 @@ public final class SystemServer {
         // Wait for installd to finish starting up so that it has a chance to
         // create critical directories such as /data/user with the appropriate
         // permissions.  We need this to complete before we initialize other services.
-        Installer installer = mSystemServiceManager.startService(Installer.class);
+        mInstaller = mSystemServiceManager.startService(Installer.class);
 
         // Activity manager runs the show.
         mActivityManagerService = mSystemServiceManager.startService(
                 ActivityManagerService.Lifecycle.class).getService();
         mActivityManagerService.setSystemServiceManager(mSystemServiceManager);
-        mActivityManagerService.setInstaller(installer);
 
         // Power manager needs to be started early because other services need it.
         // Native daemons may be watching for it to be registered so it must be ready
@@ -354,7 +354,7 @@ public final class SystemServer {
 
         // Start the package manager.
         Slog.i(TAG, "Package Manager");
-        mPackageManagerService = PackageManagerService.main(mSystemContext, installer,
+        mPackageManagerService = PackageManagerService.main(mSystemContext, mInstaller,
                 mFactoryTestMode != FactoryTest.FACTORY_TEST_OFF, mOnlyCore);
         mFirstBoot = mPackageManagerService.isFirstBoot();
         mPackageManager = mSystemContext.getPackageManager();
