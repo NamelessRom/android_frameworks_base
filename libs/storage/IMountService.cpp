@@ -64,7 +64,7 @@ public:
     {
         Parcel data, reply;
         data.writeInterfaceToken(IMountService::getInterfaceDescriptor());
-        data.writeStrongBinder(IInterface::asBinder(listener));
+        data.writeStrongBinder(listener->asBinder());
         if (remote()->transact(TRANSACTION_registerListener, data, &reply) != NO_ERROR) {
             ALOGD("registerListener could not contact remote\n");
             return;
@@ -80,7 +80,7 @@ public:
     {
         Parcel data, reply;
         data.writeInterfaceToken(IMountService::getInterfaceDescriptor());
-        data.writeStrongBinder(IInterface::asBinder(listener));
+        data.writeStrongBinder(listener->asBinder());
         if (remote()->transact(TRANSACTION_unregisterListener, data, &reply) != NO_ERROR) {
             ALOGD("unregisterListener could not contact remote\n");
             return;
@@ -406,7 +406,7 @@ public:
     {
         Parcel data, reply;
         data.writeInterfaceToken(IMountService::getInterfaceDescriptor());
-        data.writeStrongBinder(IInterface::asBinder(observer));
+        data.writeStrongBinder(observer->asBinder());
         if (remote()->transact(TRANSACTION_shutdown, data, &reply) != NO_ERROR) {
             ALOGD("shutdown could not contact remote\n");
             return;
@@ -443,7 +443,7 @@ public:
         data.writeString16(rawPath);
         data.writeString16(canonicalPath);
         data.writeString16(key);
-        data.writeStrongBinder(IInterface::asBinder(token));
+        data.writeStrongBinder(token->asBinder());
         data.writeInt32(nonce);
         if (remote()->transact(TRANSACTION_mountObb, data, &reply) != NO_ERROR) {
             ALOGD("mountObb could not contact remote\n");
@@ -463,7 +463,7 @@ public:
         data.writeInterfaceToken(IMountService::getInterfaceDescriptor());
         data.writeString16(filename);
         data.writeInt32(force ? 1 : 0);
-        data.writeStrongBinder(IInterface::asBinder(token));
+        data.writeStrongBinder(token->asBinder());
         data.writeInt32(nonce);
         if (remote()->transact(TRANSACTION_unmountObb, data, &reply) != NO_ERROR) {
             ALOGD("unmountObb could not contact remote\n");
