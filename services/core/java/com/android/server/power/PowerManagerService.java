@@ -612,6 +612,10 @@ public final class PowerManagerService extends SystemService
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.PROXIMITY_ON_WAKE),
                     false, mSettingsObserver, UserHandle.USER_ALL);
+            /* TODO: enable later
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HARDWARE_KEYS_DISABLE),
+                    false, mSettingsObserver, UserHandle.USER_ALL);*/
 
             // Go.
             readConfigurationLocked();
@@ -693,6 +697,24 @@ public final class PowerManagerService extends SystemService
                 Settings.Global.STAY_ON_WHILE_PLUGGED_IN, BatteryManager.BATTERY_PLUGGED_AC);
         mProximityWakeEnabled = Settings.System.getInt(resolver,
                 Settings.System.PROXIMITY_ON_WAKE, 0) == 1;
+
+        /* TODO: enable later
+        final boolean hasForceNavbar = Settings.System.getIntForUser(resolver,
+                Settings.System.NAVBAR_FORCE_ENABLE, 0, UserHandle.USER_CURRENT) == 1;
+        final boolean hardwareKeysDisable = hasForceNavbar && Settings.System.getIntForUser(resolver,
+                Settings.System.HARDWARE_KEYS_DISABLE, 0, UserHandle.USER_CURRENT) == 1;
+
+        if (!hardwareKeysDisable) {
+            mButtonTimeout = Settings.System.getIntForUser(resolver,
+                    Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
+                    DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
+            mButtonBrightness = Settings.System.getIntForUser(resolver,
+                    Settings.System.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
+                    UserHandle.USER_CURRENT);
+        } else {
+            mButtonTimeout = 0;
+            mButtonBrightness = 0;
+        }*/
 
         final int oldScreenBrightnessSetting = mScreenBrightnessSetting;
         mScreenBrightnessSetting = Settings.System.getIntForUser(resolver,
