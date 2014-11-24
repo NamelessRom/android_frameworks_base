@@ -308,6 +308,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     WindowState mNavigationBar = null;
     boolean mHasNavigationBar = false;
     boolean mCanHideNavigationBar = false;
+    boolean mHardwareKeysDisabled = false;
     boolean mNavigationBarCanMove = false; // can the navigation bar ever move to the side?
     boolean mNavigationBarOnBottom = true; // is the navigation bar on the bottom *right now*?
     int[] mNavigationBarHeightForRotation = new int[4];
@@ -715,6 +716,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVBAR_FORCE_ENABLE), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HARDWARE_KEYS_DISABLE), false, this,
                     UserHandle.USER_ALL);
 
             updateSettings();
@@ -1357,6 +1361,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final boolean hasAssist = (activeHardwareKeys & KEY_MASK_ASSIST) != 0;
         final boolean hasAppSwitch = (activeHardwareKeys & KEY_MASK_APP_SWITCH) != 0;
         final ContentResolver resolver = mContext.getContentResolver();
+
+        final boolean hasForceNavbar = Settings.System.getIntForUser(resolver,
+                Settings.System.NAVBAR_FORCE_ENABLE, 0, UserHandle.USER_CURRENT) == 1;
+        mHardwareKeysDisabled = hasForceNavbar && Settings.System.getIntForUser(resolver,
+                Settings.System.HARDWARE_KEYS_DISABLE, 0, UserHandle.USER_CURRENT) == 1;
 
         // Initialize all assignments to sane defaults.
         mPressOnMenuBehavior = KEY_ACTION_MENU;
@@ -2525,6 +2534,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         // it handle it, because that gives us the correct 5 second
         // timeout.
         if (keyCode == KeyEvent.KEYCODE_HOME) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
 
             // If we have released the home key, and didn't do anything else
             // while it was pressed, then it is time to go home!
@@ -2620,6 +2630,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             return -1;
         } else if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
+
             // Hijack modified menu keys for debugging features
             final int chordBug = KeyEvent.META_SHIFT_ON;
 
@@ -2679,6 +2691,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             return -1;
         } else if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
+
             if (down) {
                 if (repeatCount == 0) {
                     mSearchKeyShortcutPending = true;
@@ -2693,6 +2707,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             return 0;
         } else if (keyCode == KeyEvent.KEYCODE_APP_SWITCH) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
+
             if (down) {
                 if (mPressOnAppSwitchBehavior == KEY_ACTION_APP_SWITCH
                         || mLongPressOnAppSwitchBehavior == KEY_ACTION_APP_SWITCH) {
@@ -2724,6 +2740,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             return -1;
         } else if (keyCode == KeyEvent.KEYCODE_ASSIST) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
+
             if (down) {
                 if (mPressOnAssistBehavior == KEY_ACTION_APP_SWITCH
                         || mLongPressOnAssistBehavior == KEY_ACTION_APP_SWITCH) {
@@ -2755,6 +2773,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
             return -1;
         } else if (keyCode == KeyEvent.KEYCODE_VOICE_ASSIST) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
+
             if (!down) {
                 Intent voiceIntent;
                 if (!keyguardOn) {
@@ -2765,6 +2785,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
                 mContext.startActivityAsUser(voiceIntent, UserHandle.CURRENT_OR_SELF);
             }
+        } else if (keyCode == KeyEvent.KEYCODE_CAMERA) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
         } else if (keyCode == KeyEvent.KEYCODE_SYSRQ) {
             if (down && repeatCount == 0) {
                 mHandler.post(mScreenshotRunnable);
@@ -2807,6 +2829,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         UserHandle.CURRENT_OR_SELF);
             }
             return -1;
+        } else if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mHardwareKeysDisabled && !virtualKey) return -1;
         } else if (KeyEvent.isMetaKey(keyCode)) {
             if (down) {
                 mPendingMetaAction = true;
@@ -5024,7 +5048,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         if (useHapticFeedback) {
-            performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
+            if (event != null && event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD) {
+                performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
+            } else if (!mHardwareKeysDisabled) {
+                performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
+            }
         }
 
         if (isWakeKey) {
