@@ -652,6 +652,9 @@ public final class PowerManagerService extends SystemService
             resolver.registerContentObserver(Settings.Global.getUriFor(
                     Settings.Global.WAKE_WHEN_PLUGGED_OR_UNPLUGGED),
                     false, mSettingsObserver, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HARDWARE_KEYS_DISABLE),
+                    false, mSettingsObserver, UserHandle.USER_ALL);
 
             mPerformanceManager.reset();
 
@@ -742,6 +745,23 @@ public final class PowerManagerService extends SystemService
                 (mWakeUpWhenPluggedOrUnpluggedConfig ? 1 : 0));
         mProximityWakeEnabled = Settings.System.getInt(resolver,
                 Settings.System.PROXIMITY_ON_WAKE, 0) == 1;
+
+        final boolean hasForceNavbar = Settings.Secure.getIntForUser(resolver,
+                Settings.Secure.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
+        final boolean hardwareKeysDisable = hasForceNavbar && Settings.System.getIntForUser(resolver,
+                Settings.System.HARDWARE_KEYS_DISABLE, 0, UserHandle.USER_CURRENT) == 1;
+
+        if (!hardwareKeysDisable) {
+            mButtonTimeout = Settings.System.getIntForUser(resolver,
+                    Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
+                    DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
+            mButtonBrightness = Settings.System.getIntForUser(resolver,
+                    Settings.System.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
+                    UserHandle.USER_CURRENT);
+        } else {
+            mButtonTimeout = 0;
+            mButtonBrightness = 0;
+        }
 
         final int oldScreenBrightnessSetting = mScreenBrightnessSetting;
         mScreenBrightnessSetting = Settings.System.getIntForUser(resolver,
