@@ -25,6 +25,7 @@
       <sourceFolder url="file://$MODULE_DIR$/usage/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/usb/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/voiceinteraction/java" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/tests" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
