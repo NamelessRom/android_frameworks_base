@@ -17,4 +17,9 @@
 <resources>
     <java-symbol type="array" name="shutdown_reboot_actions" />
     <java-symbol type="array" name="shutdown_reboot_options" />
+
+    <java-symbol type="string" name="action_app" />
+    <java-symbol type="string" name="action_null" />
+    <java-symbol type="string" name="action_screenshot" />
+    <java-symbol type="string" name="action_screenrecord" />
 </resources>
