@@ -33,6 +33,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -50,6 +51,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
@@ -137,6 +139,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected static final int MSG_HIDE_HEADS_UP = 1029;
     protected static final int MSG_ESCALATE_HEADS_UP = 1030;
     protected static final int MSG_DECAY_HEADS_UP = 1031;
+    protected static final int MSG_TOGGLE_SCREENSHOT = 1032;
 
     protected static final boolean ENABLE_HEADS_UP = true;
     // scores above this threshold should be displayed in heads up mode.
@@ -1079,6 +1082,13 @@ public abstract class BaseStatusBar extends SystemUI implements
         mHandler.sendEmptyMessage(msg);
     }
 
+    @Override
+    public void toggleScreenshot() {
+        int msg = MSG_TOGGLE_SCREENSHOT;
+        mHandler.removeMessages(msg);
+        mHandler.sendEmptyMessage(msg);
+    }
+
     protected abstract WindowManager.LayoutParams getSearchLayoutParams(
             LayoutParams layoutParams);
 
@@ -1167,6 +1177,74 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected void showRecentsPreviousAffiliatedTask() {
         if (mRecents != null) {
             mRecents.showPrevAffiliatedTask();
+        }
+    }
+
+    final Object mScreenshotLock = new Object();
+    ServiceConnection mScreenshotConnection = null;
+
+    final Runnable mScreenshotTimeout = new Runnable() {
+        @Override public void run() {
+            synchronized (mScreenshotLock) {
+                if (mScreenshotConnection != null) {
+                    mContext.unbindService(mScreenshotConnection);
+                    mScreenshotConnection = null;
+                }
+            }
+        }
+    };
+
+    private void takeScreenshot() {
+        synchronized (mScreenshotLock) {
+            if (mScreenshotConnection != null) {
+                return;
+            }
+            ComponentName cn = new ComponentName("com.android.systemui",
+                    "com.android.systemui.screenshot.TakeScreenshotService");
+            Intent intent = new Intent();
+            intent.setComponent(cn);
+            ServiceConnection conn = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    synchronized (mScreenshotLock) {
+                        if (mScreenshotConnection != this) {
+                            return;
+                        }
+                        Messenger messenger = new Messenger(service);
+                        Message msg = Message.obtain(null, 1);
+                        final ServiceConnection myConn = this;
+                        Handler h = new Handler(mHandler.getLooper()) {
+                            @Override
+                            public void handleMessage(Message msg) {
+                                synchronized (mScreenshotLock) {
+                                    if (mScreenshotConnection == myConn) {
+                                        mContext.unbindService(mScreenshotConnection);
+                                        mScreenshotConnection = null;
+                                        mHandler.removeCallbacks(mScreenshotTimeout);
+                                    }
+                                }
+                            }
+                        };
+                        msg.replyTo = new Messenger(h);
+                        msg.arg1 = msg.arg2 = 0;
+                        /*if (mStatusBar != null && mStatusBar.isVisibleLw())
+                            msg.arg1 = 1;
+                        if (mNavigationBar != null && mNavigationBar.isVisibleLw())
+                            msg.arg2 = 1;*/
+                        try {
+                            messenger.send(msg);
+                        } catch (RemoteException e) {
+                        }
+                    }
+                }
+                @Override
+                public void onServiceDisconnected(ComponentName name) {}
+            };
+            if (mContext.bindServiceAsUser(
+                    intent, conn, Context.BIND_AUTO_CREATE, UserHandle.CURRENT)) {
+                mScreenshotConnection = conn;
+                mHandler.postDelayed(mScreenshotTimeout, 10000);
+            }
         }
     }
 
@@ -1269,6 +1347,10 @@ public abstract class BaseStatusBar extends SystemUI implements
                  if (mSearchPanelView != null && mSearchPanelView.isShowing()) {
                      mSearchPanelView.show(false, true);
                  }
+                 break;
+             case MSG_TOGGLE_SCREENSHOT:
+                 if (DEBUG) Log.d(TAG, "toggle screenshot");
+                 takeScreenshot();
                  break;
             }
         }
