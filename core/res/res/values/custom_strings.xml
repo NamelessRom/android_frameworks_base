@@ -33,4 +33,7 @@
     <string name="reboot_download">Download</string>
     <!-- Button to soft reboot the device, within the Reboot Options dialog -->
     <string name="reboot_soft">Soft reboot</string>
+
+    <string name="action_null">Nothing</string>
+    <string name="action_screenshot">Screenshot</string>
 </resources>
