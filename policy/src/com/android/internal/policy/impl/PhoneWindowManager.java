@@ -77,6 +77,8 @@ import com.android.internal.os.DeviceKeyHandler;
 
 import com.android.internal.util.cm.ActionUtils;
 import dalvik.system.DexClassLoader;
+
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
 import android.util.Log;
@@ -120,6 +122,8 @@ import com.android.internal.policy.impl.keyguard.KeyguardServiceDelegate.ShowLis
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.util.gesture.EdgeGesturePosition;
 import com.android.internal.util.gesture.EdgeServiceConstants;
+import com.android.internal.util.nameless.ActionConstants;
+import com.android.internal.util.nameless.ActionProcessor;
 import com.android.internal.widget.PointerLocationView;
 import com.android.server.LocalServices;
 
@@ -646,22 +650,23 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Time to volume and power must be pressed within this interval of each other.
     private static final long SCREENSHOT_CHORD_DEBOUNCE_DELAY_MILLIS = 150;
     // Increase the chord delay when taking a screenshot from the keyguard
-    private static final float KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER = 2.5f;
+    private static final float KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER = 2.0f;
+    private long mChordDebounceDelayMillis;
     private boolean mScreenshotChordEnabled;
     private boolean mVolumeDownKeyTriggered;
-    private long mVolumeDownKeyTime;
-    private boolean mVolumeDownKeyConsumedByScreenshotChord;
+    private boolean mVolumeDownKeyConsumedByKeyChord;
     private boolean mVolumeUpKeyTriggered;
     private boolean mPowerKeyTriggered;
     private long mVolumeUpKeyTime;
-    private boolean mVolumeUpKeyConsumedByScreenshotChord;
+    private boolean mVolumeUpKeyConsumedByKeyChord;
     private long mPowerKeyTime;
     private boolean mScreenshotChordVolumeDownKeyTriggered;
     private long mScreenshotChordVolumeDownKeyTime;
-    private boolean mScreenshotChordVolumeDownKeyConsumed;
     private boolean mScreenshotChordVolumeUpKeyTriggered;
     private boolean mScreenshotChordPowerKeyTriggered;
     private long mScreenshotChordPowerKeyTime;
+    private String mVolumeDownAction;
+    private String mVolumeUpAction;
 
     /* The number of steps between min and max brightness */
     private static final int BRIGHTNESS_STEPS = 10;
@@ -880,6 +885,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LID_CONTROLS_SLEEP), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.POWER_CHORD_DELAY), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.POWER_CHORD_ACTION_DOWN), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.POWER_CHORD_ACTION_UP), false, this,
                     UserHandle.USER_ALL);
 
             updateSettings();
@@ -1111,7 +1125,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 && (event.getFlags() & KeyEvent.FLAG_FALLBACK) == 0) {
             mScreenshotChordPowerKeyTriggered = true;
             mScreenshotChordPowerKeyTime = event.getDownTime();
-            interceptScreenshotChord();
+            interceptPowerVolumeDownChord();
+            interceptPowerVolumeUpChord();
         }
 
         // Stop ringing or end call if configured to do so when power is pressed.
@@ -1161,7 +1176,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private void interceptPowerKeyUp(KeyEvent event, boolean interactive, boolean canceled) {
         final boolean handled = canceled || mPowerKeyHandled;
         mScreenshotChordPowerKeyTriggered = false;
-        cancelPendingScreenshotChordAction();
+        cancelVolumeUpChordAction();
+        cancelVolumeDownChordAction();
         cancelPendingPowerKeyAction();
 
         if (!handled) {
@@ -1313,51 +1329,60 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return getResolvedLongPressOnPowerBehavior() != LONG_PRESS_POWER_NOTHING;
     }
 
-    private void interceptScreenshotChord() {
-        if (mScreenshotChordEnabled
+    private void interceptPowerVolumeDownChord() {
+        if (!TextUtils.equals(mVolumeDownAction, ActionConstants.ActionConstant.ACTION_NULL.value())
                 && mScreenshotChordVolumeDownKeyTriggered && mScreenshotChordPowerKeyTriggered
                 && !mScreenshotChordVolumeUpKeyTriggered) {
             final long now = SystemClock.uptimeMillis();
             if (now <= mScreenshotChordVolumeDownKeyTime + SCREENSHOT_CHORD_DEBOUNCE_DELAY_MILLIS
                     && now <= mScreenshotChordPowerKeyTime
                             + SCREENSHOT_CHORD_DEBOUNCE_DELAY_MILLIS) {
-                mScreenshotChordVolumeDownKeyConsumed = true;
+                mVolumeDownKeyConsumedByKeyChord = true;
                 cancelPendingPowerKeyAction();
 
-                mHandler.postDelayed(mScreenshotRunnable, getScreenshotChordLongPressDelay());
+                mHandler.postDelayed(mVolumeDownChordRunnable, getVolumeDownChordLongPressDelay());
             }
         }
     }
 
-    private void interceptScreenshotLog() {
-        if (mScreenshotChordEnabled
-                && mVolumeUpKeyTriggered && mPowerKeyTriggered && !mVolumeDownKeyTriggered) {
+    private void interceptPowerVolumeUpChord() {
+        if (!TextUtils.equals(mVolumeUpAction, ActionConstants.ActionConstant.ACTION_NULL.value())
+                && mScreenshotChordVolumeUpKeyTriggered && mScreenshotChordPowerKeyTriggered
+                && !mScreenshotChordVolumeDownKeyTriggered) {
             final long now = SystemClock.uptimeMillis();
             if (now <= mVolumeUpKeyTime + SCREENSHOT_CHORD_DEBOUNCE_DELAY_MILLIS
-                   && now <= mPowerKeyTime + SCREENSHOT_CHORD_DEBOUNCE_DELAY_MILLIS) {
-                mVolumeUpKeyConsumedByScreenshotChord = true;
-                cancelPendingScreenshotForLog();
+                    && now <= mScreenshotChordPowerKeyTime
+                            + SCREENSHOT_CHORD_DEBOUNCE_DELAY_MILLIS) {
+                mVolumeUpKeyConsumedByKeyChord = true;
+                cancelPendingPowerKeyAction();
 
-                mHandler.postDelayed(mScreenshotForLog, getScreenshotChordLongPressDelay());
+                mHandler.postDelayed(mVolumeUpChordRunnable, getVolumeUpChordLongPressDelay());
             }
         }
     }
 
-    private void cancelPendingScreenshotForLog() {
-        mHandler.removeCallbacks(mScreenshotForLog);
-    }
-
-    private long getScreenshotChordLongPressDelay() {
+    private long getVolumeDownChordLongPressDelay() {
         if (mKeyguardDelegate.isShowing()) {
-            // Double the time it takes to take a screenshot from the keyguard
-            return (long) (KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER *
-                    ViewConfiguration.get(mContext).getDeviceGlobalActionKeyTimeout());
+            // Double the time it takes to process a key chord from the keyguard
+            return (long) (KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER * mChordDebounceDelayMillis);
         }
-        return ViewConfiguration.get(mContext).getDeviceGlobalActionKeyTimeout();
+        return mChordDebounceDelayMillis;
     }
 
-    private void cancelPendingScreenshotChordAction() {
-        mHandler.removeCallbacks(mScreenshotRunnable);
+    private long getVolumeUpChordLongPressDelay() {
+        if (mKeyguardDelegate.isShowing()) {
+            // Double the time it takes to process a key chord from the keyguard
+            return (long) (KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER * mChordDebounceDelayMillis);
+        }
+        return mChordDebounceDelayMillis;
+    }
+
+    private void cancelVolumeDownChordAction() {
+        mHandler.removeCallbacks(mVolumeDownChordRunnable);
+    }
+
+    private void cancelVolumeUpChordAction() {
+        mHandler.removeCallbacks(mVolumeUpChordRunnable);
     }
 
     private final Runnable mEndCallLongPress = new Runnable() {
@@ -1371,24 +1396,17 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     };
 
-    private final Runnable mScreenshotRunnable = new Runnable() {
+    private final Runnable mVolumeDownChordRunnable = new Runnable() {
         @Override
         public void run() {
-            takeScreenshot();
+            ActionProcessor.launchAction(mContext, mVolumeDownAction);
         }
     };
 
-    private final Runnable mScreenshotForLog = new Runnable() {
+    private final Runnable mVolumeUpChordRunnable = new Runnable() {
+        @Override
         public void run() {
-            Intent intent = new Intent("android.system.agent");
-            intent.setComponent(new ComponentName("com.qualcomm.agent",
-                    "com.qualcomm.agent.SystemAgent"));
-            intent.putExtra("para", "takeLogs");
-            try {
-                mContext.startService(intent);
-            } catch (Exception e) {
-                Slog.e(TAG, "Exception when start SystemAgent service", e);
-            }
+            ActionProcessor.launchAction(mContext, mVolumeUpAction);
         }
     };
 
@@ -1732,6 +1750,25 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
+    private void updatePowerKeyChord() {
+        final ContentResolver resolver = mContext.getContentResolver();
+
+        mChordDebounceDelayMillis = Settings.System.getLongForUser(resolver,
+                Settings.System.POWER_CHORD_DELAY, 250, UserHandle.USER_CURRENT);
+
+        mVolumeDownAction = Settings.System.getStringForUser(resolver,
+                Settings.System.POWER_CHORD_ACTION_DOWN, UserHandle.USER_CURRENT);
+        if (TextUtils.isEmpty(mVolumeDownAction)) {
+            mVolumeDownAction = ActionConstants.ActionConstant.ACTION_SCREENSHOT.value();
+        }
+
+        mVolumeUpAction = Settings.System.getStringForUser(resolver,
+                Settings.System.POWER_CHORD_ACTION_UP, UserHandle.USER_CURRENT);
+        if (TextUtils.isEmpty(mVolumeUpAction)) {
+            mVolumeUpAction = ActionConstants.ActionConstant.ACTION_SCREENRECORD.value();
+        }
+    }
+
     private void updateKeyAssignments() {
         int activeHardwareKeys = mDeviceHardwareKeys;
 
@@ -2029,6 +2066,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.NAVBAR_LEFT_IN_LANDSCAPE, 0, UserHandle.USER_CURRENT) == 1;
 
             updateKeyAssignments();
+            updatePowerKeyChord();
 
             // Configure rotation lock.
             int userRotation = Settings.System.getIntForUser(resolver,
@@ -2974,9 +3012,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
             }
             if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-                    && mScreenshotChordVolumeDownKeyConsumed) {
+                    && mVolumeDownKeyConsumedByKeyChord) {
                 if (!down) {
-                    mScreenshotChordVolumeDownKeyConsumed = false;
+                    mVolumeDownKeyConsumedByKeyChord = false;
                 }
                 return -1;
             }
@@ -2988,9 +3026,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
             }
             if (keyCode == KeyEvent.KEYCODE_VOLUME_UP
-                    && mVolumeUpKeyConsumedByScreenshotChord) {
+                    && mVolumeUpKeyConsumedByKeyChord) {
                 if (!down) {
-                    mVolumeUpKeyConsumedByScreenshotChord = false;
+                    mVolumeUpKeyConsumedByKeyChord = false;
                 }
                 return -1;
             }
@@ -3267,7 +3305,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (mHardwareKeysDisabled && !virtualKey) return -1;
         } else if (keyCode == KeyEvent.KEYCODE_SYSRQ) {
             if (down && repeatCount == 0) {
-                mHandler.post(mScreenshotRunnable);
+                mHandler.post(mVolumeDownChordRunnable);
             }
             return -1;
         } else if (keyCode == KeyEvent.KEYCODE_BRIGHTNESS_UP
@@ -5411,13 +5449,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                                 && (event.getFlags() & KeyEvent.FLAG_FALLBACK) == 0) {
                             mScreenshotChordVolumeDownKeyTriggered = true;
                             mScreenshotChordVolumeDownKeyTime = event.getDownTime();
-                            mScreenshotChordVolumeDownKeyConsumed = false;
+                            mVolumeDownKeyConsumedByKeyChord = false;
                             cancelPendingPowerKeyAction();
-                            interceptScreenshotChord();
+                            interceptPowerVolumeDownChord();
                         }
                     } else {
                         mScreenshotChordVolumeDownKeyTriggered = false;
-                        cancelPendingScreenshotChordAction();
+                        cancelVolumeDownChordAction();
                     }
                 } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
                     if (down) {
@@ -5425,14 +5463,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                                 && (event.getFlags() & KeyEvent.FLAG_FALLBACK) == 0) {
                             mVolumeUpKeyTriggered = true;
                             mVolumeUpKeyTime = event.getDownTime();
-                            mVolumeUpKeyConsumedByScreenshotChord = false;
+                            mVolumeUpKeyConsumedByKeyChord = false;
                             mScreenshotChordVolumeUpKeyTriggered = true;
                             cancelPendingPowerKeyAction();
-                            interceptScreenshotLog();
+                            interceptPowerVolumeUpChord();
                         }
                     } else {
                         mScreenshotChordVolumeUpKeyTriggered = false;
-                        cancelPendingScreenshotChordAction();
+                        cancelVolumeUpChordAction();
                     }
                 }
                 if (down) {
