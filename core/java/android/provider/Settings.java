@@ -3524,6 +3524,25 @@ public final class Settings {
         public static final String LONG_PRESS_KILL_DELAY = "long_press_kill_delay";
 
         /**
+         * The delay when the power chord should get triggered
+         * Default: 250
+         * @hide
+         */
+        public static final String POWER_CHORD_DELAY = "power_chord_delay";
+
+        /**
+         * The action that should get executed when triggering the power chord (down)
+         * @hide
+         */
+        public static final String POWER_CHORD_ACTION_DOWN = "power_chord_action_down";
+
+        /**
+         * The action that should get executed when triggering the power chord (up)
+         * @hide
+         */
+        public static final String POWER_CHORD_ACTION_UP = "power_chord_action_up";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
