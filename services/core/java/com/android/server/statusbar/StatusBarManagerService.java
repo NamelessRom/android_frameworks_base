@@ -193,6 +193,16 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
     }
 
     @Override
+    public void toggleScreenshot() {
+        if (mBar != null) {
+            try {
+                mBar.toggleScreenshot();
+            } catch (RemoteException ex) {
+            }
+        }
+    }
+
+    @Override
     public void disable(int what, IBinder token, String pkg) {
         disableInternal(mCurrentUserId, what, token, pkg);
     }
