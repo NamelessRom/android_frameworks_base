@@ -4957,6 +4957,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         mPowerKeyTriggered = true;
                         mPowerKeyTime = event.getDownTime();
                         interceptPowerVolumeDownChord();
+                        interceptPowerVolumeUpChord();
                     }
 
                     TelecomManager telecomManager = getTelecommService();
