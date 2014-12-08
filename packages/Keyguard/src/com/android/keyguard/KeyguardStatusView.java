@@ -54,11 +54,15 @@ public class KeyguardStatusView extends GridLayout {
     private TextClock mClockView;
     private TextView mOwnerInfo;
 
+    private boolean mEnableRefresh;
+
     private KeyguardUpdateMonitorCallback mInfoCallback = new KeyguardUpdateMonitorCallback() {
 
         @Override
         public void onTimeChanged() {
-            refresh();
+            if (mEnableRefresh) {
+                refresh();
+            }
         }
 
         @Override
@@ -73,11 +77,14 @@ public class KeyguardStatusView extends GridLayout {
         @Override
         public void onStartedWakingUp() {
             setEnableMarquee(true);
+            mEnableRefresh = true;
+            refresh();
         }
 
         @Override
         public void onFinishedGoingToSleep(int why) {
             setEnableMarquee(false);
+            mEnableRefresh = false;
         }
 
         @Override
