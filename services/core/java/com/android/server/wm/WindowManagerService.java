@@ -3089,6 +3089,7 @@ public class WindowManagerService extends IWindowManager.Stub
                     winAnimator.mEnterAnimationPending = true;
                 }
                 if (toBeDisplayed) {
+                    win.mLayoutNeeded = true;
                     if (win.isDrawnLw() && okToDisplay()) {
                         winAnimator.applyEnterAnimationLocked();
                     }
