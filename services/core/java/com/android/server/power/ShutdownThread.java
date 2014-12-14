@@ -187,7 +187,7 @@ public final class ShutdownThread extends Thread {
                 Settings.System.ADVANCED_REBOOT_ONECLICK, 0) == 1;
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(com.android.internal.R.string.reboot_system);
+        builder.setTitle(com.android.internal.R.string.reboot_title);
         if (instantTrigger) {
             builder.setItems(com.android.internal.R.array.shutdown_reboot_options, new DialogInterface.OnClickListener() {
                 @Override
