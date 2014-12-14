@@ -17,12 +17,4 @@
 <resources>
     <java-symbol type="array" name="shutdown_reboot_actions" />
     <java-symbol type="array" name="shutdown_reboot_options" />
-    <java-symbol type="string" name="reboot_system" />
-    <java-symbol type="string" name="reboot_reboot" />
-    <java-symbol type="string" name="reboot_recovery" />
-    <java-symbol type="string" name="reboot_bootloader" />
-    <java-symbol type="string" name="reboot_bootmenu" />
-    <java-symbol type="string" name="reboot_fastboot" />
-    <java-symbol type="string" name="reboot_download" />
-    <java-symbol type="string" name="reboot_soft" />
 </resources>
