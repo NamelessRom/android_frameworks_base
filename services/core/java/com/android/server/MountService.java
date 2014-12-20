@@ -1366,6 +1366,16 @@ class MountService extends IMountService.Stub
         Resources resources = mContext.getResources();
 
         int id = com.android.internal.R.xml.storage_list;
+        String oppoLayout = SystemProperties.get("ro.oppo.layout", "");
+        if (oppoLayout.equals("unified")) {
+            Slog.i(TAG, "readStorageListLocked: using unified storage list");
+            String pkg = mContext.getPackageName();
+            id=resources.getIdentifier("storage_list_ufd", "xml", pkg);
+        } else if (oppoLayout.equals("standard")) {
+            Slog.i(TAG, "readStorageListLocked: using standard storage list");
+            String pkg = mContext.getPackageName();
+            id=resources.getIdentifier("storage_list_std", "xml", pkg);
+        }
         XmlResourceParser parser = resources.getXml(id);
         AttributeSet attrs = Xml.asAttributeSet(parser);
 
