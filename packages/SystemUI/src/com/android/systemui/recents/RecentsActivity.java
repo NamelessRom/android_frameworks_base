@@ -29,6 +29,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
@@ -196,6 +197,9 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
         mConfig.launchedWithAltTab = launchIntent.getBooleanExtra(
                 AlternateRecentsComponent.EXTRA_TRIGGERED_FROM_ALT_TAB, false);
 
+        boolean mRecentsSearchbar = Settings.System.getInt(
+                getContentResolver(), Settings.System.RECENTS_SEARCH_BAR, 1) == 1;
+
         // Load all the tasks
         RecentsTaskLoader loader = RecentsTaskLoader.getInstance();
         SpaceNode root = loader.reload(this,
@@ -250,7 +254,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
             }
             findViewById(R.id.clear_recents).setVisibility(View.VISIBLE);
             if (mRecentsView.hasSearchBar()) {
-                mRecentsView.setSearchBarVisibility(View.VISIBLE);
+                mRecentsView.setSearchBarVisibility(mRecentsSearchbar ? View.VISIBLE : View.GONE);
             } else {
                 addSearchBarAppWidgetView();
             }

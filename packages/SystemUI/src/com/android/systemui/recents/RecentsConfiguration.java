@@ -21,7 +21,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -30,7 +32,6 @@ import android.view.animation.Interpolator;
 import com.android.systemui.R;
 import com.android.systemui.recents.misc.Console;
 import com.android.systemui.recents.misc.SystemServicesProxy;
-
 
 /** A static Recents configuration for the current context
  * NOTE: We should not hold any references to a Context from a static instance */
@@ -128,6 +129,9 @@ public class RecentsConfiguration {
     public boolean lockToAppEnabled;
     public boolean developerOptionsEnabled;
     public boolean debugModeEnabled;
+    public boolean mRecentsSearchbar;
+
+    private Context mContext;
 
     /** Private constructor */
     private RecentsConfiguration(Context context) {
@@ -169,6 +173,7 @@ public class RecentsConfiguration {
         SharedPreferences settings = context.getSharedPreferences(context.getPackageName(), 0);
         Resources res = context.getResources();
         DisplayMetrics dm = res.getDisplayMetrics();
+        mContext = context;
 
         // Debug mode
         debugModeEnabled = settings.getBoolean(Constants.Values.App.Key_DebugModeEnabled, false);
@@ -200,6 +205,11 @@ public class RecentsConfiguration {
         // Search Bar
         searchBarSpaceHeightPx = res.getDimensionPixelSize(R.dimen.recents_search_bar_space_height);
         searchBarAppWidgetId = settings.getInt(Constants.Values.App.Key_SearchAppWidgetId, -1);
+
+        mRecentsSearchbarObserver.onChange(true);
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.RECENTS_SEARCH_BAR),
+                false, mRecentsSearchbarObserver);
 
         // Task stack
         taskStackScrollDuration =
@@ -278,6 +288,19 @@ public class RecentsConfiguration {
         altTabKeyDelay = res.getInteger(R.integer.recents_alt_tab_key_delay);
         fakeShadows = res.getBoolean(R.bool.config_recents_fake_shadows);
     }
+
+    public ContentObserver mRecentsSearchbarObserver = new ContentObserver(null) {
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            mRecentsSearchbar = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.RECENTS_SEARCH_BAR, 1) == 1;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+    };
 
     /** Updates the system insets */
     public void updateSystemInsets(Rect insets) {
@@ -368,7 +391,7 @@ public class RecentsConfiguration {
                                    Rect searchBarSpaceBounds) {
         // Return empty rects if search is not enabled
         int searchBarSize = searchBarSpaceHeightPx;
-        if (!Constants.DebugFlags.App.EnableSearchLayout || !hasSearchBarAppWidget()) {
+        if (!Constants.DebugFlags.App.EnableSearchLayout || !hasSearchBarAppWidget() || !mRecentsSearchbar) {
             searchBarSize = 0;
         }
 
