@@ -139,6 +139,8 @@ import com.android.server.nameless.BootDexoptDialog;
 import com.android.server.policy.keyguard.KeyguardServiceDelegate;
 import com.android.server.policy.keyguard.KeyguardServiceDelegate.DrawnListener;
 
+import namelessrom.providers.NamelessSettings;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -926,6 +928,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(CMSettings.System.getUriFor(
                     CMSettings.System.NAVBAR_LEFT_IN_LANDSCAPE), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(NamelessSettings.System.getUriFor(
+                    NamelessSettings.System.LONG_PRESS_KILL_DELAY), false, this,
                     UserHandle.USER_ALL);
             updateSettings();
         }
@@ -2166,6 +2171,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     ((mDeviceHardwareWakeKeys & KEY_MASK_VOLUME) != 0);
             mVolBtnMusicControls = (CMSettings.System.getIntForUser(resolver,
                     CMSettings.System.VOLBTN_MUSIC_CONTROLS, 1, UserHandle.USER_CURRENT) == 1);
+
+            mBackKillTimeout = NamelessSettings.System.getIntForUser(resolver,
+                    NamelessSettings.System.LONG_PRESS_KILL_DELAY, 1000, UserHandle.USER_CURRENT);
 
             // Configure wake gesture.
             boolean wakeGestureEnabledSetting = Settings.Secure.getIntForUser(resolver,
