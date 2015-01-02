@@ -88,9 +88,13 @@ public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
             }
         }
 
+        // There is also the case where the flashlight got toggled via intent, for example
+        // from the launcher or keyhandler. In this case we also want to show the tile.
+        state.value |= mFlashlightController.isFromIntent();
+
         // Always show the tile when the flashlight is or was recently on. This is needed because
         // the camera is not available while it is being used for the flashlight.
-        state.visible = mWasLastOn != 0 || mFlashlightController.isAvailable();
+        state.visible = mWasLastOn != 0 || mFlashlightController.isAvailable() || state.value;
         state.label = mHost.getContext().getString(R.string.quick_settings_flashlight_label);
         state.iconId = state.value
                 ? R.drawable.ic_qs_flashlight_on : R.drawable.ic_qs_flashlight_off;
