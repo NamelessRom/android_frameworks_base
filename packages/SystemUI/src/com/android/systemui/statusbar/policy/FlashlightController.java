@@ -27,12 +27,18 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.PowerManager;
 import android.os.Process;
-import android.os.SystemProperties;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 
+import com.android.systemui.R;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -66,7 +72,22 @@ public class FlashlightController {
     private SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
 
+    private int mValueOn;
+    private int mValueOff;
+    private File mFlashDevice;
+    private FileWriter mFlashDeviceWriter;
+    private PowerManager.WakeLock mWakeLock;
+
     public FlashlightController(Context mContext) {
+        final String path = mContext.getResources().getString(R.string.flashDevice);
+        if (!TextUtils.isEmpty(path) && (mFlashDevice = new File(path)).exists()) {
+            mValueOff = mContext.getResources().getInteger(R.integer.flashValueOff);
+            mValueOn = mContext.getResources().getInteger(R.integer.flashValueOn);
+
+            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        }
+
         mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
         initialize();
     }
@@ -183,11 +204,44 @@ public class FlashlightController {
     }
 
     private void updateFlashlight(boolean forceDisable) {
-        try {
-            boolean enabled;
-            synchronized (this) {
-                enabled = mFlashlightEnabled && !forceDisable;
+        boolean enabled;
+        synchronized (this) {
+            enabled = mFlashlightEnabled && !forceDisable;
+        }
+
+        if (mFlashDevice != null) {
+            try {
+                if (mFlashDeviceWriter == null) {
+                    mFlashDeviceWriter = new FileWriter(mFlashDevice);
+                }
+
+                if (enabled) {
+                    mFlashDeviceWriter.write(String.valueOf(mValueOn));
+                    mFlashDeviceWriter.flush();
+                    if (!mWakeLock.isHeld()) {
+                        mWakeLock.acquire();
+                    }
+                } else {
+                    mFlashDeviceWriter.write(String.valueOf(mValueOff));
+                    mFlashDeviceWriter.flush();
+                    mFlashDeviceWriter.close();
+                    mFlashDeviceWriter = null;
+                    if (mWakeLock.isHeld()) {
+                        mWakeLock.release();
+                    }
+                }
+
+                // If no error occurs, we updated the light and can return, else fallback
+                return;
+            } catch (IOException ioe) {
+                Log.e(TAG, "Could not update flashlight via sysfs", ioe);
+                if (mWakeLock.isHeld()) {
+                    mWakeLock.release();
+                }
             }
+        }
+
+        try {
             if (enabled) {
                 if (mCameraDevice == null) {
                     startDevice();
