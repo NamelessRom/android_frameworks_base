@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
+import android.app.INotificationManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -1731,7 +1732,18 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     private boolean shouldShowOnKeyguard(StatusBarNotification sbn) {
-        return mShowLockscreenNotifications && !mNotificationData.isAmbient(sbn.getKey());
+        boolean mayShowOnKeyguard = true;
+        try {
+            mayShowOnKeyguard = INotificationManager.Stub.asInterface(ServiceManager.getService(Context.NOTIFICATION_SERVICE)).
+                areLockscreenNotificationsEnabledForPackage(sbn.getPackageName(), sbn.getUid());
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error calling NoMan", e);
+        }
+        if (DEBUG) {
+            Log.d(TAG, String.format("shouldShowOnKeyguard: %s (uid: %d) may show: %b",
+                                     sbn.getPackageName(), sbn.getUid(), mayShowOnKeyguard));
+        }
+        return mShowLockscreenNotifications && mayShowOnKeyguard && !mNotificationData.isAmbient(sbn.getKey());
     }
 
     protected void setZenMode(int mode) {

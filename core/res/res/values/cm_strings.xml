@@ -138,6 +138,7 @@
     <string name="app_ops_mute_unmute_microphone">mute/unmute the microphone</string>
     <string name="app_ops_play_audio">play audio</string>
     <string name="app_ops_post_notification">post a notification</string>
+    <string name="app_ops_post_lockscreen_notification">post a notification on the lockscreen</string>
     <string name="app_ops_project_media">project media</string>
     <string name="app_ops_read_calendar">read your calendar</string>
     <string name="app_ops_read_call_log">read the call log</string>
