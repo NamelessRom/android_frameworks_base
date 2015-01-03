@@ -251,7 +251,9 @@ public class AppOpsManager {
     /** @hide */
     public static final int OP_SU = 61;
     /** @hide */
-    public static final int _NUM_OP = 62;
+    public static final int OP_POST_LOCKSCREEN_NOTIFICATION = 62;
+    /** @hide */
+    public static final int _NUM_OP = 63;
 
     /** Access to coarse location information. */
     public static final String OPSTR_COARSE_LOCATION =
@@ -384,6 +386,8 @@ public class AppOpsManager {
             "android:alarm_wakeup";
     private static final String OPSTR_SU =
             "android:su";
+    private static final String OPSTR_POST_LOCKSCREEN_NOTIFICATION =
+            "android:post_lockscreen_notification";
 
     /**
      * This maps each operation to the operation that serves as the
@@ -455,7 +459,8 @@ public class AppOpsManager {
             OP_DELETE_CALL_LOG,
             OP_DATA_CONNECT_CHANGE,
             OP_ALARM_WAKEUP,
-            OP_SU
+            OP_SU,
+            OP_POST_LOCKSCREEN_NOTIFICATION,
     };
 
     /**
@@ -525,6 +530,7 @@ public class AppOpsManager {
             null,
             null,
             OPSTR_SU,
+            null,
     };
 
     /**
@@ -594,6 +600,7 @@ public class AppOpsManager {
         OPSTR_DATA_CONNECT_CHANGE,
         OPSTR_ALARM_WAKEUP,
         OPSTR_SU,
+        OPSTR_POST_LOCKSCREEN_NOTIFICATION,
     };
 
     /**
@@ -663,6 +670,7 @@ public class AppOpsManager {
             "DATA_CONNECT_CHANGE",
             "ALARM_WAKEUP",
             "SU",
+            "POST_LOCKSCREEN_NOTIFICATION",
     };
 
     /**
@@ -732,6 +740,7 @@ public class AppOpsManager {
             android.Manifest.permission.MODIFY_PHONE_STATE,
             null, // OP_ALARM_WAKEUP
             null,
+            null, // OP_POST_LOCKSCREEN_NOTIFICATION
     };
 
     /**
@@ -802,6 +811,7 @@ public class AppOpsManager {
             null, //DATA_CONNECT_CHANGE
             null, //ALARM_WAKEUP
             UserManager.DISALLOW_SU, //SU TODO: this should really be investigated.
+            null, // OP_POST_LOCKSCREEN_NOTIFICATION
     };
 
     /**
@@ -871,6 +881,7 @@ public class AppOpsManager {
             false, //DATA_CONNECT_CHANGE
             true, //ALARM_WAKEUP
             false, //SU
+            false, // OP_POST_LOCKSCREEN_NOTIFICATION
     };
 
     /**
@@ -939,6 +950,7 @@ public class AppOpsManager {
             AppOpsManager.MODE_ALLOWED,
             AppOpsManager.MODE_ALLOWED, // OP_ALARM_WAKEUP
             AppOpsManager.MODE_ASK, // OP_SU
+            AppOpsManager.MODE_ALLOWED,
     };
 
     /**
@@ -1008,6 +1020,7 @@ public class AppOpsManager {
             AppOpsManager.MODE_ASK,     // OP_DATA_CONNECT_CHANGE
             AppOpsManager.MODE_ALLOWED, // OP_ALARM_WAKEUP
             AppOpsManager.MODE_ASK,     // OP_SU
+            AppOpsManager.MODE_ALLOWED, // OP_POST_LOCKSCREEN_NOTIFICATION
     };
 
     /**
@@ -1076,6 +1089,7 @@ public class AppOpsManager {
         true,     // OP_DATA_CONNECT_CHANGE
         false,    // OP_ALARM_WAKEUP
         true,     // OP_SU
+        false,    // OP_POST_LOCKSCREEN_NOTIFICATION
     };
 
     /**
@@ -1148,6 +1162,7 @@ public class AppOpsManager {
             false,     // OP_DATA_CONNECT_CHANGE
             false,     // OP_ALARM_WAKEUP
             false,     // OP_SU
+            false,     // OP_POST_LOCKSCREEN_NOTIFICATION
     };
 
     private static HashMap<String, Integer> sOpStrToOp = new HashMap<String, Integer>();

@@ -88,6 +88,7 @@ limitations under the License.
         <item>@string/app_ops_toggle_mobile_data</item>
         <item>@string/app_ops_alarm_wakeup</item>
         <item>@string/app_ops_su</item>
+        <item>@string/app_ops_post_lockscreen_notification</item>
     </string-array>
 
 </resources>

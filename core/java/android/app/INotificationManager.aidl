@@ -45,6 +45,9 @@ interface INotificationManager
     void setNotificationsEnabledForPackage(String pkg, int uid, boolean enabled);
     boolean areNotificationsEnabledForPackage(String pkg, int uid);
 
+    void setLockscreenNotificationsEnabledForPackage(String pkg, int uid, boolean enabled);
+    boolean areLockscreenNotificationsEnabledForPackage(String pkg, int uid);
+
     void setPackagePriority(String pkg, int uid, int priority);
     int getPackagePriority(String pkg, int uid);
 
