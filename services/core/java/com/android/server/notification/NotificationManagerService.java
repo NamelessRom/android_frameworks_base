@@ -1059,6 +1059,13 @@ public class NotificationManagerService extends SystemService {
         }
     }
 
+    void setLockscreenNotificationsEnabledForPackageImpl(String pkg, int uid, boolean enabled) {
+        Slog.v(TAG, (enabled?"en":"dis") + "abling lockscreen notifications for " + pkg);
+
+        mAppOps.setMode(AppOpsManager.OP_POST_LOCKSCREEN_NOTIFICATION, uid, pkg,
+                enabled ? AppOpsManager.MODE_ALLOWED : AppOpsManager.MODE_IGNORED);
+    }
+
     private void updateListenerHintsLocked() {
         final int hints = mListenersDisablingEffects.isEmpty() ? 0 : HINT_HOST_DISABLE_EFFECTS;
         if (hints == mListenerHints) return;
@@ -1221,6 +1228,13 @@ public class NotificationManagerService extends SystemService {
             setNotificationsEnabledForPackageImpl(pkg, uid, enabled);
         }
 
+        @Override
+        public void setLockscreenNotificationsEnabledForPackage(String pkg, int uid, boolean enabled) {
+            checkCallerIsSystem();
+
+            setLockscreenNotificationsEnabledForPackageImpl(pkg, uid, enabled);
+        }
+
         /**
          * Use this when you just want to know if notifications are OK for this package.
          */
@@ -1228,6 +1242,12 @@ public class NotificationManagerService extends SystemService {
         public boolean areNotificationsEnabledForPackage(String pkg, int uid) {
             checkCallerIsSystem();
             return (mAppOps.checkOpNoThrow(AppOpsManager.OP_POST_NOTIFICATION, uid, pkg)
+                    == AppOpsManager.MODE_ALLOWED);
+        }
+
+        @Override
+        public boolean areLockscreenNotificationsEnabledForPackage(String pkg, int uid) {
+            return (mAppOps.checkOpNoThrow(AppOpsManager.OP_POST_LOCKSCREEN_NOTIFICATION, uid, pkg)
                     == AppOpsManager.MODE_ALLOWED);
         }
 

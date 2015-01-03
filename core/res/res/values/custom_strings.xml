@@ -15,4 +15,5 @@
      limitations under the License.
 -->
 <resources>
+    <string name="app_ops_post_lockscreen_notification">post a notification on the lockscreen</string>
 </resources>
