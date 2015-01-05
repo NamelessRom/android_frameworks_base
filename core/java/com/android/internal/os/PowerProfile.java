@@ -169,7 +169,7 @@ public class PowerProfile {
     }
 
     private void readPowerValuesFromXml(Context context) {
-        int id = com.android.internal.R.xml.power_profile;
+        int id = getPowerProfileResId(context);
         XmlResourceParser parser = context.getResources().getXml(id);
         boolean parsingArray = false;
         ArrayList<Double> array = new ArrayList<Double>();
@@ -221,6 +221,28 @@ public class PowerProfile {
         } finally {
             parser.close();
         }
+    }
+
+    private int getPowerProfileResId(final Context context) {
+        int id = com.android.internal.R.xml.power_profile;
+        /*
+         * If ro.power_profile.override is set, use it to override the default.
+         * This is used for devices, which need to dynamically define the power profile.
+         */
+        String powerProfileOverride = SystemProperties.get("ro.power_profile.override");
+        if (!powerProfileOverride.isEmpty()) {
+            int tmpId = resources.getIdentifier(powerProfileOverride, "xml",
+                                                 context.getPackageName());
+            if(tmpId > 0) {
+                Slog.i(TAG, "getPowerProfileResId: using power profile "
+                       + powerProfileOverride);
+                id = tmpId;
+            } else {
+                Slog.e(TAG, "getPowerProfileResId: could not retrieve power profile "
+                       + powerProfileOverride + " using default instead");
+            }
+        }
+        return id;
     }
 
     /**
