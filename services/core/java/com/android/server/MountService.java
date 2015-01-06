@@ -1385,15 +1385,13 @@ class MountService extends IMountService.Stub
          */
         String storageListOverride = SystemProperties.get("ro.storage_list.override");
         if (!storageListOverride.isEmpty()) {
-            int tmp_id = resources.getIdentifier(storageListOverride, "xml",
-                                                 mContext.getPackageName());
-            if(tmp_id > 0) {
-                Slog.i(TAG, "readStorageListLocked: using storage list "
-                       + storageListOverride);
-                id = tmp_id;
+            int tmpId = resources.getIdentifier(storageListOverride, "xml", "android");
+            if(tmpId > 0) {
+                Slog.i(TAG, "readStorageListLocked: using storage list \"" + storageListOverride + "\"");
+                id = tmpId;
             } else {
-                Slog.e(TAG, "readStorageListLocked: could not retrieve storage list "
-                       + storageListOverride + " using default instead");
+                Slog.e(TAG, "readStorageListLocked: could not retrieve storage list \""
+                       + storageListOverride + "\", using default instead");
             }
         }
         XmlResourceParser parser = resources.getXml(id);
