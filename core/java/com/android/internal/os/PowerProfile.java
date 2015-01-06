@@ -235,14 +235,14 @@ public class PowerProfile {
         String powerProfileOverride = SystemProperties.get("ro.power_profile.override");
         if (!powerProfileOverride.isEmpty()) {
             int tmpId = context.getResources().getIdentifier(powerProfileOverride, "xml",
-                                                 context.getPackageName());
+                                                 "android");
             if(tmpId > 0) {
-                Slog.i(TAG, "getPowerProfileResId: using power profile "
-                       + powerProfileOverride);
+                Slog.i(TAG, "getPowerProfileResId: using power profile \""
+                       + powerProfileOverride + "\"");
                 id = tmpId;
             } else {
-                Slog.e(TAG, "getPowerProfileResId: could not retrieve power profile "
-                       + powerProfileOverride + " using default instead");
+                Slog.e(TAG, "getPowerProfileResId: could not retrieve power profile \""
+                       + powerProfileOverride + "\", using default instead");
             }
         }
         return id;
