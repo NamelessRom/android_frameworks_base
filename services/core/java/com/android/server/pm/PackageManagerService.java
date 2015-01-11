@@ -4942,13 +4942,11 @@ public class PackageManagerService extends IPackageManager.Stub {
         if (DEBUG_DEXOPT) {
             Log.i(TAG, "Optimizing app " + curr + " of " + total + ": " + pkg.packageName);
         }
-        if (!isFirstBoot()) {
-            final String bootMsg = String.format("%s\n(%s)", mContext.getResources()
-                    .getString(R.string.android_upgrading_apk, curr, total), pkg.packageName);
-            try {
-                ActivityManagerNative.getDefault().showBootMessage(bootMsg, true);
-            } catch (RemoteException e) {
-            }
+        final String bootMsg = String.format("%s\n(%s)", mContext.getResources()
+                .getString(R.string.android_upgrading_apk, curr, total), pkg.packageName);
+        try {
+            ActivityManagerNative.getDefault().showBootMessage(bootMsg, true);
+        } catch (RemoteException e) {
         }
         PackageParser.Package p = pkg;
         synchronized (mInstallLock) {
