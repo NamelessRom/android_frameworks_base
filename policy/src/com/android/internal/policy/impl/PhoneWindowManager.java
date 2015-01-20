@@ -6134,8 +6134,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     /** {@inheritDoc} */
     @Override
     public void showBootMessage(final CharSequence msg, final boolean always) {
-        final int titleRes = mContext.getResources().getString(
-                    com.android.internal.R.string.android_installing_apk).equals(msg) ?
+        final String installingMsg = mContext.getResources().getString(
+                      com.android.internal.R.string.android_installing_apk);
+        final int titleRes = (msg != null && msq.contains(installingMsg)) ?
                       R.string.android_installing_title :
                       R.string.android_upgrading_title;
 
