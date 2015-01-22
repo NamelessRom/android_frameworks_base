@@ -46,6 +46,7 @@ import com.android.systemui.qs.tiles.FlashlightTile;
 import com.android.systemui.qs.tiles.HotspotTile;
 import com.android.systemui.qs.tiles.IntentTile;
 import com.android.systemui.qs.tiles.LocationTile;
+import com.android.systemui.qs.tiles.NfcTile;
 import com.android.systemui.qs.tiles.NotificationsTile;
 import com.android.systemui.qs.tiles.ProfilesTile;
 import com.android.systemui.qs.tiles.RoamingTile;
@@ -306,6 +307,8 @@ public class QSTileHost implements QSTile.Host {
                 return new ProfilesTile(this);
             case QSConstants.TILE_ADB_NETWORK:
                 return new AdbOverNetworkTile(this);
+            case QSConstants.TILE_NFC:
+                return new NfcTile(this);
             default:
                 throw new IllegalArgumentException("Bad tile spec: " + tileSpec);
         }
