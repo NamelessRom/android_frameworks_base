@@ -221,7 +221,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/effects/ogg/WirelessChargingStarted.ogg:system/media/audio/ui/WirelessChargingStarted.ogg \
     $(LOCAL_PATH)/effects/ogg/camera_click_48k.ogg:system/media/audio/ui/camera_click.ogg \
     $(LOCAL_PATH)/effects/ogg/camera_focus.ogg:system/media/audio/ui/camera_focus.ogg \
-    $(LOCAL_PATH)/ringtones/material/ogg/Atria.ogg:system/media/audio/ringtones/Atria.ogg \
+    $(LOCAL_PATH)/alarms/material/ogg/Timer.ogg:system/media/audio/alarms/Timer.ogg \
     $(LOCAL_PATH)/ringtones/material/ogg/Callisto.ogg:system/media/audio/ringtones/Callisto.ogg \
     $(LOCAL_PATH)/ringtones/material/ogg/Dione.ogg:system/media/audio/ringtones/Dione.ogg \
     $(LOCAL_PATH)/ringtones/material/ogg/Ganymede.ogg:system/media/audio/ringtones/Ganymede.ogg \
@@ -244,5 +244,3 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/notifications/material/ogg/Salacia.ogg:system/media/audio/notifications/Salacia.ogg \
     $(LOCAL_PATH)/notifications/material/ogg/Tethys.ogg:system/media/audio/notifications/Tethys.ogg \
     $(LOCAL_PATH)/notifications/material/ogg/Titan.ogg:system/media/audio/notifications/Titan.ogg \
-
-    
