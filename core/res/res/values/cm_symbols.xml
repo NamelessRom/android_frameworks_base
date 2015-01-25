@@ -59,7 +59,7 @@
     <java-symbol type="string" name="stk_cc_ussd_to_ss" />
     <java-symbol type="string" name="stk_cc_ussd_to_ussd" />
 
-    <java-symbol type="drawable" name="cm_platlogo" />
+    <!--<java-symbol type="drawable" name="cm_platlogo" />-->
 
     <java-symbol type="layout" name="permission_confirmation_dialog" />
 
@@ -213,16 +213,16 @@
     <java-symbol type="anim" name="last_app_out" />
 
     <!-- Performance Profiles -->
-    <java-symbol type="string" name="config_perf_profile_prop" />
+    <!--<java-symbol type="string" name="config_perf_profile_prop" />
     <java-symbol type="string" name="config_perf_profile_default_entry" />
     <java-symbol type="array" name="perf_profile_entries" />
     <java-symbol type="array" name="perf_profile_values" />
     <java-symbol type="string" name="perf_profile_pwrsv" />
     <java-symbol type="string" name="perf_profile_bal" />
-    <java-symbol type="string" name="perf_profile_perf" />
+    <java-symbol type="string" name="perf_profile_perf" />-->
 
     <!-- Array of default activities with custom power management -->
-    <java-symbol type="array" name="config_auto_perf_activities" />
+    <!--<java-symbol type="array" name="config_auto_perf_activities" />-->
 
     <!-- Power menu -->
     <java-symbol type="drawable" name="ic_lock_screenshot" />
