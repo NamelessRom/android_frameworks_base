@@ -181,6 +181,7 @@ public class StaticIpConfiguration implements Parcelable {
         for (InetAddress dnsServer : dnsServers) {
             NetworkUtils.parcelInetAddress(dest, dnsServer, flags);
         }
+        dest.writeString(domains);
     }
 
     protected static void readFromParcel(StaticIpConfiguration s, Parcel in) {
@@ -191,5 +192,6 @@ public class StaticIpConfiguration implements Parcelable {
         for (int i = 0; i < size; i++) {
             s.dnsServers.add(NetworkUtils.unparcelInetAddress(in));
         }
+        s.domains = in.readString();
     }
 }
