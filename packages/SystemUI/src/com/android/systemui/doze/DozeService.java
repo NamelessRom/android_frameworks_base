@@ -56,15 +56,20 @@ public class DozeService extends DreamService {
     private static final String NOTIFICATION_PULSE_ACTION = ACTION_BASE + ".notification_pulse";
     private static final String EXTRA_INSTANCE = "instance";
 
+    private static final int _DATA_Z = 2;
+
     private final String mTag = String.format(TAG + ".%08x", hashCode());
     private final Context mContext = this;
     private final DozeParameters mDozeParameters = new DozeParameters(mContext);
     private final Handler mHandler = new Handler();
-
     private DozeHost mHost;
     private SensorManager mSensors;
     private TriggerSensor mSigMotionSensor;
     private TriggerSensor mPickupSensor;
+    private Sensor mProximitySensor;
+    private boolean mProximityRegistered = false;
+    private Sensor mAccelerometerSensor;
+    private boolean mAccelerometerRegistered = false;
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
     private AlarmManager mAlarmManager;
@@ -72,6 +77,7 @@ public class DozeService extends DreamService {
     private boolean mDreaming;
     private boolean mPulsing;
     private boolean mBroadcastReceiverRegistered;
+    private boolean mScreenBroadcastReceiverRegistered = false;
     private boolean mDisplayStateSupported;
     private boolean mNotificationLightOn;
     private boolean mPowerSaveActive;
@@ -94,6 +100,8 @@ public class DozeService extends DreamService {
         pw.print("  mBroadcastReceiverRegistered: "); pw.println(mBroadcastReceiverRegistered);
         pw.print("  mSigMotionSensor: "); pw.println(mSigMotionSensor);
         pw.print("  mPickupSensor:"); pw.println(mPickupSensor);
+        pw.print("  mProximitySensor:"); pw.println(mProximitySensor);
+        pw.print("  mAccelerometerSensor:"); pw.println(mAccelerometerSensor);
         pw.print("  mDisplayStateSupported: "); pw.println(mDisplayStateSupported);
         pw.print("  mNotificationLightOn: "); pw.println(mNotificationLightOn);
         pw.print("  mPowerSaveActive: "); pw.println(mPowerSaveActive);
@@ -121,12 +129,15 @@ public class DozeService extends DreamService {
                 mDozeParameters.getPulseOnSigMotion(), mDozeParameters.getVibrateOnSigMotion());
         mPickupSensor = new TriggerSensor(Sensor.TYPE_PICK_UP_GESTURE,
                 mDozeParameters.getPulseOnPickup(), mDozeParameters.getVibrateOnPickup());
+	mProximitySensor = mSensors.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+	mAccelerometerSensor = mSensors.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, mTag);
         mWakeLock.setReferenceCounted(true);
         mAlarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         mDisplayStateSupported = mDozeParameters.getDisplayStateSupported();
         mUiModeManager = (UiModeManager) mContext.getSystemService(Context.UI_MODE_SERVICE);
+	registerSensorListener();
         turnDisplayOff();
     }
 
@@ -238,6 +249,26 @@ public class DozeService extends DreamService {
         }
     }
 
+    private void extraSensorRequestPulse() {
+	mWakeLock.acquire();
+        try {
+            requestPulse();
+            // reset the notification pulse schedule, but only if we think we were not triggered
+            // by a notification-related vibration
+            final long timeSinceNotification = System.currentTimeMillis()
+                - mNotificationPulseTime;
+            final boolean withinVibrationThreshold =
+                timeSinceNotification < mDozeParameters.getPickupVibrationThreshold();
+            if (withinVibrationThreshold) {
+                if (DEBUG) Log.d(mTag, "Not resetting schedule, recent notification");
+            } else {
+                resetNotificationResets();
+            }
+	} finally {
+            mWakeLock.release();
+        }
+    }
+
     private void turnDisplayOff() {
         if (DEBUG) Log.d(mTag, "Display off");
         setDozeScreenState(Display.STATE_OFF);
@@ -267,6 +298,14 @@ public class DozeService extends DreamService {
     }
 
     private void listenForBroadcasts(boolean listen) {
+	if (!mScreenBroadcastReceiverRegistered) {
+            final IntentFilter screenfilter = new IntentFilter();
+            screenfilter.addAction(Intent.ACTION_SCREEN_ON);
+            screenfilter.addAction(Intent.ACTION_SCREEN_OFF);
+            mContext.registerReceiver(mScreenBroadcastReceiver, screenfilter);
+	    mScreenBroadcastReceiverRegistered = true;
+	}
+
         if (listen) {
             final IntentFilter filter = new IntentFilter(PULSE_ACTION);
             filter.addAction(NOTIFICATION_PULSE_ACTION);
@@ -365,6 +404,31 @@ public class DozeService extends DreamService {
         return sb.append(']').toString();
     }
 
+    private SensorEventListener mSensorListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.equals(mProximitySensor)) {
+            float value = event.values[0];
+                if (value >= mProximitySensor.getMaximumRange()) {
+		    extraSensorRequestPulse();
+		    registerSensorListener();
+                } else {
+		    unregisterSensorListener(false);
+		}
+            } else if (event.sensor.equals(mAccelerometerSensor)) {
+	    float[] values = event.values;
+	    float Z = -values[_DATA_Z];
+		if (Z >= 2) {
+		    extraSensorRequestPulse();
+		}
+	    }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
+
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -384,6 +448,20 @@ public class DozeService extends DreamService {
                 if (mCarMode && mDreaming) {
                     finishForCarMode();
                 }
+            }
+        }
+    };
+
+    private final BroadcastReceiver mScreenBroadcastReceiver = new BroadcastReceiver() {
+	private String action = null;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+	    action = intent.getAction();
+            if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                unregisterSensorListener(true);
+            }
+            if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                registerSensorListener();
             }
         }
     };
@@ -419,6 +497,34 @@ public class DozeService extends DreamService {
             }
         }
     };
+
+    private void registerSensorListener() {
+	Log.d(mTag, "registering extra sensors for doze");
+        if (mProximitySensor != null && !mProximityRegistered) {
+	    mProximityRegistered = true;
+            mSensors.registerListener(mSensorListener, mProximitySensor, SensorManager.SENSOR_DELAY_UI);
+	    Log.d(mTag, "registered proximity for doze");
+	}
+        if (mAccelerometerSensor != null && !mAccelerometerRegistered) {
+	    mAccelerometerRegistered = true;
+            mSensors.registerListener(mSensorListener, mAccelerometerSensor, SensorManager.SENSOR_DELAY_UI);
+	    Log.d(mTag, "registered accelerometer for doze");
+	}
+    }
+
+    private void unregisterSensorListener(boolean unregisterall) {
+	Log.d(mTag, "un-registering extra sensors for doze");
+        if (mProximitySensor != null && mProximityRegistered && unregisterall) {
+            mSensors.unregisterListener(mSensorListener, mProximitySensor);
+	    mProximityRegistered = false;
+	    Log.d(mTag, "un-registered proximity for doze");
+	}
+        if (mAccelerometerSensor != null && mAccelerometerRegistered) {
+            mSensors.unregisterListener(mSensorListener, mAccelerometerSensor);
+	    mAccelerometerRegistered = false;
+	    Log.d(mTag, "un-registered accelerometer for doze");
+	}
+    }
 
     private class TriggerSensor extends TriggerEventListener {
         private final Sensor mSensor;
