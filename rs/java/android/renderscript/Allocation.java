@@ -77,6 +77,8 @@ public class Allocation extends BaseObj {
             new HashMap<Long, Allocation>();
     OnBufferAvailableListener mBufferNotifier;
 
+    private Surface mGetSurfaceSurface = null;
+
     private Element.DataType validateObjectIsPrimitiveArray(Object d, boolean checkType) {
         final Class c = d.getClass();
         if (!c.isArray()) {
@@ -1555,7 +1557,12 @@ public class Allocation extends BaseObj {
         if ((mUsage & USAGE_IO_INPUT) == 0) {
             throw new RSInvalidStateException("Allocation is not a surface texture.");
         }
-        return mRS.nAllocationGetSurface(getID(mRS));
+
+        if (mGetSurfaceSurface == null) {
+            mGetSurfaceSurface = mRS.nAllocationGetSurface(getID(mRS));
+        }
+
+        return mGetSurfaceSurface;
     }
 
     /**
