@@ -190,6 +190,9 @@
                 android:excludeFromRecents="true">
         </activity>
 
+        <activity android:name=".nameless.powermenu.PowerMenuActivity"
+            android:excludeFromRecents="true" />
+
         <activity android:name=".recent.RecentsActivity"
                 android:label="@string/accessibility_desc_recent_apps"
                 android:theme="@style/RecentsStyle"

@@ -1195,6 +1195,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     void showGlobalActionsInternal() {
         sendCloseSystemWindows(SYSTEM_DIALOG_REASON_GLOBAL_ACTIONS);
+
+        // If we fail showing the new power menu, default to the old one, just in case
+        if (showAwesomePowerMenu()) {
+            return;
+        }
+
         if (mGlobalActions == null) {
             mGlobalActions = new GlobalActions(mContext, mWindowManagerFuncs);
         }
@@ -1205,6 +1211,21 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // poke the wake lock so they have some time to see the dialog.
             mPowerManager.userActivity(SystemClock.uptimeMillis(), false);
         }
+    }
+
+    boolean showAwesomePowerMenu() {
+        final Intent intent = new Intent();
+        intent.setClassName("com.android.systemui",
+                "com.android.systemui.nameless.powermenu.PowerMenuActivity");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION
+                | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        try {
+            mContext.startActivity(intent);
+        } catch (Exception exc) {
+            Log.e(TAG, "Could not start new power menu, defaulting to old one", exc);
+            return false;
+        }
+        return true;
     }
 
     boolean isDeviceProvisioned() {
