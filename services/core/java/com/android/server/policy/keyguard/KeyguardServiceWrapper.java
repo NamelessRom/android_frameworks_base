@@ -17,6 +17,7 @@
 package com.android.server.policy.keyguard;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -240,6 +241,14 @@ public class KeyguardServiceWrapper implements IKeyguardService {
 
     public boolean isInputRestricted() {
         return mKeyguardStateMonitor.isInputRestricted();
+    }
+
+    public void setBackgroundBitmap(Bitmap bmp) {
+        try {
+            mService.setBackgroundBitmap(bmp);
+        } catch (RemoteException e) {
+            Slog.w(TAG, "Remote Exception", e);
+        }
     }
 
     public void dump(String prefix, PrintWriter pw) {

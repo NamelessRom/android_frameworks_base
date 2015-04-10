@@ -15,17 +15,6 @@
      limitations under the License.
 -->
 <resources>
-    <!-- We don't want to publish private symbols in namelessrom.R as part of the
-         SDK.  Instead, put them here. -->
-    <private-symbols package="com.android.internal" />
-
     <!-- Use alternative way to blur lockscreen -->
-    <java-symbol type="bool" name="config_use_stackblur" />
-
-    <!-- Network traffic indicator -->
-    <java-symbol type="dimen" name="net_traffic_single_text_size" />
-    <java-symbol type="dimen" name="net_traffic_multi_text_size" />
-    <java-symbol type="drawable" name="stat_sys_network_traffic_down" />
-    <java-symbol type="drawable" name="stat_sys_network_traffic_up" />
-    <java-symbol type="drawable" name="stat_sys_network_traffic_updown" />
+    <bool name="config_use_stackblur">false</bool>
 </resources>
