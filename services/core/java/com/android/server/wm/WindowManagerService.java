@@ -33,7 +33,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.CompatibilityInfo;
 import android.content.res.Configuration;
-import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -131,6 +130,8 @@ import com.android.server.am.BatteryStatsService;
 import com.android.server.input.InputManagerService;
 import com.android.server.policy.PhoneWindowManager;
 import com.android.server.power.ShutdownThread;
+import com.android.systemui.cm.UserContentObserver;
+import namelessrom.providers.NamelessSettings;
 
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -576,7 +577,7 @@ public class WindowManagerService extends IWindowManager.Stub
     OnHardKeyboardStatusChangeListener mHardKeyboardStatusChangeListener;
     SettingsObserver mSettingsObserver;
 
-    private final class SettingsObserver extends ContentObserver {
+    private final class SettingsObserver extends UserContentObserver {
         private final Uri mShowImeWithHardKeyboardUri =
                 Settings.Secure.getUriFor(Settings.Secure.SHOW_IME_WITH_HARD_KEYBOARD);
 
@@ -590,6 +591,9 @@ public class WindowManagerService extends IWindowManager.Stub
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(mDisplayInversionEnabledUri, false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(NamelessSettings.System.getUriFor(
+                    NamelessSettings.System.LOCKSCREEN_SEE_THROUGH), false, this,
+                    UserHandle.USER_ALL);
         }
 
         @Override
@@ -599,6 +603,13 @@ public class WindowManagerService extends IWindowManager.Stub
             } else if (mDisplayInversionEnabledUri.equals(uri)) {
                 updateCircularDisplayMaskIfNeeded();
             }
+        }
+
+        @Override
+        protected void update() {
+            WindowAnimator.sSeeThroughEnabled = NamelessSettings.System.getBoolean(
+                    mContext.getContentResolver(),
+                    NamelessSettings.System.LOCKSCREEN_SEE_THROUGH, false);
         }
     }
 
