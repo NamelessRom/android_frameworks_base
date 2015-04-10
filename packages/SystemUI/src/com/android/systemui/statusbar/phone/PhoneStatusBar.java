@@ -16,7 +16,6 @@
 
 package com.android.systemui.statusbar.phone;
 
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.NonNull;
@@ -189,6 +188,7 @@ import com.android.systemui.volume.VolumeComponent;
 import cyanogenmod.app.CMContextConstants;
 import cyanogenmod.app.CustomTileListenerService;
 import cyanogenmod.app.StatusBarPanelCustomTile;
+import org.namelessrom.internal.utils.Blur;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -216,6 +216,7 @@ import static com.android.systemui.statusbar.phone.BarTransitions.MODE_WARNING;
 
 import cyanogenmod.providers.CMSettings;
 import cyanogenmod.themes.IThemeService;
+import namelessrom.providers.NamelessSettings;
 
 public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         DragDownHelper.DragDownCallback, ActivityStarter, OnUnlockMethodChangedListener,
@@ -442,6 +443,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     // - The custom Recents Long Press, if selected.  When null, use default (switch last app).
     private ComponentName mCustomRecentsLongPressHandler = null;
 
+    private int mBlurRadius;
+    private Bitmap mBlurredImage = null;
+
     class SettingsObserver extends UserContentObserver {
         SettingsObserver(Handler handler) {
             super(handler);
@@ -461,6 +465,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     CMSettings.System.NAVBAR_LEFT_IN_LANDSCAPE), false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(CMSettings.System.getUriFor(
                     CMSettings.Secure.RECENTS_LONG_PRESS_ACTIVITY), false, this);
+            resolver.registerContentObserver(NamelessSettings.System.getUriFor(
+                    NamelessSettings.System.LOCKSCREEN_BLUR_RADIUS), false, this,
+                    UserHandle.USER_ALL);
             update();
         }
 
@@ -491,6 +498,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
             // This method reads CMSettings.Secure.RECENTS_LONG_PRESS_ACTIVITY
             updateCustomRecentsLongPressHandler(false);
+
+            mBlurRadius = NamelessSettings.System.getIntForUser(mContext.getContentResolver(),
+                    NamelessSettings.System.LOCKSCREEN_BLUR_RADIUS, 14, UserHandle.USER_CURRENT);
         }
     }
 
@@ -2215,6 +2225,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     && mMediaController.getPlaybackState() != null
                     && mMediaController.getPlaybackState().getState()
                             == PlaybackState.STATE_PLAYING);
+        }
+
+        // apply blurred image
+        if (backdropBitmap == null && !mLiveLockScreenController.isShowingLiveLockScreenView()) {
+            backdropBitmap = mBlurredImage;
+            // might still be null
         }
 
         // apply user lockscreen image
@@ -5373,6 +5389,25 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 || mFingerprintUnlockController.getMode()
                         == FingerprintUnlockController.MODE_WAKE_AND_UNLOCK_PULSING;
         updateDozingState();
+    }
+
+    public void setBackgroundBitmap(Bitmap bmp) {
+        if (bmp == null && mBlurredImage == null) {
+            return;
+        }
+
+        if (bmp != null && mBlurRadius != 0) {
+            mBlurredImage = Blur.blurBitmap(mContext, bmp, mBlurRadius);
+        } else {
+            mBlurredImage = bmp;
+        }
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                updateMediaMetaData(true);
+            }
+        });
     }
 
     public VisualizerView getVisualizer() {
