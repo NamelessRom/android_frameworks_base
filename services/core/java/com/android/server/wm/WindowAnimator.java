@@ -110,6 +110,8 @@ public class WindowAnimator {
     static final int KEYGUARD_ANIMATING_OUT = 2;
     int mForceHiding = KEYGUARD_NOT_SHOWN;
 
+    static boolean sSeeThroughEnabled;
+
     private String forceHidingToString() {
         switch (mForceHiding) {
             case KEYGUARD_NOT_SHOWN:    return "KEYGUARD_NOT_SHOWN";
@@ -240,7 +242,7 @@ public class WindowAnimator {
         // If a keyguard panel is currently being shown, we should
         // continue to hide the windows as if blur is disabled.
         if (winKeyguardPanel == null) {
-            keyguardOn &= !mKeyguardBlurEnabled;
+            keyguardOn &= (!mKeyguardBlurEnabled && !sSeeThroughEnabled);
         }
         return keyguardOn && !allowWhenLocked && (win.getDisplayId() == Display.DEFAULT_DISPLAY);
     }
@@ -250,7 +252,7 @@ public class WindowAnimator {
 
         final WindowList windows = mService.getWindowListLocked(displayId);
 
-        if (mKeyguardGoingAway && !mKeyguardBlurEnabled) {
+        if (mKeyguardGoingAway && !mKeyguardBlurEnabled && !sSeeThroughEnabled) {
             for (int i = windows.size() - 1; i >= 0; i--) {
                 WindowState win = windows.get(i);
                 if (!mPolicy.isKeyguardHostWindow(win.mAttrs)) {
@@ -264,8 +266,7 @@ public class WindowAnimator {
 
                         // Create a new animation to delay until keyguard is gone on its own.
                         winAnimator.mAnimation = new AlphaAnimation(1.0f, 1.0f);
-                        winAnimator.mAnimation.setDuration(
-                                mKeyguardBlurEnabled ? 0 : KEYGUARD_ANIM_TIMEOUT_MS);
+                        winAnimator.mAnimation.setDuration(KEYGUARD_ANIM_TIMEOUT_MS);
                         winAnimator.mAnimationIsEntrance = false;
                         winAnimator.mAnimationStartTime = -1;
                         winAnimator.mKeyguardGoingAwayAnimation = true;
@@ -355,7 +356,7 @@ public class WindowAnimator {
                         if (nowAnimating && win.mWinAnimator.mKeyguardGoingAwayAnimation) {
                             mForceHiding = KEYGUARD_ANIMATING_OUT;
                         } else {
-                            mForceHiding = win.isDrawnLw()  && !mKeyguardBlurEnabled ?
+                            mForceHiding = win.isDrawnLw()  && !mKeyguardBlurEnabled && !sSeeThroughEnabled ?
                                 KEYGUARD_SHOWN : KEYGUARD_NOT_SHOWN;
                         }
                     }
