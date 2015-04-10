@@ -131,6 +131,7 @@ import com.android.server.am.BatteryStatsService;
 import com.android.server.input.InputManagerService;
 import com.android.server.policy.PhoneWindowManager;
 import com.android.server.power.ShutdownThread;
+import namelessrom.providers.NamelessSettings;
 
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -590,6 +591,10 @@ public class WindowManagerService extends IWindowManager.Stub
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(mDisplayInversionEnabledUri, false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(NamelessSettings.System.getUriFor(
+                    NamelessSettings.System.LOCKSCREEN_SEE_THROUGH), false, this,
+                    UserHandle.USER_ALL);
+            update();
         }
 
         @Override
@@ -599,6 +604,13 @@ public class WindowManagerService extends IWindowManager.Stub
             } else if (mDisplayInversionEnabledUri.equals(uri)) {
                 updateCircularDisplayMaskIfNeeded();
             }
+            update();
+        }
+
+        private void update() {
+            WindowAnimator.sSeeThroughEnabled = NamelessSettings.System.getInt(
+                    mContext.getContentResolver(),
+                    NamelessSettings.System.LOCKSCREEN_SEE_THROUGH, 0) != 0;
         }
     }
 
