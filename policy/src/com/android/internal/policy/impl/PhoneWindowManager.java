@@ -890,14 +890,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LID_CONTROLS_SLEEP), false, this,
                     UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.POWER_CHORD_DELAY), false, this,
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.POWER_CHORD_DELAY), false, this,
                     UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.POWER_CHORD_ACTION_DOWN), false, this,
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.POWER_CHORD_ACTION_DOWN), false, this,
                     UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.POWER_CHORD_ACTION_UP), false, this,
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.POWER_CHORD_ACTION_UP), false, this,
                     UserHandle.USER_ALL);
 
             updateSettings();
@@ -1757,17 +1757,17 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private void updatePowerKeyChord() {
         final ContentResolver resolver = mContext.getContentResolver();
 
-        mChordDebounceDelayMillis = Settings.System.getLongForUser(resolver,
-                Settings.System.POWER_CHORD_DELAY, 250, UserHandle.USER_CURRENT);
+        mChordDebounceDelayMillis = Settings.Secure.getLongForUser(resolver,
+                Settings.Secure.POWER_CHORD_DELAY, 250, UserHandle.USER_CURRENT);
 
-        mVolumeDownAction = Settings.System.getStringForUser(resolver,
-                Settings.System.POWER_CHORD_ACTION_DOWN, UserHandle.USER_CURRENT);
+        mVolumeDownAction = Settings.Secure.getStringForUser(resolver,
+                Settings.Secure.POWER_CHORD_ACTION_DOWN, UserHandle.USER_CURRENT);
         if (TextUtils.isEmpty(mVolumeDownAction)) {
             mVolumeDownAction = ActionConstants.ActionConstant.ACTION_SCREENSHOT.value();
         }
 
-        mVolumeUpAction = Settings.System.getStringForUser(resolver,
-                Settings.System.POWER_CHORD_ACTION_UP, UserHandle.USER_CURRENT);
+        mVolumeUpAction = Settings.Secure.getStringForUser(resolver,
+                Settings.Secure.POWER_CHORD_ACTION_UP, UserHandle.USER_CURRENT);
         if (TextUtils.isEmpty(mVolumeUpAction)) {
             mVolumeUpAction = ActionConstants.ActionConstant.ACTION_SCREENRECORD.value();
         }
