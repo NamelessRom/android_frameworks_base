@@ -752,11 +752,11 @@ public final class PowerManagerService extends SystemService
                 Settings.System.HARDWARE_KEYS_DISABLE, 0, UserHandle.USER_CURRENT) == 1;
 
         if (!hardwareKeysDisable) {
-            mButtonTimeout = Settings.System.getIntForUser(resolver,
-                    Settings.System.BUTTON_BACKLIGHT_TIMEOUT,
+            mButtonTimeout = Settings.Secure.getIntForUser(resolver,
+                    Settings.Secure.BUTTON_BACKLIGHT_TIMEOUT,
                     DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
-            mButtonBrightness = Settings.System.getIntForUser(resolver,
-                    Settings.System.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
+            mButtonBrightness = Settings.Secure.getIntForUser(resolver,
+                    Settings.Secure.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
                     UserHandle.USER_CURRENT);
         } else {
             mButtonTimeout = 0;
