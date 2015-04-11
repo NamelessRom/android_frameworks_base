@@ -25,14 +25,13 @@ import android.util.Log;
  * A Logging utility
  */
 public class Logger {
-
-    private static boolean DEBUG = SystemProperties.getBoolean("ro.nameless.debug", false);
+    private static boolean DEBUG = SystemProperties.getBoolean("persist.nameless.debug", false);
 
     public static synchronized void setEnabled(final boolean enable) {
         DEBUG = enable;
     }
 
-    public static boolean getEnabled() {
+    public static synchronized boolean getEnabled() {
         return DEBUG;
     }
 

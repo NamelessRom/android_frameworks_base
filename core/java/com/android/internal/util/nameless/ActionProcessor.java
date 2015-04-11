@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.UserHandle;
 import android.text.TextUtils;
 
 import com.android.internal.statusbar.IStatusBarService;
@@ -42,8 +43,14 @@ public class ActionProcessor {
     }
 
     public static boolean launchAction(final Context context, final String actionString) {
+        return launchActionAsUser(context, actionString, new UserHandle(UserHandle.USER_CURRENT));
+    }
+
+    public static boolean launchActionAsUser(final Context context, final String actionString,
+            final UserHandle userHandle) {
         if (TextUtils.isEmpty(actionString)
                 || TextUtils.equals(actionString, ActionConstant.ACTION_NULL.value())) {
+            Logger.d(TAG, "Action is empty or null");
             return false;
         }
 
@@ -51,6 +58,8 @@ public class ActionProcessor {
             @Override
             public void run() {
                 final ActionConstant action = fromString(actionString);
+                Logger.d(TAG, "Action: %s | String: %s", action.value(), actionString);
+
                 switch (action) {
                     case ACTION_SCREENSHOT: {
                         final IStatusBarService barService = IStatusBarService.Stub.asInterface(
@@ -68,7 +77,7 @@ public class ActionProcessor {
                         final Intent intent = new Intent(ACTION_SCREEN_RECORD);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         try {
-                            context.startActivity(intent);
+                            startActivity(context, intent, userHandle);
                         } catch (ActivityNotFoundException anfe) {
                             Logger.e(TAG, "Could not start screen recording", anfe);
                         }
@@ -78,7 +87,7 @@ public class ActionProcessor {
                         try {
                             final Intent intent = Intent.parseUri(actionString, 0);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
+                            startActivity(context, intent, userHandle);
                         } catch (URISyntaxException e) {
                             Logger.e(TAG, "URISyntaxException: [%s]", actionString);
                         } catch (ActivityNotFoundException e) {
@@ -91,6 +100,10 @@ public class ActionProcessor {
         }).start();
 
         return true;
+    }
+
+    private static void startActivity(Context context, Intent intent, UserHandle userHandle) {
+        context.startActivityAsUser(intent, userHandle);
     }
 
 }
