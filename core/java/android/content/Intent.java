@@ -1321,6 +1321,14 @@ public class Intent implements Parcelable, Cloneable {
     public static final String ACTION_RECENTS_LONG_PRESS = "android.intent.action.RECENTS_LONG_PRESS";
 
     /**
+     * Activity Action: Start action associated with the power key chord (down / up).
+     * <p>Input: Nothing
+     * <p>Output: Nothing
+     * @hide
+     */
+    public static final String ACTION_POWER_CHORD = "android.intent.action.ACTION_POWER_CHORD";
+
+    /**
      * Activity Action: The user pressed the "Report" button in the crash/ANR dialog.
      * This intent is delivered to the package which installed the application, usually
      * Google Play.
