@@ -3052,6 +3052,13 @@
          confirmation UI for full backup/restore -->
     <uses-permission android:name="android.permission.CONFIRM_FULL_BACKUP"/>
 
+    <!-- Allows an application to get launched using power chord
+        @hide-->
+    <permission android:name="android.permission.LAUNCH_WITH_POWER_CHORD"
+        android:label="@string/permlab_launchWithPowerChord"
+        android:description="@string/permdesc_launchWithPowerChord"
+        android:protectionLevel="dangerous" />
+
     <application android:process="system"
                  android:persistent="true"
                  android:hasCode="false"
