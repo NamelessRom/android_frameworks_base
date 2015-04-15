@@ -229,7 +229,7 @@ public final class ShutdownThread extends Thread {
                 }
             }
 
-            if (!instant) {
+            if (!advancedReboot || !instant) {
                 confirmDialogBuilder.setPositiveButton(com.android.internal.R.string.yes,
                         new DialogInterface.OnClickListener() {
                             @Override
