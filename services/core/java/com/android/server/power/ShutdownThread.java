@@ -229,13 +229,18 @@ public final class ShutdownThread extends Thread {
                 }
             }
 
-            if (!instant) {
+            if (!advancedReboot || !instant) {
                 confirmDialogBuilder.setPositiveButton(com.android.internal.R.string.yes,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 ListView reasonsList = ((AlertDialog) dialog).getListView();
-                                final int selected = reasonsList.getCheckedItemPosition();
+                                final int selected;
+                                if (reasonsList != null) {
+                                    selected = reasonsList.getCheckedItemPosition();
+                                } else {
+                                    selected = ListView.INVALID_POSITION;
+                                }
                                 handleDialog(context, selected, advancedReboot);
                             }
                         });
