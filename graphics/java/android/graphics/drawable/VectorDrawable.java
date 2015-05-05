@@ -383,7 +383,7 @@ public class VectorDrawable extends Drawable {
             mTintFilter = updateTintFilter(mTintFilter, state.mTint, state.mTintMode);
         }
 
-        final VPathRenderer path = state.mVPathRenderer;
+        final VPathRenderer path = state != null ? state.mVPathRenderer : null;
         if (path != null && path.canApplyTheme()) {
             path.applyTheme(t);
         }
@@ -449,8 +449,7 @@ public class VectorDrawable extends Drawable {
     public void inflate(Resources res, XmlPullParser parser, AttributeSet attrs, Theme theme)
             throws XmlPullParserException, IOException {
         final VectorDrawableState state = mVectorState;
-        final VPathRenderer pathRenderer = new VPathRenderer();
-        state.mVPathRenderer = pathRenderer;
+        state.mVPathRenderer = new VPathRenderer();
 
         final TypedArray a = obtainAttributes(res, theme, attrs, R.styleable.VectorDrawable);
         updateStateFromTypedArray(a);
@@ -582,7 +581,7 @@ public class VectorDrawable extends Drawable {
         }
 
         if (noPathTag) {
-            final StringBuffer tag = new StringBuffer();
+            final StringBuilder tag = new StringBuilder();
 
             if (tag.length() > 0) {
                 tag.append(" or ");

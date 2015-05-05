@@ -486,12 +486,12 @@ public class BitmapDrawable extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
-        final Bitmap bitmap = mBitmapState.mBitmap;
-        if (bitmap == null) {
+        if (mBitmapState.mBitmap == null) {
             return;
         }
 
         final BitmapState state = mBitmapState;
+        final Bitmap bitmap = state.mBitmap;
         final Paint paint = state.mPaint;
         if (state.mRebuildShader) {
             final Shader.TileMode tmx = state.mTileModeX;
@@ -759,7 +759,7 @@ public class BitmapDrawable extends Drawable {
 
         state.mTargetDensity = r.getDisplayMetrics().densityDpi;
 
-        final boolean defMipMap = state.mBitmap != null ? state.mBitmap.hasMipMap() : false;
+        final boolean defMipMap = state.mBitmap != null && state.mBitmap.hasMipMap();
         setMipMap(a.getBoolean(R.styleable.BitmapDrawable_mipMap, defMipMap));
 
         state.mAutoMirrored = a.getBoolean(

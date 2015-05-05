@@ -338,11 +338,6 @@ public class StateListDrawable extends DrawableContainer {
 
         private void mutate() {
             mThemeAttrs = mThemeAttrs != null ? mThemeAttrs.clone() : null;
-
-            final int[][] stateSets = new int[mStateSets.length][];
-            for (int i = mStateSets.length - 1; i >= 0; i--) {
-                stateSets[i] = mStateSets[i] != null ? mStateSets[i].clone() : null;
-            }
         }
 
         int addStateSet(int[] stateSet, Drawable drawable) {
