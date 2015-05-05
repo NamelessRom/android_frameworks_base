@@ -284,12 +284,15 @@ public class AnimatedVectorDrawable extends Drawable implements Animatable {
                             R.styleable.AnimatedVectorDrawable_drawable, 0);
                     if (drawableRes != 0) {
                         VectorDrawable vectorDrawable = (VectorDrawable) res.getDrawable(
-                                drawableRes, theme).mutate();
-                        vectorDrawable.setAllowCaching(false);
-                        vectorDrawable.setCallback(mCallback);
-                        pathErrorScale = vectorDrawable.getPixelSize();
-                        if (mAnimatedVectorState.mVectorDrawable != null) {
-                            mAnimatedVectorState.mVectorDrawable.setCallback(null);
+                                drawableRes, theme);
+                        if (vectorDrawable != null) {
+                            vectorDrawable = (VectorDrawable) vectorDrawable.mutate();
+                            vectorDrawable.setAllowCaching(false);
+                            vectorDrawable.setCallback(mCallback);
+                            pathErrorScale = vectorDrawable.getPixelSize();
+                            if (mAnimatedVectorState.mVectorDrawable != null) {
+                                mAnimatedVectorState.mVectorDrawable.setCallback(null);
+                            }
                         }
                         mAnimatedVectorState.mVectorDrawable = vectorDrawable;
                     }

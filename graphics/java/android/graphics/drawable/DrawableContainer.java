@@ -1091,7 +1091,11 @@ public class DrawableContainer extends Drawable implements Drawable.Callback {
             final int N = mNumChildren;
             int pixelCount = 0;
             for (int i = 0; i < N; i++) {
-                final ConstantState state = getChild(i).getConstantState();
+                final Drawable child = getChild(i);
+                if (child == null) {
+                    continue;
+                }
+                final ConstantState state = child.getConstantState();
                 if (state != null) {
                     pixelCount += state.addAtlasableBitmaps(atlasList);
                 }
