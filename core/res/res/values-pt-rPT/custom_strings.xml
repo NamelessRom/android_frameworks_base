@@ -16,5 +16,8 @@
      limitations under the License.
 -->
 <resources>
+  <string name="action_app">Aplicação</string>
   <string name="action_null">Nenhum</string>
+  <string name="action_screenshot">Capturar ecrã</string>
+  <string name="action_screenrecord">Gravação de ecrã</string>
 </resources>

@@ -16,5 +16,8 @@
      limitations under the License.
 -->
 <resources>
-  <string name="action_null">Nic nie rób</string>
+  <string name="action_app">Applicazione</string>
+  <string name="action_null">Niente</string>
+  <string name="action_screenshot">Cattura schermo</string>
+  <string name="action_screenrecord">Registra schermo</string>
 </resources>

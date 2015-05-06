@@ -16,5 +16,8 @@
      limitations under the License.
 -->
 <resources>
+  <string name="action_app">App</string>
   <string name="action_null">Niets</string>
+  <string name="action_screenshot">Screenshot</string>
+  <string name="action_screenrecord">Schermopname</string>
 </resources>

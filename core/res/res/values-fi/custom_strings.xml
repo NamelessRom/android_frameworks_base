@@ -17,4 +17,5 @@
 -->
 <resources>
   <string name="action_null">Ei mitään</string>
+  <string name="action_screenrecord">Näytön tallennus</string>
 </resources>
