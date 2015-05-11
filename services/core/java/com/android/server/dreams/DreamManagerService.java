@@ -335,7 +335,7 @@ public final class DreamManagerService extends SystemService {
                     com.android.internal.R.string.config_dozeComponent);
         }
         boolean enabled = Settings.Secure.getIntForUser(mContext.getContentResolver(),
-                Settings.Secure.DOZE_ENABLED, 1, userId) != 0;
+                Settings.Secure.DOZE_ENABLED, 0, userId) != 0;
         return TextUtils.isEmpty(name) || !enabled ? null : ComponentName.unflattenFromString(name);
     }
 
