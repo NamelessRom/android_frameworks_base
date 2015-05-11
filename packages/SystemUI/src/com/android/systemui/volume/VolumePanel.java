@@ -98,6 +98,7 @@ public class VolumePanel extends Handler implements DemoMode {
 
     private static final int VIBRATE_DURATION = 300;
     private static final int BEEP_DURATION = 150;
+    private static final int EXPAND_DURATION = 250;
     private static final int MAX_VOLUME = 100;
     private static final int FREE_DELAY = 10000;
     private static final int TIMEOUT_DELAY = 3000;
@@ -1303,16 +1304,35 @@ public class VolumePanel extends Handler implements DemoMode {
         if (!isShowing()) {
             int stream = (streamType == STREAM_REMOTE_MUSIC) ? -1 : streamType;
             // when the stream is for remote playback, use -1 to reset the stream type evaluation
+
+            final Runnable callbackRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (mCallback != null) {
+                        mCallback.onVisible(true);
+                    }
+                    announceDialogShown();
+                }
+            };
             if (mDialog != null) {
                 mDialog.show();
+
+                final Runnable expandRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        mView.setY(-mView.getHeight());
+                        mView.animate().y(0).setDuration(EXPAND_DURATION)
+                                .withEndAction(callbackRunnable);
+                    }
+                };
+                mView.post(expandRunnable);
             }
             if (stream != STREAM_MASTER) {
                 mAudioManager.forceVolumeControlStream(stream);
             }
-            if (mCallback != null) {
-                mCallback.onVisible(true);
+            if (mDialog == null) {
+                callbackRunnable.run();
             }
-            announceDialogShown();
         }
 
         // Do a little vibrate if applicable (only when going into vibrate mode)
@@ -1568,12 +1588,19 @@ public class VolumePanel extends Handler implements DemoMode {
                 if (isShowing()) {
                     hideVolumePanel();
                     if (mDialog != null) {
-                        mDialog.dismiss();
-                        clearRemoteStreamController();
-                        mActiveStreamType = -1;
-                        if (mCallback != null) {
-                            mCallback.onVisible(false);
-                        }
+                        final Runnable callbackRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                mDialog.dismiss();
+                                clearRemoteStreamController();
+                                mActiveStreamType = -1;
+                                if (mCallback != null) {
+                                    mCallback.onVisible(false);
+                                }
+                            }
+                        };
+                        mView.animate().y(-mView.getHeight()).setDuration(EXPAND_DURATION)
+                                .withEndAction(callbackRunnable);
                     }
                 }
                 synchronized (sSafetyWarningLock) {
