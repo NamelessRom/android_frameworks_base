@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowInsets;
@@ -359,10 +360,33 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
                 // Adjust to task views
                 params.rightMargin = (width / 2) - (taskViewWidth / 2);
             }
+            setClearRecentsGravity(params);
             mClearRecents.setLayoutParams(params);
         }
 
         setMeasuredDimension(width, height);
+    }
+
+    private void setClearRecentsGravity(FrameLayout.LayoutParams params) {
+        final int clearRecentsLocation = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.RECENTS_CLEAR_ALL_LOCATION, 1);
+        int gravity;
+        switch (clearRecentsLocation) {
+            case 0: // top left
+                gravity = Gravity.TOP | Gravity.LEFT;
+                break;
+            default:
+            case 1: // top right
+                gravity = Gravity.TOP | Gravity.RIGHT;
+                break;
+            case 2: // bottom left
+                gravity = Gravity.BOTTOM | Gravity.LEFT;
+                break;
+            case 3: // bottom right
+                gravity = Gravity.BOTTOM | Gravity.RIGHT;
+                break;
+        }
+        params.gravity = gravity;
     }
 
     public void noUserInteraction() {

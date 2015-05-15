@@ -51,6 +51,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="top|right"
+        android:elevation="4dp"
         android:src="@drawable/ic_dismiss_all"
         android:scaleType="centerInside"
         android:background="@drawable/recents_button_bg"

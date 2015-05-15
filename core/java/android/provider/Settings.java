@@ -3460,6 +3460,16 @@ public final class Settings {
         public static final String RECENTS_SHOW_SEARCH_BAR = "recents_show_search_bar";
 
         /**
+         * Location of the clear all recents view (default is 1)
+         * 0 - Top left
+         * 1 - Top right (default)
+         * 2 - Bottom left
+         * 3 - Bottom right
+         * @hide
+         */
+        public static final String RECENTS_CLEAR_ALL_LOCATION = "recents_clear_all_location";
+
+        /**
          * Whether to enable voice wakeup.  The value is boolean (1 or 0).
          * @hide
          */
