@@ -763,6 +763,10 @@ public final class PowerManagerService extends SystemService
             mButtonBrightness = 0;
         }
 
+        mKeyboardBrightness = Settings.Secure.getIntForUser(resolver,
+                Settings.Secure.KEYBOARD_BRIGHTNESS, mKeyboardBrightnessSettingDefault,
+                UserHandle.USER_CURRENT);
+
         final int oldScreenBrightnessSetting = mScreenBrightnessSetting;
         mScreenBrightnessSetting = Settings.System.getIntForUser(resolver,
                 Settings.System.SCREEN_BRIGHTNESS, mScreenBrightnessSettingDefault,
@@ -794,17 +798,6 @@ public final class PowerManagerService extends SystemService
             mAutoLowPowerModeConfigured = autoLowPowerModeConfigured;
             updateLowPowerModeLocked();
         }
-
-        mButtonTimeout = Settings.Secure.getIntForUser(resolver,
-                Settings.Secure.BUTTON_BACKLIGHT_TIMEOUT,
-                DEFAULT_BUTTON_ON_DURATION, UserHandle.USER_CURRENT);
-
-        mButtonBrightness = Settings.Secure.getIntForUser(resolver,
-                Settings.Secure.BUTTON_BRIGHTNESS, mButtonBrightnessSettingDefault,
-                UserHandle.USER_CURRENT);
-        mKeyboardBrightness = Settings.Secure.getIntForUser(resolver,
-                Settings.Secure.KEYBOARD_BRIGHTNESS, mKeyboardBrightnessSettingDefault,
-                UserHandle.USER_CURRENT);
 
         mDirty |= DIRTY_SETTINGS;
     }
