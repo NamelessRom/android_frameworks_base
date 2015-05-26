@@ -718,7 +718,6 @@ public class VolumePanel extends Handler implements DemoMode {
                         public void onClick(View v) {
                             resetTimeout();
                             toggleRinger(sc);
-                            updateStates();
                         }
                     });
                 }
@@ -923,6 +922,25 @@ public class VolumePanel extends Handler implements DemoMode {
         updateSliderIcon(sc, muted);
         updateSliderEnabled(sc, muted, false);
         updateSliderSuppressor(sc);
+    }
+
+    private void updateNotificationSlider(boolean forceReloadIcon) {
+        final StreamControl notification = mStreamControls.get(AudioManager.STREAM_NOTIFICATION);
+        if (notification != null) {
+            updateSlider(notification, forceReloadIcon);
+        }
+    }
+
+    private void updateRingerSlider(boolean forceReloadIcon) {
+        // If no ringer, we should update notification slider instead
+        if (!mVoiceCapable) {
+            updateNotificationSlider(forceReloadIcon);
+            return;
+        }
+        final StreamControl ringer = mStreamControls.get(AudioManager.STREAM_RING);
+        if (ringer != null) {
+            updateSlider(ringer, forceReloadIcon);
+        }
     }
 
     private void updateSliderEnabled(final StreamControl sc, boolean muted, boolean fixedVolume) {
@@ -1313,6 +1331,10 @@ public class VolumePanel extends Handler implements DemoMode {
             updateSliderEnabled(sc, muted, (flags & AudioManager.FLAG_FIXED_VOLUME) != 0);
             if (isNotificationOrRing(streamType)) {
                 updateSliderIcon(sc, muted);
+                // If an unlinked notification slider is visible, update it as well
+                if (mVoiceCapable && !mVolumeLinkNotification && mExtendedPanelExpanded) {
+                    updateNotificationSlider(false);
+                }
             }
         }
 
@@ -1632,7 +1654,10 @@ public class VolumePanel extends Handler implements DemoMode {
             case MSG_NOTIFICATION_EFFECTS_SUPPRESSOR_CHANGED: {
                 if (isShowing()) {
                     if (mExtendedPanelExpanded) {
-                        updateStates();
+                        updateRingerSlider(false);
+                        if (mVoiceCapable && !mVolumeLinkNotification) {
+                            updateNotificationSlider(false);
+                        }
                     } else {
                         updateActiveSlider();
                     }
@@ -1720,7 +1745,6 @@ public class VolumePanel extends Handler implements DemoMode {
                 StreamControl sc = (StreamControl) tag;
                 setStreamVolume(sc, progress,
                         AudioManager.FLAG_SHOW_UI | AudioManager.FLAG_VIBRATE);
-                updateStates();
             }
             resetTimeout();
         }
