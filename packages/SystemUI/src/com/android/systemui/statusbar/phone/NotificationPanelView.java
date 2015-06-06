@@ -1010,9 +1010,7 @@ public class NotificationPanelView extends PanelView implements
             mKeyguardBottomArea.setBackground(null);
         }
 
-        if (mDoubleTapToSleepEnabled
-                && mStatusBarState == StatusBarState.KEYGUARD
-                && event.getY() < mStatusBarHeaderHeight) {
+        if (mDoubleTapToSleepEnabled && mStatusBarState == StatusBarState.KEYGUARD) {
             mDoubleTapGesture.onTouchEvent(event);
         }
         initDownStates(event);
