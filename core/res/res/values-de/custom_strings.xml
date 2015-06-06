@@ -20,4 +20,6 @@
   <string name="action_null">Nichts</string>
   <string name="action_screenshot">Bildschirmfoto</string>
   <string name="action_screenrecord">Bildschirmaufnahme</string>
+  <string name="permlab_launchWithPowerChord">Starte mit Ein-/Aus-Tasten Aktionen</string>
+  <string name="permdesc_launchWithPowerChord">Erlaubt Anwendungen durch Ein-/Aus-Tasten Aktionen zu starten.</string>
 </resources>
