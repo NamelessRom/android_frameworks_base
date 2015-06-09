@@ -62,7 +62,6 @@ import com.android.systemui.qs.tiles.ProfilesTile;
 import com.android.systemui.qs.tiles.PerfProfileTile;
 import com.android.systemui.qs.tiles.RoamingTile;
 import com.android.systemui.qs.tiles.RotationLockTile;
-import com.android.systemui.qs.tiles.SyncTile;
 import com.android.systemui.qs.tiles.UsbTetherTile;
 import com.android.systemui.qs.tiles.VisualizerTile;
 import com.android.systemui.qs.tiles.ScreenTimeoutTile;
@@ -350,8 +349,6 @@ public class QSTileHost implements QSTile.Host {
                 return new VisualizerTile(this);
             case QSConstants.TILE_SCREEN_TIMEOUT:
                 return new ScreenTimeoutTile(this);
-            case QSConstants.TILE_SYNC:
-                return new SyncTile(this);
             case QSConstants.TILE_LIVE_DISPLAY:
                 return new LiveDisplayTile(this);
             case QSConstants.TILE_USB_TETHER:

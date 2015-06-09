@@ -45,7 +45,6 @@ public class QSConstants {
     public static final String TILE_LTE = "lte";
     public static final String TILE_VISUALIZER = "visualizer";
     public static final String TILE_SCREEN_TIMEOUT = "screen_timeout";
-    public static final String TILE_SYNC = "sync";
     public static final String TILE_LIVE_DISPLAY = "live_display";
     public static final String TILE_USB_TETHER = "usb_tether";
     public static final String TILE_HEADS_UP = "heads_up";
@@ -78,7 +77,6 @@ public class QSConstants {
         TILES_AVAILABLE.add(TILE_LTE);
         TILES_AVAILABLE.add(TILE_VISUALIZER);
         TILES_AVAILABLE.add(TILE_SCREEN_TIMEOUT);
-        TILES_AVAILABLE.add(TILE_SYNC);
         TILES_AVAILABLE.add(TILE_LIVE_DISPLAY);
         TILES_AVAILABLE.add(TILE_USB_TETHER);
         TILES_AVAILABLE.add(TILE_HEADS_UP);
