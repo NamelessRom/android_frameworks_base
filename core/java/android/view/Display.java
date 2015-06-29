@@ -682,6 +682,11 @@ public final class Display {
             updateDisplayInfoLocked();
             mDisplayInfo.getAppMetrics(outMetrics, mDisplayAdjustments);
 
+            if (getDisplayId() != DEFAULT_DISPLAY) {
+                // only add forced density to default display
+                return;
+            }
+
             final int densityDpiRo = SystemProperties.getInt(PROP_DENSITY_DPI_OVERRIDE_RO, 0);
             final int densityDpi = SystemProperties.getInt(PROP_DENSITY_DPI_OVERRIDE, densityDpiRo);
             if (densityDpi != 0) {
