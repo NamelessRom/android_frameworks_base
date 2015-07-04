@@ -16,8 +16,10 @@
      limitations under the License.
 -->
 <resources>
-  <string name="action_app">App</string>
-  <string name="action_null">Niets</string>
-  <string name="action_screenshot">Screenshot</string>
-  <string name="action_screenrecord">Schermopname</string>
+  <string name="action_app">Апликација</string>
+  <string name="action_null">Ништа</string>
+  <string name="action_screenshot">Сликање екрана</string>
+  <string name="action_screenrecord">Снимање екрана</string>
+  <string name="permlab_launchWithPowerChord">Покрените дугметом за напајање</string>
+  <string name="permdesc_launchWithPowerChord">Омогућава да се апликација покрене коришћењем акција дугмета за напајање.</string>
 </resources>
