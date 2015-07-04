@@ -16,5 +16,10 @@
      limitations under the License.
 -->
 <resources>
-  <string name="action_null">無</string>
+  <string name="action_app">Приложение</string>
+  <string name="action_null">Пусто</string>
+  <string name="action_screenshot">Снимок экрана</string>
+  <string name="action_screenrecord">Запись с экрана</string>
+  <string name="permlab_launchWithPowerChord">Запуск с Пауэр-аккорд</string>
+  <string name="permdesc_launchWithPowerChord">Позволяет приложению будет запущен с помощью действия кнопок питания.</string>
 </resources>
