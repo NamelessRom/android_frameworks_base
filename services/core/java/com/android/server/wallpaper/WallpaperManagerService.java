@@ -649,14 +649,9 @@ public class WallpaperManagerService extends IWallpaperManager.Stub {
         synchronized (mLock) {
             mCurrentUserId = userId;
             WallpaperData wallpaper = getWallpaperData(userId);
-            KeyguardWallpaperData keygaurdWallpaper = mKeyguardWallpaperMap.get(userId);
-            if (keygaurdWallpaper == null) {
-                keygaurdWallpaper = new KeyguardWallpaperData(userId);
-                mKeyguardWallpaperMap.put(userId, keygaurdWallpaper);
-                loadKeyguardSettingsLocked(userId);
-            }
+            KeyguardWallpaperData keyguardWallpaper = getKeyguardWallpaperData(userId);
             if (mWallpaperObserver == null) {
-                mWallpaperObserver = new WallpaperObserver(wallpaper, keygaurdWallpaper);
+                mWallpaperObserver = new WallpaperObserver(wallpaper, keyguardWallpaper);
                 mWallpaperObserver.startWatching();
             }
             switchWallpaper(wallpaper, reply);
@@ -1702,6 +1697,17 @@ public class WallpaperManagerService extends IWallpaperManager.Stub {
             wallpaper = mWallpaperMap.get(userId);
         }
         return wallpaper;
+    }
+
+    private KeyguardWallpaperData getKeyguardWallpaperData(int userId) {
+        KeyguardWallpaperData keyguardWallpaper = mKeyguardWallpaperMap.get(userId);
+        if (keyguardWallpaper == null) {
+            // User hasn't started yet, so load her settings to set desired size.
+            Slog.w(TAG, "Keyguardwallpaper not yet initialized, loading settings for user " + userId);
+            loadKeyguardSettingsLocked(userId);
+            keyguardWallpaper = mKeyguardWallpaperMap.get(userId);
+        }
+        return keyguardWallpaper;
     }
 
     @Override
