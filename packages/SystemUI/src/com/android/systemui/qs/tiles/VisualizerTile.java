@@ -198,12 +198,12 @@ public class VisualizerTile extends QSTile<QSTile.State> implements KeyguardMoni
     @Override
     protected void handleDestroy() {
         mMediaMonitor.setListening(false);
-        mMediaMonitor = null;
-        super.handleDestroy();
         doLinkage();
 
         mKeyguardMonitor.removeCallback(this);
         mContext.unregisterReceiver(mReceiver);
+
+        super.handleDestroy();
     }
 
     @Override
@@ -244,7 +244,8 @@ public class VisualizerTile extends QSTile<QSTile.State> implements KeyguardMoni
     private final Runnable mUpdateVisibilities = new Runnable() {
         @Override
         public void run() {
-            boolean showVz = mMediaMonitor.isAnythingPlaying() && !mKeyguardMonitor.isShowing();
+            boolean showVz = mMediaMonitor != null && mMediaMonitor.isAnythingPlaying()
+                    && mKeyguardMonitor != null && !mKeyguardMonitor.isShowing();
             mVisualizer.animate().cancel();
             mVisualizer.animate()
                     .setDuration(200)
