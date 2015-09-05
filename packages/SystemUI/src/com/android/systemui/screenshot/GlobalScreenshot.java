@@ -43,9 +43,12 @@ import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Process;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -100,7 +103,6 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
     private static final String SCREENSHOT_FILE_NAME_TEMPLATE = "Screenshot_%s.png";
     private static final String SCREENSHOT_SHARE_SUBJECT_TEMPLATE = "Screenshot (%s)";
 
-    private final int mNotificationId;
     private final NotificationManager mNotificationManager;
     private final Notification.Builder mNotificationBuilder, mPublicNotificationBuilder;
     private final File mScreenshotDir;
@@ -119,7 +121,7 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
     private static boolean mTickerAddSpace;
 
     SaveImageInBackgroundTask(Context context, SaveImageInBackgroundData data,
-            NotificationManager nManager, int nId) {
+            NotificationManager nManager) {
         Resources r = context.getResources();
 
         // Prepare all the output metadata
@@ -166,7 +168,6 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
 
         // Show the intermediate notification
         mTickerAddSpace = !mTickerAddSpace;
-        mNotificationId = nId;
         mNotificationManager = nManager;
         final long now = System.currentTimeMillis();
 
@@ -198,7 +199,7 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
 
         Notification n = mNotificationBuilder.build();
         n.flags |= Notification.FLAG_NO_CLEAR;
-        mNotificationManager.notify(nId, n);
+        mNotificationManager.notify(GlobalScreenshot.SCREENSHOT_NOTIFICATION_ID, n);
 
         // On the tablet, the large icon makes the notification appear as if it is clickable (and
         // on small devices, the large icon is not shown) so defer showing the large icon until
@@ -252,7 +253,11 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
             values.put(MediaStore.Images.ImageColumns.WIDTH, mImageWidth);
             values.put(MediaStore.Images.ImageColumns.HEIGHT, mImageHeight);
             values.put(MediaStore.Images.ImageColumns.SIZE, new File(mImageFilePath).length());
+
             Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) {
+                throw new RuntimeException("Uri is null!");
+            }
 
             // Create a share intent
             String subjectDate = DateFormat.getDateTimeInstance().format(new Date(mImageTime));
@@ -289,15 +294,14 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
             params[0].image = null;
             params[0].result = 0;
         } catch (Exception e) {
-            // IOException/UnsupportedOperationException may be thrown if external storage is not
-            // mounted
+            Log.e(TAG, "Failed to take screenshot", e);
             params[0].clearImage();
             params[0].result = 1;
-        }
-
-        // Recycle the bitmap data
-        if (image != null) {
-            image.recycle();
+        } finally {
+            // Recycle the bitmap data
+            if (image != null) {
+                image.recycle();
+            }
         }
 
         return params[0];
@@ -333,7 +337,7 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
                 .setWhen(now)
                 .setAutoCancel(true)
                 .setColor(r.getColor(
-                        com.android.internal.R.color.system_notification_accent_color));;
+                        com.android.internal.R.color.system_notification_accent_color));
 
             // Update the text in the public version as well
             mPublicNotificationBuilder
@@ -349,7 +353,7 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
 
             Notification n = mNotificationBuilder.build();
             n.flags &= ~Notification.FLAG_NO_CLEAR;
-            mNotificationManager.notify(mNotificationId, n);
+            mNotificationManager.notify(GlobalScreenshot.SCREENSHOT_NOTIFICATION_ID, n);
         }
         params.finisher.run();
         params.clearContext();
@@ -392,6 +396,7 @@ class GlobalScreenshot {
     static final String SCREENSHOT_URI_ID = "android:screenshot_uri_id";
 
     private static final int SCREENSHOT_FLASH_TO_PEAK_DURATION = 130;
+    private static final int SCREENSHOT_DELAY = 250;
     private static final int SCREENSHOT_DROP_IN_DURATION = 430;
     private static final int SCREENSHOT_DROP_OUT_DELAY = 500;
     private static final int SCREENSHOT_DROP_OUT_DURATION = 430;
@@ -431,6 +436,8 @@ class GlobalScreenshot {
     private MediaActionSound mCameraSound;
 
     private final int mSfHwRotation;
+
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     /**
      * @param context everything needs a context :(
@@ -538,7 +545,21 @@ class GlobalScreenshot {
     /**
      * Takes a screenshot of the current display and shows an animation.
      */
-    void takeScreenshot(Runnable finisher, boolean statusBarVisible, boolean navBarVisible) {
+    void takeScreenshot(final Runnable finisher, final boolean statusBarVisible,
+            final boolean navBarVisible) {
+        // cancel notification before taking a screenshot to prevent the notification icon
+        // appearing in the status bar of the next screenshot when taking multiple screenshots
+        mNotificationManager.cancel(SCREENSHOT_NOTIFICATION_ID);
+
+        // delay taking screenshot a bit to ensure the notification icon is gone
+        mHandler.postDelayed(new Runnable() {
+            @Override public void run() {
+                takeScreenshotInternal(finisher, statusBarVisible, navBarVisible);
+            }
+        }, SCREENSHOT_DELAY);
+    }
+
+    private void takeScreenshotInternal(Runnable finisher, boolean statusBarVisible, boolean navBarVisible) {
         // We need to orient the screenshot correctly (and the Surface api seems to take screenshots
         // only in the natural orientation of the device :!)
         mDisplay.getRealMetrics(mDisplayMetrics);
