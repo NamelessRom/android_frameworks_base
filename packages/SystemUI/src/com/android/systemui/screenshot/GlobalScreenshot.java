@@ -42,6 +42,7 @@ import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.os.Process;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
@@ -371,6 +372,7 @@ class GlobalScreenshot {
     private final int mPreviewHeight;
 
     private Context mContext;
+    private PowerManager mPowerManager;
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWindowLayoutParams;
     private NotificationManager mNotificationManager;
@@ -405,6 +407,8 @@ class GlobalScreenshot {
         mContext = context;
         LayoutInflater layoutInflater = (LayoutInflater)
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
         // Inflate the screenshot layout
         mDisplayMatrix = new Matrix();
@@ -504,6 +508,9 @@ class GlobalScreenshot {
      * Takes a screenshot of the current display and shows an animation.
      */
     void takeScreenshot(Runnable finisher, boolean statusBarVisible, boolean navBarVisible) {
+        // a lot of work ahead, help out a bit
+        mPowerManager.cpuBoost(1500000);
+
         // cancel notification before taking a screenshot to prevent the notification icon
         // appearing in the status bar of the next screenshot when taking multiple screenshots
         mNotificationManager.cancel(SCREENSHOT_NOTIFICATION_ID);
