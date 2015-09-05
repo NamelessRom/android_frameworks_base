@@ -114,8 +114,6 @@ import android.widget.Toast;
 
 import android.view.WindowManagerPolicyControl;
 import com.android.internal.R;
-import com.android.internal.policy.IKeyguardService;
-import com.android.internal.policy.IKeyguardServiceConstants;
 import com.android.internal.policy.PolicyManager;
 import com.android.internal.policy.impl.keyguard.KeyguardServiceDelegate;
 import com.android.internal.policy.impl.keyguard.KeyguardServiceDelegate.ShowListener;
@@ -662,9 +660,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     // Screenshot trigger states
     // Time to volume and power must be pressed within this interval of each other.
     private static final long SCREENSHOT_CHORD_DEBOUNCE_DELAY_MILLIS = 150;
-    // Increase the chord delay when taking a screenshot from the keyguard
-    private static final float KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER = 2.0f;
-    private long mChordDebounceDelayMillis;
+    private static final int SCREENSHOT_CHORD_PRESS_DELAY_MILLIS = 0;
+    private long mChordPressDelayMillis;
     private boolean mScreenshotChordEnabled;
     private boolean mVolumeDownKeyTriggered;
     private boolean mVolumeDownKeyConsumedByKeyChord;
@@ -1393,19 +1390,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     private long getVolumeDownChordLongPressDelay() {
-        if (mKeyguardDelegate.isShowing()) {
-            // Double the time it takes to process a key chord from the keyguard
-            return (long) (KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER * mChordDebounceDelayMillis);
-        }
-        return mChordDebounceDelayMillis;
+        return mChordPressDelayMillis;
     }
 
     private long getVolumeUpChordLongPressDelay() {
-        if (mKeyguardDelegate.isShowing()) {
-            // Double the time it takes to process a key chord from the keyguard
-            return (long) (KEYGUARD_SCREENSHOT_CHORD_DELAY_MULTIPLIER * mChordDebounceDelayMillis);
-        }
-        return mChordDebounceDelayMillis;
+        return mChordPressDelayMillis;
     }
 
     private void cancelVolumeDownChordAction() {
@@ -1783,8 +1772,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private void updatePowerKeyChord() {
         final ContentResolver resolver = mContext.getContentResolver();
 
-        mChordDebounceDelayMillis = Settings.Secure.getLongForUser(resolver,
-                Settings.Secure.POWER_CHORD_DELAY, 250, UserHandle.USER_CURRENT);
+        mChordPressDelayMillis = Settings.Secure.getLongForUser(resolver,
+                Settings.Secure.POWER_CHORD_DELAY, SCREENSHOT_CHORD_PRESS_DELAY_MILLIS,
+                UserHandle.USER_CURRENT);
 
         mVolumeDownAction = Settings.Secure.getStringForUser(resolver,
                 Settings.Secure.POWER_CHORD_ACTION_DOWN, UserHandle.USER_CURRENT);
