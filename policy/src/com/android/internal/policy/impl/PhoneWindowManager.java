@@ -126,6 +126,8 @@ import com.android.internal.view.RotationPolicy;
 import com.android.internal.widget.PointerLocationView;
 import com.android.server.LocalServices;
 
+import org.nameless.GestureHelper;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -923,6 +925,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.POWER_CHORD_ACTION_UP), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURES_SERVICE_ENABLED), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURES_SERVICE_ACTION_SCREENSHOT_ENABLED),
+                    false, this, UserHandle.USER_ALL);
 
             updateSettings();
         }
@@ -979,6 +987,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private ImmersiveModeConfirmation mImmersiveModeConfirmation;
 
     private SystemGesturesPointerEventListener mSystemGestures;
+    private GestureHelper mGestureHelper;
+
+    private boolean mGesturesServiceEnabled;
+    private boolean mGesturesServiceRegistered;
+    private boolean mGesturesServiceActionScreenshotEnabled;
 
     private EdgeGestureManager.EdgeGestureActivationListener mEdgeGestureActivationListener
             = new EdgeGestureManager.EdgeGestureActivationListener() {
@@ -1705,6 +1718,29 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         // no-op
                     }
                 });
+
+        // monitor additional gestures
+        mGestureHelper = new GestureHelper(new GestureHelper.Listener() {
+            @Override
+            public void onSwipe(int direction, int pointerCount) {
+                // only handle if user swipes using 3 touch pointers
+                if (pointerCount != 3) {
+                    return;
+                }
+
+                switch (direction) {
+                    case GestureHelper.SWIPE_FROM_BOTTOM:
+                    case GestureHelper.SWIPE_FROM_TOP: {
+                        if (mGesturesServiceActionScreenshotEnabled) {
+                            ActionProcessor.launchAction(mContext,
+                                    ActionConstants.ActionConstant.ACTION_SCREENSHOT.value());
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
         mImmersiveModeConfirmation = new ImmersiveModeConfirmation(mContext);
         mWindowManagerFuncs.registerPointerEventListener(mSystemGestures);
 
@@ -2059,10 +2095,25 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mVolBtnMusicControls = (Settings.System.getIntForUser(resolver,
                     Settings.System.VOLBTN_MUSIC_CONTROLS, 1, UserHandle.USER_CURRENT) == 1);
 
-            mBackKillEnabled = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+            mBackKillEnabled = Settings.Secure.getIntForUser(resolver,
                     Settings.Secure.KILL_APP_LONGPRESS_BACK, 0, UserHandle.USER_CURRENT) == 1;
             mBackKillTimeout = Settings.System.getIntForUser(resolver,
                     Settings.System.LONG_PRESS_KILL_DELAY, 1000, UserHandle.USER_CURRENT);
+
+            mGesturesServiceEnabled = Settings.System.getIntForUser(resolver,
+                    Settings.System.GESTURES_SERVICE_ENABLED, 0, UserHandle.USER_CURRENT) != 0;
+            mGesturesServiceActionScreenshotEnabled = Settings.System.getIntForUser(resolver,
+                    Settings.System.GESTURES_SERVICE_ACTION_SCREENSHOT_ENABLED, 0,
+                    UserHandle.USER_CURRENT) != 0;
+            if (mSystemReady) {
+                if (mGesturesServiceEnabled && !mGesturesServiceRegistered) {
+                    mGesturesServiceRegistered = true;
+                    mWindowManagerFuncs.registerPointerEventListener(mGestureHelper);
+                } else if (mGesturesServiceRegistered) {
+                    mGesturesServiceRegistered = false;
+                    mWindowManagerFuncs.unregisterPointerEventListener(mGestureHelper);
+                }
+            }
 
             // Configure wake gesture.
             boolean wakeGestureEnabledSetting = Settings.Secure.getIntForUser(resolver,
@@ -2076,10 +2127,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             final boolean useEdgeService = Settings.System.getIntForUser(resolver,
                     Settings.System.USE_EDGE_SERVICE_FOR_GESTURES, 1, UserHandle.USER_CURRENT) == 1;
             if (useEdgeService ^ mUsingEdgeGestureServiceForGestures && mSystemReady) {
-                if (!mUsingEdgeGestureServiceForGestures && useEdgeService) {
+                if (!mUsingEdgeGestureServiceForGestures) {
                     mUsingEdgeGestureServiceForGestures = true;
                     mWindowManagerFuncs.unregisterPointerEventListener(mSystemGestures);
-                } else if (mUsingEdgeGestureServiceForGestures && !useEdgeService) {
+                } else {
                     mUsingEdgeGestureServiceForGestures = false;
                     mWindowManagerFuncs.registerPointerEventListener(mSystemGestures);
                 }

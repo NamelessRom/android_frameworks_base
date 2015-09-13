@@ -3191,6 +3191,21 @@ public final class Settings {
         public static final String GESTURES_DOUBLE_TAP = "gestures_double_tap";
 
         /**
+         * Whether the custom gesture service is activated
+         *
+         * @hide
+         */
+        public static final String GESTURES_SERVICE_ENABLED = "gestures_service_enabled";
+
+        /**
+         * Whether the screenshot gesture service action is enabled
+         *
+         * @hide
+         */
+        public static final String GESTURES_SERVICE_ACTION_SCREENSHOT_ENABLED =
+                "gestures_service_action_screenshot_enabled";
+
+        /**
          * Whether lock-to-app will be triggered by long-press on recents.
          * @hide
          */
@@ -3734,7 +3749,9 @@ public final class Settings {
             NONE_IS_SILENT,
             ALLOW_LIGHTS,
             NOTIFICATION_LIGHT_BRIGHTNESS_LEVEL,
-            NOTIFICATION_LIGHT_SCREEN_ON
+            NOTIFICATION_LIGHT_SCREEN_ON,
+            GESTURES_SERVICE_ENABLED,
+            GESTURES_SERVICE_ACTION_SCREENSHOT_ENABLED
         };
 
         /**
