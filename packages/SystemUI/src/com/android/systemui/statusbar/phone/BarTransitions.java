@@ -198,7 +198,9 @@ public class BarTransitions {
             // and the gradient will not be drawn.
             Rect bounds = mGradient.getBounds();
             mGradient = res.getDrawable(mGradientResourceId);
-            mGradient.setBounds(bounds);
+            if (mGradient != null) {
+                mGradient.setBounds(bounds);
+            }
         }
 
         @Override
