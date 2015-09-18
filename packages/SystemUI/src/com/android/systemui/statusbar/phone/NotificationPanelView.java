@@ -1182,7 +1182,6 @@ public class NotificationPanelView extends PanelView implements
         mHeader.setExpansion(getHeaderExpansionFraction());
         setQsTranslation(height);
         requestScrollerTopPaddingUpdate(false /* animate */);
-        updateNotificationScrim(height);
         if (mKeyguardShowing) {
             updateHeaderKeyguard();
         }
@@ -1209,12 +1208,6 @@ public class NotificationPanelView extends PanelView implements
         } else {
             return getContext().getString(R.string.accessibility_desc_notification_shade);
         }
-    }
-
-    private void updateNotificationScrim(float height) {
-        int startDistance = mQsMinExpansionHeight + mNotificationScrimWaitDistance;
-        float progress = (height - startDistance) / (mQsMaxExpansionHeight - startDistance);
-        progress = Math.max(0.0f, Math.min(progress, 1.0f));
     }
 
     private float getHeaderExpansionFraction() {
