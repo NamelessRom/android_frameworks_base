@@ -318,6 +318,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private boolean mScreenOnComingFromTouch;
     private PointF mScreenOnTouchLocation;
 
+    private PowerManager mPowerManager;
+
     int mPixelFormat;
     Object mQueueLock = new Object();
 
@@ -854,6 +856,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     @Override
     public void start() {
+        mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+
         mDisplay = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
         updateDisplaySize();
@@ -867,7 +871,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mCurrentTheme = ThemeConfig.getSystemTheme();
         }
 
-        mStatusBarWindow = new StatusBarWindowView(mContext, null);
+        mStatusBarWindow = new StatusBarWindowView(mContext, null, mPowerManager);
         mStatusBarWindow.mService = this;
 
         super.start(); // calls createAndAddWindows()
@@ -5308,8 +5312,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     public void wakeUpIfDozing(long time, MotionEvent event) {
         if (mDozing && mDozeScrimController.isPulsing()) {
-            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-            pm.wakeUp(time);
+            mPowerManager.wakeUp(time);
             mScreenOnComingFromTouch = true;
             mScreenOnTouchLocation = new PointF(event.getX(), event.getY());
             mNotificationPanel.setTouchDisabled(false);
