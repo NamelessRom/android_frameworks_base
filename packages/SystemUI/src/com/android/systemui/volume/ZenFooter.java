@@ -142,6 +142,7 @@ public class ZenFooter extends LinearLayout {
 
     public void onConfigurationChanged() {
         mSpTexts.update();
+        Util.setText(mEndNowButton, mContext.getString(R.string.volume_zen_end_now));
     }
 
     public void cleanup() {
