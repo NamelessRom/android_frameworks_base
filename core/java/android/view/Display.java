@@ -28,6 +28,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Process;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -280,6 +281,9 @@ public final class Display {
      * @see android.os.PowerManager#isInteractive
      */
     public static final int STATE_DOZE_SUSPEND = 4;
+
+    private static final String PROP_DENSITY_DPI_OVERRIDE = "persist.sf.lcd_density.override";
+    private static final String PROP_DENSITY_DPI_OVERRIDE_RO = "ro.sf.lcd_density.override";
 
     /**
      * Internal method to create a display.
@@ -778,7 +782,12 @@ public final class Display {
         synchronized (this) {
             updateDisplayInfoLocked();
             mDisplayInfo.getAppMetrics(outMetrics, mDisplayAdjustments);
-            if (getDisplayId() == DEFAULT_DISPLAY) {
+
+            final int densityDpiRo = SystemProperties.getInt(PROP_DENSITY_DPI_OVERRIDE_RO, 0);
+            final int densityDpi = SystemProperties.getInt(PROP_DENSITY_DPI_OVERRIDE, densityDpiRo);
+            if (densityDpi != 0) {
+                outMetrics.densityDpi = densityDpi;
+            } else if (getDisplayId() == DEFAULT_DISPLAY) {
                 outMetrics.densityDpi = DisplayMetrics.DENSITY_DEVICE_DEFAULT;
             }
         }

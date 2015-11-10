@@ -148,8 +148,16 @@ public class DisplayMetrics {
     public static int DENSITY_DEVICE_DEFAULT;
 
     static {
-        DENSITY_DEVICE = SystemProperties.getInt("qemu.sf.lcd_density", SystemProperties
-            .getInt("ro.sf.lcd_density", DENSITY_DEFAULT));
+        setupDensityOverridden();
+    }
+
+    private static void setupDensityOverridden() {
+        final int value = SystemProperties.getInt("qemu.sf.lcd_density",
+                 SystemProperties.getInt("ro.sf.lcd_density", DENSITY_DEFAULT));
+        // Allow to set density per settings, if not set or 0, fall back to default value
+        final int overridden = SystemProperties.getInt("persist.sf.lcd_density", value);
+
+        DENSITY_DEVICE = ((overridden != 0) ? overridden : value);
         DENSITY_DEVICE_DEFAULT = DENSITY_DEVICE;
         DENSITY_PREFERRED = SystemProperties.getInt("persist.sys.lcd_density", DENSITY_DEVICE);
     }
