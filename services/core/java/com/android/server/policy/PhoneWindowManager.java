@@ -138,7 +138,8 @@ import com.android.server.policy.keyguard.KeyguardServiceDelegate;
 import com.android.server.policy.keyguard.KeyguardServiceDelegate.DrawnListener;
 
 import namelessrom.providers.NamelessSettings;
-import org.namelessrom.internal.BootDexoptDialog;
+
+import org.cyanogenmod.platform.internal.BootDexoptDialog;
 
 import java.io.File;
 import java.io.FileReader;
