@@ -36,6 +36,7 @@ services := \
 LOCAL_STATIC_JAVA_LIBRARIES := $(addprefix services.,$(services))
 
 LOCAL_JAVA_LIBRARIES += org.cyanogenmod.platform.internal
+LOCAL_JAVA_LIBRARIES += org.namelessrom.platform.internal
 
 include $(BUILD_JAVA_LIBRARY)
 
