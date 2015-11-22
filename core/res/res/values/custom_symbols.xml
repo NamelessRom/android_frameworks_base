@@ -29,6 +29,17 @@
 
     <!-- CONFIG END -->
 
+    <!-- Nameless -->
+    <java-symbol type="drawable" name="logo_nameless" />
+
+    <!-- Boot dexopt layout -->
+    <java-symbol type="drawable" name="dexopt_brand_logo" />
+    <java-symbol type="layout" name="boot_dexopt_layout" />
+    <java-symbol type="id" name="dexopt_icon" />
+    <java-symbol type="id" name="dexopt_message" />
+    <java-symbol type="id" name="dexopt_message_detail" />
+    <java-symbol type="id" name="dexopt_progress" />
+
     <!-- Network traffic indicator -->
     <java-symbol type="dimen" name="net_traffic_single_text_size" />
     <java-symbol type="dimen" name="net_traffic_multi_text_size" />
