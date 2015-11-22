@@ -16,6 +16,6 @@ LOCAL_JAVA_LIBRARIES += services.accessibility
 
 LOCAL_JAVA_LIBRARIES += org.cyanogenmod.platform.internal
 
-LOCAL_JAVA_LIBRARIES += org.namelessrom.platform
+LOCAL_JAVA_LIBRARIES += org.namelessrom.platform.internal
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
