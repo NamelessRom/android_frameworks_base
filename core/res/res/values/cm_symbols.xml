@@ -112,9 +112,6 @@
     <!-- Advanced settings switch -->
     <java-symbol type="string" name="lock_to_app_toast_no_navbar" />
 
-    <!-- PlatLogo -->
-    <java-symbol type="drawable" name="platlogo_cm" />
-
     <!-- LiveDisplay -->
     <java-symbol type="string" name="live_display_title" />
     <java-symbol type="string" name="live_display_hint" />
