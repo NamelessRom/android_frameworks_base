@@ -74,6 +74,7 @@ private:
 
     // Package Offsets (best-case, fast look-up).
     Iterator mFrameworkStart;
+    Iterator mNamelessFrameworkStart;
     Iterator mCMFrameworkStart;
     Iterator mAppStart;
 
@@ -102,6 +103,9 @@ void BackTrackingAttributeFinder<Derived, Iterator>::jumpToClosestAttribute(cons
             break;
         case 0x3f:
             mCurrent = mCMFrameworkStart;
+            break;
+        case 0x6f:
+            mCurrent = mNamelessFrameworkStart;
             break;
         case 0x7f:
             mCurrent = mAppStart;
@@ -138,6 +142,9 @@ void BackTrackingAttributeFinder<Derived, Iterator>::markCurrentPackageId(const 
             break;
         case 0x3f:
             mCMFrameworkStart = mCurrent;
+            break;
+        case 0x6f:
+            mNamelessFrameworkStart = mCurrent;
             break;
         case 0x7f:
             mAppStart = mCurrent;
