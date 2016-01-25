@@ -1956,7 +1956,9 @@ public abstract class BaseStatusBar extends SystemUI implements
             entry.icon.set(ic);
             inflateViews(entry, mStackScroller);
         }
-        updateHeadsUp(key, entry, shouldInterrupt, alertAgain);
+        if (mUseHeadsUp) {
+            updateHeadsUp(key, entry, shouldInterrupt, alertAgain);
+        }
         mNotificationData.updateRanking(ranking);
         updateNotifications();
 
