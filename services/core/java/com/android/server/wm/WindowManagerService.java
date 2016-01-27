@@ -313,7 +313,6 @@ public class WindowManagerService extends IWindowManager.Stub
     private static final String SYSTEM_SECURE = "ro.secure";
     private static final String SYSTEM_DEBUGGABLE = "ro.debuggable";
 
-    private static final String PERSIST_SYS_LCD_DENSITY = "persist.sys.lcd_density";
     private static final String DENSITY_OVERRIDE = "ro.config.density_override";
     private static final String SIZE_OVERRIDE = "ro.config.size_override";
 
@@ -8619,9 +8618,6 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public int getInitialDisplayDensity(int displayId) {
-        if (displayId == Display.DEFAULT_DISPLAY) {
-            return DisplayMetrics.DENSITY_DEVICE_DEFAULT;
-        }
         synchronized (mWindowMap) {
             final DisplayContent displayContent = getDisplayContentLocked(displayId);
             if (displayContent != null && displayContent.hasAccess(Binder.getCallingUid())) {
@@ -8635,9 +8631,6 @@ public class WindowManagerService extends IWindowManager.Stub
 
     @Override
     public int getBaseDisplayDensity(int displayId) {
-        if (displayId == Display.DEFAULT_DISPLAY) {
-            return DisplayMetrics.DENSITY_PREFERRED;
-        }
         synchronized (mWindowMap) {
             final DisplayContent displayContent = getDisplayContentLocked(displayId);
             if (displayContent != null && displayContent.hasAccess(Binder.getCallingUid())) {
@@ -8665,7 +8658,6 @@ public class WindowManagerService extends IWindowManager.Stub
             synchronized(mWindowMap) {
                 final DisplayContent displayContent = getDisplayContentLocked(displayId);
                 if (displayContent != null) {
-                    SystemProperties.set(PERSIST_SYS_LCD_DENSITY, Integer.toString(density));
                     setForcedDisplayDensityLocked(displayContent, density);
                     Settings.Global.putString(mContext.getContentResolver(),
                             Settings.Global.DISPLAY_DENSITY_FORCED, Integer.toString(density));
@@ -8673,10 +8665,6 @@ public class WindowManagerService extends IWindowManager.Stub
             }
         } finally {
             Binder.restoreCallingIdentity(ident);
-        }
-        try {
-            ActivityManagerNative.getDefault().restart();
-        } catch (RemoteException e) {
         }
     }
 
@@ -8706,7 +8694,6 @@ public class WindowManagerService extends IWindowManager.Stub
             synchronized(mWindowMap) {
                 final DisplayContent displayContent = getDisplayContentLocked(displayId);
                 if (displayContent != null) {
-                    SystemProperties.set(PERSIST_SYS_LCD_DENSITY, null);
                     setForcedDisplayDensityLocked(displayContent,
                             displayContent.mInitialDisplayDensity);
                     Settings.Global.putString(mContext.getContentResolver(),
@@ -8715,10 +8702,6 @@ public class WindowManagerService extends IWindowManager.Stub
             }
         } finally {
             Binder.restoreCallingIdentity(ident);
-        }
-        try {
-            ActivityManagerNative.getDefault().restart();
-        } catch (RemoteException e) {
         }
     }
 
