@@ -289,8 +289,6 @@ public class Recents extends SystemUI
 
         // Initialize some static datastructures
         TaskStackViewLayoutAlgorithm.initializeCurve();
-        // Load the header bar layout
-        reloadHeaderBarLayout();
 
         mSettingsObserver = new RecentsSettingsObserver(mHandler);
         mSettingsObserver.observe();
@@ -311,6 +309,9 @@ public class Recents extends SystemUI
     @Override
     public void onBootCompleted() {
         mBootCompleted = true;
+        // Load the header bar layout when boot is complete to prevent
+        // a race condition when broadcasting
+        reloadHeaderBarLayout();
     }
 
     /** Shows the Recents. */
