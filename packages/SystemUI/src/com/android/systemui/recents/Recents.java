@@ -267,6 +267,7 @@ public class Recents extends SystemUI
         RecentsTaskLoader.initialize(mContext);
         mInflater = LayoutInflater.from(mContext);
         mSystemServicesProxy = new SystemServicesProxy(mContext);
+        mConfig = RecentsConfiguration.reinitialize(mContext, mSystemServicesProxy);
         mHandler = new Handler();
         mTaskStackBounds = new Rect();
         mAppWidgetHost = new RecentsAppWidgetHost(mContext, Constants.Values.App.AppWidgetHostId);
@@ -289,8 +290,6 @@ public class Recents extends SystemUI
 
         // Initialize some static datastructures
         TaskStackViewLayoutAlgorithm.initializeCurve();
-        // Load the header bar layout
-        reloadHeaderBarLayout();
 
         mSettingsObserver = new RecentsSettingsObserver(mHandler);
         mSettingsObserver.observe();
@@ -311,6 +310,9 @@ public class Recents extends SystemUI
     @Override
     public void onBootCompleted() {
         mBootCompleted = true;
+        // Load the header bar layout when boot is complete to prevent
+        // a race condition when broadcasting
+        reloadHeaderBarLayout();
     }
 
     /** Shows the Recents. */
@@ -579,7 +581,6 @@ public class Recents extends SystemUI
         mStatusBarHeight = res.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
         mNavBarHeight = res.getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_height);
         mNavBarWidth = res.getDimensionPixelSize(com.android.internal.R.dimen.navigation_bar_width);
-        mConfig = RecentsConfiguration.reinitialize(mContext, mSystemServicesProxy);
         mConfig.updateOnConfigurationChange();
         Rect searchBarBounds = new Rect();
         // Try and pre-emptively bind the search widget on startup to ensure that we
