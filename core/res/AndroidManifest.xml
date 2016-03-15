@@ -2773,6 +2773,19 @@
          confirmation UI for full backup/restore -->
     <uses-permission android:name="android.permission.CONFIRM_FULL_BACKUP"/>
 
+    <!-- Allows an application to write to Nameless system settings -->
+    <permission android:name="android.permission.WRITE_NAMELESS_SETTINGS"
+                android:label="@string/permlab_writeNamelessSettings"
+                android:description="@string/permdesc_writeNamelessSettings"
+                android:protectionLevel="dangerous" />
+
+    <!-- Allows an application to write to secure Nameless system settings.
+        <p>Not for use by third-party applications. -->
+    <permission android:name="android.permission.WRITE_NAMELESS_SECURE_SETTINGS"
+                android:label="@string/permlab_writeNamelessSecureSettings"
+                android:description="@string/permdesc_writeNamelessSecureSettings"
+                android:protectionLevel="signature|privileged|development" />
+
     <application android:process="system"
                  android:persistent="true"
                  android:hasCode="false"
