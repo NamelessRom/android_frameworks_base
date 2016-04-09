@@ -74,7 +74,8 @@ public class RecentsConfiguration {
     public int maxNumTasksToLoad;
 
     /** Search bar */
-    public boolean searchBarEnabled = true;
+    private final boolean searchBarEnabledDefault;
+    public boolean searchBarEnabled;
     public int searchBarSpaceHeightPx;
 
     /** Task stack */
@@ -156,6 +157,10 @@ public class RecentsConfiguration {
                 com.android.internal.R.interpolator.linear_out_slow_in);
         quintOutInterpolator = AnimationUtils.loadInterpolator(context,
                 com.android.internal.R.interpolator.decelerate_quint);
+
+        // Search bar
+        searchBarEnabledDefault = context.getResources().getBoolean(
+                R.bool.recents_show_search_bar_default);
     }
 
     /** Updates the configuration to the current context */
@@ -284,7 +289,8 @@ public class RecentsConfiguration {
     public boolean updateShowSearch(Context context) {
         boolean wasEnabled = searchBarEnabled;
         searchBarEnabled = CMSettings.System.getInt(context.getContentResolver(),
-                CMSettings.System.RECENTS_SHOW_SEARCH_BAR, 1) == 1;
+                CMSettings.System.RECENTS_SHOW_SEARCH_BAR,
+                (searchBarEnabledDefault ? 1 : 0)) == 1;
         return wasEnabled != searchBarEnabled;
     }
 
