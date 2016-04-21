@@ -4021,7 +4021,7 @@ public class NotificationManagerService extends SystemService {
                     filter.stats = true;
                     if (ai < args.length-1) {
                         ai++;
-                        filter.since = Long.valueOf(args[ai]);
+                        filter.since = Long.parseLong(args[ai]);
                     } else {
                         filter.since = 0;
                     }
