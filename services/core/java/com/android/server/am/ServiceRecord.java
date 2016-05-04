@@ -459,7 +459,7 @@ final class ServiceRecord extends Binder {
                             Context ctx = null;
                             try {
                                 ctx = ams.mContext.createPackageContext(
-                                        appInfo.packageName, 0);
+                                        appInfo.packageName, 0, new UserHandle(userId));
 
                                 Notification.Builder notiBuilder = new Notification.Builder(ctx);
 
