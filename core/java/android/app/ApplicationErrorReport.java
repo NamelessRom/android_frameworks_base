@@ -187,6 +187,14 @@ public class ApplicationErrorReport implements Parcelable {
         // if the error app is on the system image, look for system apps
         // error receiver
         if ((appFlags&ApplicationInfo.FLAG_SYSTEM) != 0) {
+            // if overlaid, try to resolve the specified receiver first
+            candidate = context.getString(
+                    com.android.internal.R.string.config_error_receiver_system_apps);
+            result = getErrorReportReceiver(pm, packageName, candidate);
+            if (result != null) {
+                return result;
+            }
+
             candidate = SystemProperties.get(SYSTEM_APPS_ERROR_RECEIVER_PROPERTY);
             result = getErrorReportReceiver(pm, packageName, candidate);
             if (result != null) {
