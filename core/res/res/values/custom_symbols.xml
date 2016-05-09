@@ -19,6 +19,16 @@
          SDK.  Instead, put them here. -->
     <private-symbols package="com.android.internal" />
 
+    <!-- CONFIG START -->
+
+    <!-- Use alternative way to blur lockscreen -->
+    <java-symbol type="bool" name="config_use_stackblur" />
+
+    <!-- package name of error reporter for system apps -->
+    <java-symbol type="string" name="config_error_receiver_system_apps" />
+
+    <!-- CONFIG END -->
+
     <!-- Nameless -->
     <java-symbol type="drawable" name="logo_nameless" />
 
@@ -29,9 +39,6 @@
     <java-symbol type="id" name="dexopt_message" />
     <java-symbol type="id" name="dexopt_message_detail" />
     <java-symbol type="id" name="dexopt_progress" />
-
-    <!-- Use alternative way to blur lockscreen -->
-    <java-symbol type="bool" name="config_use_stackblur" />
 
     <!-- Network traffic indicator -->
     <java-symbol type="dimen" name="net_traffic_single_text_size" />
