@@ -17,9 +17,5 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!-- Labels for the WRITE_SETTINGS permission -->
-  <string name="permlab_writeNamelessSettings">NamelessRom Einstellungen für das System ändern</string>
-  <string name="permdesc_writeNamelessSettings">Erlaubt einer App, NamelessRom Systemeinstellungen zu ändern.</string>
   <!-- Labels for the WRITE_SECURE_SETTINGS permission -->
-  <string name="permlab_writeNamelessSecureSettings">NamelessRom Sicherheitseinstellungen für das System ändern</string>
-  <string name="permdesc_writeNamelessSecureSettings">Erlaubt einer App, NamelessRom Systemsicherheitseinstellungen zu ändern. Nicht für normale Apps.</string>
 </resources>
