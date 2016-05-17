@@ -1059,6 +1059,12 @@ public final class SystemServer {
             }
         }
 
+        try {
+            mSystemServiceManager.startService("org.namelessrom.services.NamelessSystemServer");
+        } catch (Throwable e) {
+            Slog.w(TAG, "starting external platform services", e);
+        }
+
         // It is now time to start up the app processes...
 
         try {
