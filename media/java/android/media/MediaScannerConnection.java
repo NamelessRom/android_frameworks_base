@@ -133,6 +133,8 @@ public class MediaScannerConnection implements ServiceConnection {
                 }
                 try {
                     mContext.unbindService(this);
+                    mClient = null;
+                    mService = null;
                 } catch (IllegalArgumentException ex) {
                     if (false) {
                         Log.v(TAG, "disconnect failed: " + ex);
@@ -205,6 +207,7 @@ public class MediaScannerConnection implements ServiceConnection {
         void scanNextPath() {
             if (mNextPath >= mPaths.length) {
                 mConnection.disconnect();
+                mConnection = null;
                 return;
             }
             String mimeType = mMimeTypes != null ? mMimeTypes[mNextPath] : null;
