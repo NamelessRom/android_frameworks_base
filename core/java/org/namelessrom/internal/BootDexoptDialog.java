@@ -128,6 +128,7 @@ public class BootDexoptDialog extends Dialog {
         if (mTotal != total && total > 0) {
             mTotal = total;
             mBootDexoptProgress.setMax(mTotal);
+            mBootDexoptProgress.setSecondaryProgress(mTotal);
         }
 
         if (info == null) {
@@ -145,10 +146,6 @@ public class BootDexoptDialog extends Dialog {
             isApk = true;
             msg = mContext.getResources().getString(com.android.internal.R.string.android_upgrading_apk, current, total);
             mBootDexoptProgress.setProgress(current);
-            // just make it look pretty :P
-            if ((current + 1) <= total) {
-                mBootDexoptProgress.setSecondaryProgress(current + 1);
-            }
         }
 
         // check if the state has changed
