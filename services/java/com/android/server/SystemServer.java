@@ -620,8 +620,10 @@ public final class SystemServer {
         }
 
         try {
-            ActivityManagerNative.getDefault().showBootMessage(null, Integer.MIN_VALUE,
-                    Integer.MIN_VALUE, false);
+            ActivityManagerNative.getDefault().showBootMessage(
+                    context.getResources().getText(
+                            com.android.internal.R.string.android_upgrading_starting_apps),
+                    false);
         } catch (RemoteException e) {
         }
 
